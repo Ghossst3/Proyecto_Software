@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora · {{ orden.folio }} · STIHL Workshop</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
+
+        .navbar {
+            background:#2d2d2d; color:white; padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
+        .navbar .logo span { color:#ff6600; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-greeting .name { font-weight:600; }
+        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+        .btn-logout {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-logout:hover { background:#ff6600; color:white; }
+
+        .main-container { max-width:1000px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
+        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
+        .breadcrumb a { color:#ff6600; text-decoration:none; }
+        .breadcrumb a:hover { text-decoration:underline; }
+
+        /* Banner orden */
+        .orden-banner {
+            background:linear-gradient(135deg,#2d2d2d,#1a1a1a); color:white;
+            border-radius:20px; padding:1.5rem 2rem; margin-bottom:1.5rem;
+            display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .orden-banner .folio { font-size:1.8rem; font-weight:800; color:#ff6600; }
+        .orden-banner .info  { font-size:0.9rem; color:#a0a0a0; margin-top:4px; }
+        .btn-volver {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-volver:hover { background:#ff6600; color:white; }
+
+        .layout { display:grid; grid-template-columns:1fr 1.8fr; gap:1.5rem; align-items:start; }
+
+        /* Formulario */
+        .form-card {
+            background:white; border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.05); overflow:hidden;
+            position:sticky; top:1.5rem;
+        }
+        .form-header { background:#2d2d2d; padding:1.2rem 1.5rem; color:white; }
+        .form-header h3 { font-size:1.1rem; font-weight:600; }
+        .form-header p  { font-size:0.82rem; color:#a0a0a0; margin-top:3px; }
+        .form-body { padding:1.5rem; }
+
+        .input-group { margin-bottom:1.1rem; }
+        .input-group label {
+            display:block; font-size:0.82rem; font-weight:600; color:#2d3e50;
+            margin-bottom:5px; text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .input-group textarea, .input-group select {
+            width:100%; padding:0.65rem 0.9rem; border:1px solid #d9e0e6;
+            border-radius:10px; font-size:0.92rem; background:#fafbfc;
+            transition:all 0.2s; outline:none; resize:vertical;
+        }
+        .input-group textarea:focus, .input-group select:focus {
+            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12); background:white;
+        }
+
+        /* Toggle cambiar estado */
+        .toggle-estado {
+            display:flex; align-items:center; gap:10px; margin-bottom:1rem;
+            padding:0.8rem 1rem; background:#fff8f4; border-radius:10px;
+            border:1px solid #ffd5b0; cursor:pointer;
+        }
+        .toggle-estado input[type="checkbox"] { width:18px; height:18px; accent-color:#ff6600; }
+        .toggle-estado label { font-size:0.9rem; font-weight:600; color:#e65100; cursor:pointer; }
+        .estado-select { display:none; }
+        .estado-select.visible { display:block; }
+
+        .btn-registrar {
+            width:100%; background:#ff6600; color:white; border:none;
+            padding:0.8rem; border-radius:40px; font-size:1rem; font-weight:600;
+            cursor:pointer; transition:all 0.2s; margin-top:0.5rem;
+            box-shadow:0 6px 15px rgba(255,102,0,0.35);
+        }
+        .btn-registrar:hover { background:#e65c00; transform:scale(1.02); }
+
+        /* Sin permiso */
+        .sin-permiso {
+            text-align:center; padding:2rem; color:#9aa9b7;
+            background:#fafbfc; border-radius:12px; border:2px dashed #d9e0e6;
+        }
+        .sin-permiso .icon { font-size:2rem; margin-bottom:0.5rem; }
+
+        /* Timeline bitácora */
+        .timeline-card {
+            background:white; border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.05); overflow:hidden;
+        }
+        .timeline-header {
+            padding:1.2rem 1.5rem; border-bottom:2px solid #ff6600;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .timeline-header h3 { font-size:1.1rem; font-weight:600; color:#2d2d2d; }
+        .count-badge {
+            background:#ff6600; color:white; font-weight:700;
+            padding:0.25rem 0.8rem; border-radius:20px; font-size:0.85rem;
+        }
+
+        .timeline { padding:1.5rem; position:relative; }
+        .timeline::before {
+            content:''; position:absolute; left:2.3rem; top:1.5rem; bottom:1.5rem;
+            width:2px; background:#eaeef2; border-radius:2px;
+        }
+
+        .entrada {
+            display:flex; gap:1rem; margin-bottom:1.5rem; position:relative;
+        }
+        .entrada:last-child { margin-bottom:0; }
+
+        .entrada-dot {
+            width:36px; height:36px; border-radius:50%; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1rem; z-index:1; border:3px solid white;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+        .entrada-dot.con-estado  { background:#ff6600; }
+        .entrada-dot.sin-estado  { background:#6f7d8c; }
+
+        .entrada-body {
+            flex:1; background:#fafbfc; border-radius:12px;
+            padding:1rem 1.2rem; border:1px solid #eaeef2;
+            transition:box-shadow 0.2s;
+        }
+        .entrada-body:hover { box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+
+        .entrada-meta {
+            display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:0.5rem; margin-bottom:0.6rem;
+        }
+        .usuario-info { display:flex; align-items:center; gap:8px; }
+        .avatar-mini {
+            width:28px; height:28px; border-radius:50%;
+            background:linear-gradient(135deg,#ff6600,#e65100);
+            color:white; font-weight:700; font-size:0.78rem;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .usuario-nombre { font-weight:600; font-size:0.88rem; color:#2d2d2d; }
+        .fecha-hora { font-size:0.78rem; color:#9aa9b7; }
+
+        .descripcion-texto {
+            font-size:0.92rem; color:#3e4a5e; line-height:1.6; margin-bottom:0.5rem;
+        }
+
+        .estado-cambio {
+            display:inline-flex; align-items:center; gap:6px;
+            background:#fff3e0; border:1px solid #ffd5b0;
+            border-radius:20px; padding:0.2rem 0.8rem; font-size:0.8rem;
+        }
+        .estado-cambio .anterior { color:#9aa9b7; text-decoration:line-through; }
+        .estado-cambio .flecha   { color:#ff6600; font-weight:700; }
+        .estado-cambio .nuevo    { color:#e65100; font-weight:700; }
+
+        .btn-eliminar-entrada {
+            background:none; border:none; color:#d9e0e6; cursor:pointer;
+            font-size:0.8rem; padding:0.2rem 0.5rem; border-radius:6px;
+            transition:all 0.2s; margin-top:0.3rem;
+        }
+        .btn-eliminar-entrada:hover { color:#c62828; background:#ffebee; }
+
+        .empty-timeline { text-align:center; padding:3rem; color:#9aa9b7; }
+        .empty-timeline .icon { font-size:3rem; margin-bottom:0.5rem; }
+
+        .mensaje {
+            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
+            display:flex; align-items:center; gap:12px; border-left:5px solid;
+            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
+        }
+        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+
+        .badge-estado {
+            padding:0.2rem 0.7rem; border-radius:20px; font-size:0.75rem; font-weight:700;
+        }
+        .badge-estado.recibido              { background:#e3f2fd; color:#1565c0; }
+        .badge-estado.diagnosticando        { background:#fff8e1; color:#f57f17; }
+        .badge-estado.esperando_refacciones { background:#fce4ec; color:#880e4f; }
+        .badge-estado.en_reparacion         { background:#fff3e0; color:#e65100; }
+        .badge-estado.listo                 { background:#e8f5e9; color:#2e7d32; }
+        .badge-estado.entregado             { background:#f3e5f5; color:#6a1b9a; }
+
+        .dashboard-footer {
+            background:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
+            margin-top:3rem; display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
+        .footer-links a:hover { color:#ff6600; }
+        .footer-copy span { color:#ff6600; font-weight:600; }
+
+        @media(max-width:800px) { .layout { grid-template-columns:1fr; } }
+        @media print {
+            .navbar, .breadcrumb, .form-card, .dashboard-footer,
+            .btn-eliminar-entrada { display:none !important; }
+            body { background:white; }
+            .main-container { margin:0; padding:0; max-width:100%; }
+            .timeline-card { box-shadow:none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
+        <a href="{{ url_for('ordenes') }}">Órdenes</a> ›
+        <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}">{{ orden.folio }}</a> ›
+        Bitácora
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+            <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Banner orden -->
+    <div class="orden-banner">
+        <div>
+            <div class="folio">{{ orden.folio }}</div>
+            <div class="info">
+                👥 {{ orden.nombre_cliente }} &nbsp;·&nbsp;
+                🔧 {{ orden.tipo_equipo }} {{ orden.marca }} {{ orden.modelo or '' }} &nbsp;·&nbsp;
+                <span class="badge-estado {{ orden.estado }}">
+                    {{ orden.estado | replace('_',' ') | title }}
+                </span>
+            </div>
+        </div>
+        <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}" class="btn-volver">
+            ← Volver a la orden
+        </a>
+    </div>
+
+    <div class="layout">
+
+        <!-- ── Formulario agregar entrada ── -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3>📝 Registrar avance</h3>
+                <p>Documenta el trabajo realizado en esta orden.</p>
+            </div>
+            <div class="form-body">
+                {% if puede_agregar %}
+                <form action="{{ url_for('agregar_bitacora', orden_id=orden.id) }}" method="POST">
+                    <input type="hidden" name="origen" value="bitacora">
+
+                    <div class="input-group">
+                        <label for="descripcion">Descripción del avance *</label>
+                        <textarea id="descripcion" name="descripcion" rows="4"
+                                  placeholder="Ej. Se realizó diagnóstico del carburador. Se detectó obstrucción en el conducto principal…"
+                                  required></textarea>
+                    </div>
+
+                    <!-- Toggle cambiar estado -->
+                    <div class="toggle-estado" onclick="toggleEstado()">
+                        <input type="checkbox" id="chkEstado" name="cambiar_estado" value="1"
+                               onchange="toggleEstado()">
+                        <label for="chkEstado">🔄 Cambiar estado de la orden</label>
+                    </div>
+
+                    <div class="input-group estado-select" id="estadoSelect">
+                        <label for="estado_nuevo">Nuevo estado</label>
+                        <select id="estado_nuevo" name="estado_nuevo">
+                            <option value="">— Sin cambio —</option>
+                            {% set estados = [
+                                ('recibido',              'Recibido'),
+                                ('diagnosticando',        'Diagnosticando'),
+                                ('esperando_refacciones', 'Esperando Refacciones'),
+                                ('en_reparacion',         'En Reparación'),
+                                ('listo',                 'Listo'),
+                                ('entregado',             'Entregado')
+                            ] %}
+                            {% for val, label in estados %}
+                            <option value="{{ val }}"
+                                {{ 'selected' if val == orden.estado }}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-registrar">Registrar avance →</button>
+                </form>
+                {% else %}
+                <div class="sin-permiso">
+                    <div class="icon">🔒</div>
+                    <p>Solo técnicos y encargados pueden registrar avances.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ── Timeline de bitácora ── -->
+        <div class="timeline-card">
+            <div class="timeline-header">
+                <h3>📋 Historial de avances</h3>
+                <span class="count-badge">{{ entradas | length }} entrada(s)</span>
+            </div>
+
+            {% if entradas %}
+            <div class="timeline">
+                {% for e in entradas %}
+                <div class="entrada">
+                    <div class="entrada-dot {{ 'con-estado' if e.estado_nuevo else 'sin-estado' }}">
+                        {{ '🔄' if e.estado_nuevo else '📝' }}
+                    </div>
+                    <div class="entrada-body">
+                        <div class="entrada-meta">
+                            <div class="usuario-info">
+                                <div class="avatar-mini">{{ e.usuario_nombre[0] | upper }}</div>
+                                <span class="usuario-nombre">{{ e.usuario_nombre }}</span>
+                                <span style="font-size:0.75rem;color:#9aa9b7;">@{{ e.nombre_usuario }}</span>
+                            </div>
+                            <span class="fecha-hora">
+                                {{ e.fecha_hora.strftime('%d/%m/%Y %H:%M') }}
+                            </span>
+                        </div>
+
+                        <div class="descripcion-texto">{{ e.descripcion }}</div>
+
+                        {% if e.estado_nuevo %}
+                        <div class="estado-cambio">
+                            <span class="anterior">{{ e.estado_anterior | replace('_',' ') | title if e.estado_anterior else '—' }}</span>
+                            <span class="flecha">→</span>
+                            <span class="nuevo">{{ e.estado_nuevo | replace('_',' ') | title }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if rol in ['dueño', 'encargado_mostrador'] %}
+                        <form method="POST"
+                              action="{{ url_for('eliminar_bitacora', entrada_id=e.id) }}"
+                              onsubmit="return confirm('¿Eliminar esta entrada de la bitácora?')">
+                            <button type="submit" class="btn-eliminar-entrada">🗑 Eliminar</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-timeline">
+                <div class="icon">📋</div>
+                <p>Aún no hay avances registrados para esta orden.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<div class="dashboard-footer">
+    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+
+<script>
+function toggleEstado() {
+    const chk    = document.getElementById('chkEstado');
+    const select = document.getElementById('estadoSelect');
+    chk.checked
+        ? select.classList.add('visible')
+        : select.classList.remove('visible');
+}
+</script>
+</body>
+</html>

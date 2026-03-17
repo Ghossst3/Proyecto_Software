@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios · STIHL Workshop</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
+
+        .navbar {
+            background:#2d2d2d; color:white; padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
+        .navbar .logo span { color:#ff6600; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-greeting .name { font-weight:600; }
+        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+        .btn-logout {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-logout:hover { background:#ff6600; color:white; }
+
+        .main-container { max-width:1100px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
+        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
+        .breadcrumb a { color:#ff6600; text-decoration:none; }
+
+        .section-header {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
+        }
+        .section-title {
+            font-size:1.8rem; font-weight:600; color:#2d2d2d;
+            display:flex; align-items:center; gap:10px;
+        }
+        .section-title .bar {
+            background:#ff6600; width:8px; height:32px;
+            border-radius:4px; display:inline-block;
+        }
+        .btn-nuevo {
+            background:#ff6600; color:white; padding:0.7rem 1.5rem;
+            border-radius:40px; font-weight:600; font-size:0.95rem;
+            text-decoration:none; transition:all 0.2s;
+            box-shadow:0 6px 15px rgba(255,102,0,0.35);
+        }
+        .btn-nuevo:hover { background:#e65c00; transform:scale(1.02); }
+
+        /* Stats */
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr));
+            gap:1rem; margin-bottom:1.5rem;
+        }
+        .stat-card {
+            background:white; border-radius:16px; padding:1.2rem 1.5rem;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); border-left:4px solid #eaeef2;
+        }
+        .stat-card .count { font-size:2rem; font-weight:700; color:#2d2d2d; }
+        .stat-card .label { font-size:0.78rem; color:#6f7d8c; text-transform:uppercase; font-weight:600; }
+        .stat-card.total    { border-left-color:#ff6600; }
+        .stat-card.activos  { border-left-color:#2e7d32; }
+        .stat-card.inactivos{ border-left-color:#c62828; }
+
+        .mensaje {
+            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
+            display:flex; align-items:center; gap:12px; border-left:5px solid;
+            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
+        }
+        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+
+        .search-bar {
+            background:white; border-radius:16px; padding:1rem 1.5rem;
+            margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); flex-wrap:wrap;
+        }
+        .search-bar input, .search-bar select {
+            border:1px solid #d9e0e6; border-radius:10px;
+            padding:0.6rem 1rem; font-size:0.95rem; outline:none; background:#fafbfc;
+        }
+        .search-bar input { flex:1; min-width:200px; }
+        .search-bar input:focus, .search-bar select:focus {
+            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12);
+        }
+
+        .table-card {
+            background:white; border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.04); overflow:hidden;
+        }
+        .table-responsive { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; }
+        thead tr { border-bottom:2px solid #ff6600; }
+        thead th {
+            padding:1rem; text-align:left; font-size:0.82rem;
+            text-transform:uppercase; letter-spacing:0.5px;
+            color:#2d2d2d; font-weight:600;
+        }
+        tbody tr { border-bottom:1px solid #eaeef2; transition:background 0.15s; }
+        tbody tr:hover { background:#fff8f4; }
+        tbody tr:last-child { border-bottom:none; }
+        tbody tr.inactivo { opacity:0.55; }
+        td { padding:0.9rem 1rem; font-size:0.92rem; color:#3e4a5e; vertical-align:middle; }
+
+        .avatar {
+            width:38px; height:38px; border-radius:50%;
+            background:linear-gradient(135deg, #ff6600, #e65100);
+            display:flex; align-items:center; justify-content:center;
+            color:white; font-weight:700; font-size:1rem;
+        }
+        .usuario-info { display:flex; align-items:center; gap:12px; }
+        .usuario-info .nombre { font-weight:600; color:#2d2d2d; }
+        .usuario-info .username { font-size:0.78rem; color:#9aa9b7; }
+
+        .badge-rol {
+            padding:0.25rem 0.8rem; border-radius:20px;
+            font-size:0.78rem; font-weight:700;
+        }
+        .badge-rol.dueño               { background:#fff3e0; color:#e65100; }
+        .badge-rol.encargado_mostrador  { background:#e3f2fd; color:#1565c0; }
+        .badge-rol.tecnico             { background:#e8f5e9; color:#2e7d32; }
+        .badge-rol.almacenista         { background:#f3e5f5; color:#6a1b9a; }
+
+        .badge-estado {
+            padding:0.25rem 0.8rem; border-radius:20px;
+            font-size:0.78rem; font-weight:700;
+        }
+        .badge-estado.activo   { background:#e8f5e9; color:#2e7d32; }
+        .badge-estado.inactivo { background:#ffebee; color:#c62828; }
+
+        .acciones { display:flex; gap:0.5rem; flex-wrap:wrap; }
+        .btn-accion {
+            padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem;
+            font-weight:600; text-decoration:none; transition:all 0.2s; border:none; cursor:pointer;
+        }
+        .btn-editar    { background:#e3f2fd; color:#1565c0; }
+        .btn-editar:hover { background:#1565c0; color:white; }
+        .btn-desactivar{ background:#ffebee; color:#c62828; }
+        .btn-desactivar:hover { background:#c62828; color:white; }
+        .btn-activar   { background:#e8f5e9; color:#2e7d32; }
+        .btn-activar:hover { background:#2e7d32; color:white; }
+
+        .empty-state { text-align:center; padding:4rem; color:#6f7d8c; }
+        .empty-state .icon { font-size:4rem; margin-bottom:1rem; }
+
+        .dashboard-footer {
+            background:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
+            margin-top:3rem; display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
+        .footer-links a:hover { color:#ff6600; }
+        .footer-copy span { color:#ff6600; font-weight:600; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> › Usuarios
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+            <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="section-header">
+        <div class="section-title"><span class="bar"></span> 👥 Usuarios del sistema</div>
+        <a href="{{ url_for('nuevo_usuario') }}" class="btn-nuevo">+ Nuevo usuario</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="count">{{ lista | length }}</div>
+            <div class="label">Total usuarios</div>
+        </div>
+        <div class="stat-card activos">
+            <div class="count">{{ lista | selectattr('activo','eq',1) | list | length }}</div>
+            <div class="label">Activos</div>
+        </div>
+        <div class="stat-card inactivos">
+            <div class="count">{{ lista | selectattr('activo','eq',0) | list | length }}</div>
+            <div class="label">Inactivos</div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar por nombre o usuario…" oninput="filtrar()">
+        <select id="filtroRol" onchange="filtrar()">
+            <option value="">Todos los roles</option>
+            <option value="dueño">Dueño</option>
+            <option value="Encargado Mostrador">Encargado Mostrador</option>
+            <option value="Tecnico">Técnico</option>
+            <option value="Almacenista">Almacenista</option>
+        </select>
+        <select id="filtroEstado" onchange="filtrar()">
+            <option value="">Todos</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos</option>
+        </select>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if lista %}
+                        {% for u in lista %}
+                        <tr class="fila-usuario {{ 'inactivo' if not u.activo }}"
+                            data-rol="{{ u.rol }}"
+                            data-estado="{{ 'activo' if u.activo else 'inactivo' }}">
+                            <td>
+                                <div class="usuario-info">
+                                    <div class="avatar">{{ u.nombre_completo[0] | upper }}</div>
+                                    <div>
+                                        <div class="nombre">{{ u.nombre_completo }}</div>
+                                        <div class="username">@{{ u.nombre_usuario }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ u.email or '—' }}</td>
+                            <td>
+                                <span class="badge-rol {{ u.rol }}">
+                                    {{ u.rol | replace('_', ' ') | title }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-estado {{ 'activo' if u.activo else 'inactivo' }}">
+                                    {{ 'Activo' if u.activo else 'Inactivo' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="acciones">
+                                    <a href="{{ url_for('editar_usuario', user_id=u.id) }}"
+                                       class="btn-accion btn-editar">Editar</a>
+                                    <form method="POST"
+                                          action="{{ url_for('toggle_usuario', user_id=u.id) }}"
+                                          style="display:inline;">
+                                        {% if u.activo %}
+                                        <button type="submit" class="btn-accion btn-desactivar"
+                                                data-nombre="{{ u.nombre_completo }}"
+                                                onclick="return confirm('¿Desactivar ' + this.dataset.nombre + '?')">
+                                            Desactivar
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" class="btn-accion btn-activar">
+                                            Activar
+                                        </button>
+                                        {% endif %}
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="5">
+                            <div class="empty-state">
+                                <div class="icon">👥</div>
+                                <p>No hay usuarios registrados.</p>
+                            </div>
+                        </td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-footer">
+    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+
+<script>
+function filtrar() {
+    const texto  = document.getElementById('searchInput').value.toLowerCase();
+    const rol    = document.getElementById('filtroRol').value;
+    const estado = document.getElementById('filtroEstado').value;
+    document.querySelectorAll('.fila-usuario').forEach(fila => {
+        const okTexto  = fila.textContent.toLowerCase().includes(texto);
+        const okRol    = !rol    || fila.dataset.rol    === rol;
+        const okEstado = !estado || fila.dataset.estado === estado;
+        fila.style.display = (okTexto && okRol && okEstado) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

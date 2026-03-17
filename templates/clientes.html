@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes · STIHL Workshop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background-color: #f0f3f7; min-height: 100vh; display: flex; flex-direction: column; }
+
+        .navbar {
+            background-color: #2d2d2d; color: white;
+            padding: 0.8rem 2rem; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size: 1.8rem; font-weight: 600; }
+        .navbar .logo span { color: #ff6600; }
+        .user-area { display: flex; align-items: center; gap: 20px; }
+        .user-greeting .name { font-weight: 600; }
+        .user-greeting .role { font-size: 0.8rem; color: #ccc; text-transform: uppercase; }
+        .btn-logout {
+            background: transparent; border: 2px solid #ff6600;
+            color: #ff6600; padding: 0.5rem 1.2rem; border-radius: 40px;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            text-decoration: none; transition: all 0.2s;
+        }
+        .btn-logout:hover { background-color: #ff6600; color: white; }
+
+        .main-container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; width: 100%; flex: 1; }
+
+        /* Breadcrumb */
+        .breadcrumb { font-size: 0.9rem; color: #6f7d8c; margin-bottom: 1.5rem; }
+        .breadcrumb a { color: #ff6600; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* Cabecera sección */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .section-title { font-size: 1.8rem; font-weight: 600; color: #2d2d2d;
+            display: flex; align-items: center; gap: 10px; }
+        .section-title .bar { background-color: #ff6600; width: 8px; height: 32px;
+            border-radius: 4px; display: inline-block; }
+
+        .btn-nuevo {
+            background-color: #ff6600; color: white;
+            padding: 0.7rem 1.5rem; border-radius: 40px;
+            font-weight: 600; font-size: 0.95rem; text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 6px 15px rgba(255,102,0,0.35);
+        }
+        .btn-nuevo:hover { background-color: #e65c00; transform: scale(1.02); }
+
+        /* Flash messages */
+        .mensaje {
+            padding: 1rem 1.5rem; border-radius: 12px; font-weight: 500;
+            display: flex; align-items: center; gap: 12px;
+            border-left: 5px solid; background-color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+        }
+        .mensaje.error   { border-left-color: #c62828; color: #c62828; }
+        .mensaje.success { border-left-color: #2e7d32; color: #2e7d32; }
+        .mensaje.warning { border-left-color: #e65100; color: #e65100; }
+        .mensaje.info    { border-left-color: #1565c0; color: #1565c0; }
+
+        /* Barra de búsqueda */
+        .search-bar {
+            background: white; border-radius: 16px; padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+        }
+        .search-bar input {
+            flex: 1; border: 1px solid #d9e0e6; border-radius: 10px;
+            padding: 0.6rem 1rem; font-size: 0.95rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-bar input:focus { border-color: #ff6600; box-shadow: 0 0 0 3px rgba(255,102,0,0.12); }
+        .search-bar select {
+            border: 1px solid #d9e0e6; border-radius: 10px;
+            padding: 0.6rem 1rem; font-size: 0.95rem; outline: none;
+            background: #fafbfc; cursor: pointer;
+        }
+
+        /* Tabla */
+        .table-card {
+            background: white; border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04); overflow: hidden;
+        }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { border-bottom: 2px solid #ff6600; }
+        thead th {
+            padding: 1rem 1.2rem; text-align: left;
+            font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 0.5px; color: #2d2d2d; font-weight: 600;
+        }
+        tbody tr { border-bottom: 1px solid #eaeef2; transition: background 0.15s; }
+        tbody tr:hover { background-color: #fff8f4; }
+        tbody tr:last-child { border-bottom: none; }
+        td { padding: 1rem 1.2rem; font-size: 0.95rem; color: #3e4a5e; }
+
+        .badge-tipo {
+            padding: 0.2rem 0.8rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .badge-tipo.persona_fisica { background-color: #e3f2fd; color: #1565c0; }
+        .badge-tipo.empresa        { background-color: #fff3e0; color: #e65100; }
+
+        .acciones { display: flex; gap: 0.6rem; }
+        .btn-accion {
+            padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.82rem;
+            font-weight: 600; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+        }
+        .btn-editar  { background-color: #e3f2fd; color: #1565c0; }
+        .btn-editar:hover  { background-color: #1565c0; color: white; }
+        .btn-eliminar { background-color: #ffebee; color: #c62828; }
+        .btn-eliminar:hover { background-color: #c62828; color: white; }
+
+        /* Sin resultados */
+        .empty-state {
+            text-align: center; padding: 4rem 2rem; color: #6f7d8c;
+        }
+        .empty-state .icon { font-size: 4rem; margin-bottom: 1rem; }
+        .empty-state p { font-size: 1.1rem; }
+
+        /* Footer */
+        .dashboard-footer {
+            background-color: #2d2d2d; color: #a0a0a0;
+            padding: 1.5rem 2rem; margin-top: 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 1rem;
+        }
+        .footer-links a { color: #ccc; text-decoration: none; margin-right: 2rem; font-size: 0.9rem; }
+        .footer-links a:hover { color: #ff6600; }
+        .footer-copy span { color: #ff6600; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> › Clientes
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mensaje {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Cabecera -->
+    <div class="section-header">
+        <div class="section-title">
+            <span class="bar"></span> 👥 Clientes
+        </div>
+        <a href="{{ url_for('nuevo_cliente') }}" class="btn-nuevo">+ Registrar cliente</a>
+    </div>
+
+    <!-- Búsqueda rápida (funciona con JS puro) -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar por nombre, teléfono o email…" oninput="filtrar()">
+        <select id="filtroTipo" onchange="filtrar()">
+            <option value="">Todos los tipos</option>
+            <option value="persona_fisica">Persona física</option>
+            <option value="empresa">Empresa</option>
+        </select>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table id="tablaClientes">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre / Empresa</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Fecha registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if clientes %}
+                        {% for c in clientes %}
+                        <tr class="fila-cliente" data-tipo="{{ c.tipo_cliente }}">
+                            <td>{{ c.id }}</td>
+                            <td><strong>{{ c.nombre_completo }}</strong>
+                                {% if c.rfc %}<br><small style="color:#9aa9b7">RFC: {{ c.rfc }}</small>{% endif %}
+                            </td>
+                            <td>{{ c.telefono or '—' }}</td>
+                            <td>{{ c.email or '—' }}</td>
+                            <td>
+                                <span class="badge-tipo {{ c.tipo_cliente }}">
+                                    {{ 'Persona física' if c.tipo_cliente == 'persona_fisica' else 'Empresa' }}
+                                </span>
+                            </td>
+                            <td>{{ c.fecha_registro.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <div class="acciones">
+                                    <a href="{{ url_for('editar_cliente', cliente_id=c.id) }}" class="btn-accion btn-editar">Editar</a>
+                                    <a href="{{ url_for('eliminar_cliente', cliente_id=c.id) }}"
+                                       class="btn-accion btn-eliminar"
+                                       onclick="return confirm('¿Eliminar a {{ c.nombre_completo }}?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <div class="icon">👥</div>
+                                    <p>Aún no hay clientes registrados.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="dashboard-footer">
+    <div class="footer-links">
+        <a href="#">SOPORTE TÉCNICO</a>
+        <a href="#">CONTACTO</a>
+    </div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+
+<script>
+function filtrar() {
+    const texto = document.getElementById('searchInput').value.toLowerCase();
+    const tipo  = document.getElementById('filtroTipo').value;
+    document.querySelectorAll('.fila-cliente').forEach(fila => {
+        const contenido = fila.textContent.toLowerCase();
+        const coincideTipo  = !tipo || fila.dataset.tipo === tipo;
+        const coincideTexto = contenido.includes(texto);
+        fila.style.display = (coincideTipo && coincideTexto) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

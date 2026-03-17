@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refacciones · {{ orden.folio }} · STIHL Workshop</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
+
+        .navbar {
+            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
+        .navbar .logo span { color:#ff6600; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-greeting .name { font-weight:600; }
+        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+        .btn-logout {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-logout:hover { background-color:#ff6600; color:white; }
+
+        .main-container { max-width:1100px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
+
+        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
+        .breadcrumb a { color:#ff6600; text-decoration:none; }
+        .breadcrumb a:hover { text-decoration:underline; }
+
+        /* Cabecera orden */
+        .orden-banner {
+            background:linear-gradient(135deg, #2d2d2d, #1a1a1a);
+            color:white; border-radius:20px; padding:1.5rem 2rem;
+            margin-bottom:1.5rem; display:flex;
+            justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .orden-banner .folio { font-size:1.8rem; font-weight:800; color:#ff6600; }
+        .orden-banner .info  { font-size:0.9rem; color:#a0a0a0; margin-top:4px; }
+        .orden-banner .btn-volver {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .orden-banner .btn-volver:hover { background:#ff6600; color:white; }
+
+        .layout { display:grid; grid-template-columns:1fr 1.6fr; gap:1.5rem; align-items:start; }
+
+        /* Formulario agregar */
+        .form-card {
+            background:white; border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.05); overflow:hidden;
+            position:sticky; top:1.5rem;
+        }
+        .form-header { background:#2d2d2d; padding:1.2rem 1.5rem; color:white; }
+        .form-header h3 { font-size:1.1rem; font-weight:600; }
+        .form-header p  { font-size:0.82rem; color:#a0a0a0; margin-top:3px; }
+        .form-body { padding:1.5rem; }
+
+        .input-group { margin-bottom:1rem; }
+        .input-group label {
+            display:block; font-size:0.82rem; font-weight:600; color:#2d3e50;
+            margin-bottom:5px; text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .input-group input, .input-group select, .input-group textarea {
+            width:100%; padding:0.65rem 0.9rem; border:1px solid #d9e0e6;
+            border-radius:10px; font-size:0.92rem; background:#fafbfc;
+            transition:all 0.2s; outline:none;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12); background:white;
+        }
+        .precio-preview {
+            background:#fff8f4; border:1px solid #ffd5b0; border-radius:10px;
+            padding:0.6rem 1rem; font-size:0.88rem; color:#e65100;
+            margin-top:0.5rem; display:none;
+        }
+        .btn-agregar {
+            width:100%; background:#ff6600; color:white; border:none;
+            padding:0.8rem; border-radius:40px; font-size:1rem; font-weight:600;
+            cursor:pointer; transition:all 0.2s; margin-top:0.5rem;
+            box-shadow:0 6px 15px rgba(255,102,0,0.35);
+        }
+        .btn-agregar:hover { background:#e65c00; transform:scale(1.02); }
+
+        /* Lista de refacciones usadas */
+        .lista-card {
+            background:white; border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.05); overflow:hidden;
+        }
+        .lista-header {
+            padding:1.2rem 1.5rem; border-bottom:2px solid #ff6600;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .lista-header h3 { font-size:1.1rem; font-weight:600; color:#2d2d2d; }
+        .total-badge {
+            background:#ff6600; color:white; font-weight:700;
+            padding:0.3rem 1rem; border-radius:20px; font-size:0.9rem;
+        }
+
+        table { width:100%; border-collapse:collapse; }
+        thead th {
+            padding:0.8rem 1rem; text-align:left; font-size:0.78rem;
+            text-transform:uppercase; letter-spacing:0.4px; color:#6f7d8c;
+            border-bottom:1px solid #eaeef2; font-weight:600;
+        }
+        tbody tr { border-bottom:1px solid #eaeef2; transition:background 0.15s; }
+        tbody tr:hover { background:#fff8f4; }
+        tbody tr:last-child { border-bottom:none; }
+        td { padding:0.85rem 1rem; font-size:0.9rem; color:#3e4a5e; }
+
+        .ref-nombre { font-weight:600; color:#2d2d2d; display:block; }
+        .ref-codigo { font-size:0.78rem; color:#9aa9b7; }
+
+        .btn-eliminar-item {
+            background:#ffebee; color:#c62828; border:none;
+            padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem;
+            font-weight:600; cursor:pointer; transition:all 0.2s;
+        }
+        .btn-eliminar-item:hover { background:#c62828; color:white; }
+
+        .empty-ref {
+            text-align:center; padding:2.5rem; color:#9aa9b7;
+        }
+        .empty-ref .icon { font-size:2.5rem; margin-bottom:0.5rem; }
+
+        /* Total final */
+        .total-row {
+            background:#f0f3f7; padding:1rem 1.5rem;
+            display:flex; justify-content:flex-end; align-items:center; gap:1rem;
+            border-top:2px solid #eaeef2;
+        }
+        .total-label { font-size:1rem; color:#6f7d8c; font-weight:500; }
+        .total-valor { font-size:1.4rem; font-weight:800; color:#ff6600; }
+
+        .mensaje {
+            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
+            display:flex; align-items:center; gap:12px; border-left:5px solid;
+            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
+        }
+        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+
+        .dashboard-footer {
+            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
+            margin-top:3rem; display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
+        .footer-links a:hover { color:#ff6600; }
+        .footer-copy span { color:#ff6600; font-weight:600; }
+
+        @media(max-width:800px) { .layout { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
+        <a href="{{ url_for('ordenes') }}">Órdenes</a> ›
+        <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}">{{ orden.folio }}</a> ›
+        Refacciones usadas
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+            <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Banner de la orden -->
+    <div class="orden-banner">
+        <div>
+            <div class="folio">{{ orden.folio }}</div>
+            <div class="info">
+                👥 {{ orden.nombre_cliente }} &nbsp;·&nbsp;
+                🔧 {{ orden.tipo_equipo }} {{ orden.marca }} {{ orden.modelo or '' }}
+            </div>
+        </div>
+        <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}" class="btn-volver">
+            ← Volver a la orden
+        </a>
+    </div>
+
+    <div class="layout">
+
+        <!-- ── Formulario agregar refaccion ── -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3>➕ Agregar refacción</h3>
+                <p>Solo se muestran refacciones con stock disponible.</p>
+            </div>
+            <div class="form-body">
+                <form action="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" method="POST">
+
+                    <div class="input-group">
+                        <label for="refaccion_id">Refacción *</label>
+                        <select id="refaccion_id" name="refaccion_id" required
+                                onchange="actualizarPrecio(this)">
+                            <option value="">— Selecciona —</option>
+                            {% for r in refacciones_disponibles %}
+                            <option value="{{ r.id }}"
+                                    data-precio="{{ r.precio_venta }}"
+                                    data-stock="{{ r.stock_actual }}"
+                                    data-unidad="{{ r.unidad }}">
+                                {{ r.nombre }}
+                                ({{ r.codigo }}) · Stock: {{ r.stock_actual }} {{ r.unidad }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="precio-preview" id="precioPreview"></div>
+
+                    <div class="input-group">
+                        <label for="cantidad">Cantidad *</label>
+                        <input type="number" id="cantidad" name="cantidad"
+                               min="1" value="1" required
+                               oninput="calcularSubtotal()">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="precio_unitario">Precio unitario ($) *</label>
+                        <input type="number" id="precio_unitario" name="precio_unitario"
+                               min="0" step="0.01" required
+                               oninput="calcularSubtotal()">
+                    </div>
+
+                    <div class="precio-preview" id="subtotalPreview" style="display:block; background:#e8f5e9; border-color:#a5d6a7; color:#2e7d32;">
+                        Subtotal: <strong id="subtotalValor">$0.00</strong>
+                    </div>
+
+                    <div class="input-group" style="margin-top:1rem;">
+                        <label for="notas">Notas (opcional)</label>
+                        <input type="text" id="notas" name="notas"
+                               placeholder="Ej. Instalada en carburador principal">
+                    </div>
+
+                    <button type="submit" class="btn-agregar">Agregar a la orden →</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Lista de refacciones usadas ── -->
+        <div class="lista-card">
+            <div class="lista-header">
+                <h3>🔩 Refacciones utilizadas</h3>
+                <span class="total-badge">{{ items_actuales | length }} pieza(s)</span>
+            </div>
+
+            {% if items_actuales %}
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Refacción</th>
+                            <th>Cant.</th>
+                            <th>Precio unit.</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items_actuales %}
+                        <tr>
+                            <td>
+                                <span class="ref-nombre">{{ item.nombre_refaccion }}</span>
+                                <span class="ref-codigo">{{ item.codigo }}</span>
+                                {% if item.notas %}
+                                    <span style="font-size:0.78rem; color:#9aa9b7; display:block;">
+                                        📝 {{ item.notas }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.cantidad }} {{ item.unidad }}</td>
+                            <td>${{ '%.2f' % item.precio_unitario }}</td>
+                            <td style="font-weight:700; color:#2d2d2d;">
+                                ${{ '%.2f' % item.subtotal }}
+                            </td>
+                            <td>
+                                <form method="POST"
+                                      action="{{ url_for('eliminar_refaccion_orden', item_id=item.id) }}"
+                                      onsubmit="return confirm('¿Quitar esta refacción? El stock será restaurado.')">
+                                    <button type="submit" class="btn-eliminar-item">Quitar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Total en refacciones:</span>
+                <span class="total-valor">${{ '%.2f' % total_refacciones }}</span>
+            </div>
+            {% else %}
+            <div class="empty-ref">
+                <div class="icon">🔩</div>
+                <p>Aún no se han agregado refacciones a esta orden.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<div class="dashboard-footer">
+    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+
+<script>
+function actualizarPrecio(select) {
+    const opt     = select.options[select.selectedIndex];
+    const precio  = opt.dataset.precio || 0;
+    const stock   = opt.dataset.stock  || 0;
+    const unidad  = opt.dataset.unidad || '';
+    const preview = document.getElementById('precioPreview');
+    const inputPrecio = document.getElementById('precio_unitario');
+    const inputCant   = document.getElementById('cantidad');
+
+    if (select.value) {
+        inputPrecio.value = parseFloat(precio).toFixed(2);
+        inputCant.max     = stock;
+        preview.style.display = 'block';
+        preview.textContent   = `Precio sugerido: $${parseFloat(precio).toFixed(2)} · Stock disponible: ${stock} ${unidad}`;
+        calcularSubtotal();
+    } else {
+        preview.style.display = 'none';
+        inputPrecio.value = '';
+    }
+}
+
+function calcularSubtotal() {
+    const cant   = parseFloat(document.getElementById('cantidad').value) || 0;
+    const precio = parseFloat(document.getElementById('precio_unitario').value) || 0;
+    document.getElementById('subtotalValor').textContent = '$' + (cant * precio).toFixed(2);
+}
+</script>
+</body>
+</html>

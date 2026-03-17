@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ cot.folio }} · STIHL Workshop</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
+        .navbar {
+            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
+        .navbar .logo span { color:#ff6600; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-greeting .name { font-weight:600; }
+        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+        .btn-logout {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-logout:hover { background-color:#ff6600; color:white; }
+
+        .main-container { max-width:900px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
+        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
+        .breadcrumb a { color:#ff6600; text-decoration:none; }
+
+        /* Cabecera */
+        .cot-header {
+            background:linear-gradient(135deg,#2d2d2d,#1a1a1a); color:white;
+            border-radius:20px; padding:2rem; margin-bottom:1.5rem;
+            display:flex; justify-content:space-between; align-items:flex-start;
+            flex-wrap:wrap; gap:1rem;
+        }
+        .cot-folio { font-size:2.5rem; font-weight:800; color:#ff6600; }
+        .cot-fecha { font-size:0.85rem; color:#a0a0a0; margin-top:4px; }
+
+        .badge-estado {
+            padding:0.4rem 1.2rem; border-radius:20px; font-size:0.9rem; font-weight:700;
+        }
+        .badge-estado.borrador  { background:#f5f5f5; color:#757575; }
+        .badge-estado.enviada   { background:#e3f2fd; color:#1565c0; }
+        .badge-estado.aprobada  { background:#e8f5e9; color:#2e7d32; }
+        .badge-estado.rechazada { background:#ffebee; color:#c62828; }
+        .badge-estado.vencida   { background:#fff3e0; color:#e65100; }
+
+        .acciones-bar { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+        .btn-accion-lg {
+            padding:0.7rem 1.5rem; border-radius:40px; font-size:0.95rem;
+            font-weight:600; text-decoration:none; transition:all 0.2s; border:none; cursor:pointer;
+        }
+        .btn-volver    { background:#f0f3f7; color:#6f7d8c; }
+        .btn-volver:hover { background:#d9e0e6; }
+        .btn-imprimir  { background:#e3f2fd; color:#1565c0; }
+        .btn-imprimir:hover { background:#1565c0; color:white; }
+
+        /* Cambiar estado */
+        .estado-form {
+            background:white; border-radius:16px; padding:1.5rem;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); margin-bottom:1.5rem;
+        }
+        .estado-form h4 {
+            font-size:0.85rem; text-transform:uppercase; color:#ff6600;
+            font-weight:700; margin-bottom:1rem; letter-spacing:0.5px;
+        }
+        .estados-grid { display:flex; flex-wrap:wrap; gap:0.8rem; }
+        .btn-estado {
+            padding:0.5rem 1.2rem; border-radius:20px; border:2px solid #d9e0e6;
+            background:white; font-size:0.85rem; font-weight:600;
+            cursor:pointer; transition:all 0.2s; color:#3e4a5e;
+        }
+        .btn-estado:hover { border-color:#ff6600; color:#ff6600; }
+        .btn-estado.activo { background:#ff6600; color:white; border-color:#ff6600; }
+
+        /* Cuerpo cotización */
+        .grid-info { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+        .info-card {
+            background:white; border-radius:16px; padding:1.5rem;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04);
+        }
+        .info-card h4 {
+            font-size:0.85rem; text-transform:uppercase; color:#ff6600;
+            font-weight:700; margin-bottom:1rem; padding-bottom:0.5rem;
+            border-bottom:2px solid #ff6600; letter-spacing:0.5px;
+        }
+        .info-row { display:flex; justify-content:space-between;
+            padding:0.4rem 0; border-bottom:1px solid #f0f3f7; font-size:0.9rem; }
+        .info-row:last-child { border-bottom:none; }
+        .info-row .key { color:#6f7d8c; }
+        .info-row .val { font-weight:600; color:#2d2d2d; }
+
+        /* Tabla de conceptos */
+        .conceptos-card {
+            background:white; border-radius:20px; overflow:hidden;
+            box-shadow:0 8px 20px rgba(0,0,0,0.04); margin-bottom:1.5rem;
+        }
+        .conceptos-card h4 {
+            padding:1.2rem 1.5rem; font-size:0.85rem; text-transform:uppercase;
+            color:#ff6600; font-weight:700; border-bottom:2px solid #ff6600;
+            letter-spacing:0.5px;
+        }
+        table { width:100%; border-collapse:collapse; }
+        thead th {
+            padding:0.8rem 1rem; text-align:left; font-size:0.8rem;
+            text-transform:uppercase; color:#6f7d8c; font-weight:600;
+            border-bottom:1px solid #eaeef2;
+        }
+        tbody tr { border-bottom:1px solid #eaeef2; }
+        tbody tr:last-child { border-bottom:none; }
+        td { padding:0.85rem 1rem; font-size:0.92rem; color:#3e4a5e; }
+
+        .totales-section {
+            padding:1.2rem 1.5rem; background:#f9fafb;
+            border-top:2px solid #eaeef2;
+        }
+        .totales-row {
+            display:flex; justify-content:flex-end; gap:3rem;
+            padding:0.3rem 0; font-size:0.95rem; color:#3e4a5e;
+        }
+        .totales-row .lbl { min-width:120px; text-align:right; }
+        .totales-row .val { min-width:80px; text-align:right; font-weight:600; }
+        .totales-row.final {
+            border-top:2px solid #ff6600; margin-top:0.5rem; padding-top:0.8rem;
+            font-size:1.2rem; font-weight:800; color:#2d2d2d;
+        }
+        .totales-row.final .val { color:#ff6600; }
+
+        .notas-card {
+            background:white; border-radius:16px; padding:1.5rem;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); margin-bottom:1.5rem;
+        }
+        .notas-card h4 {
+            font-size:0.85rem; text-transform:uppercase; color:#ff6600;
+            font-weight:700; margin-bottom:0.8rem; letter-spacing:0.5px;
+        }
+        .notas-card p { color:#3e4a5e; line-height:1.6; font-size:0.92rem; }
+
+        .mensaje { padding:1rem 1.5rem; border-radius:12px; font-weight:500;
+            display:flex; align-items:center; gap:12px; border-left:5px solid;
+            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem; }
+        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+
+        .dashboard-footer {
+            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
+            margin-top:3rem; display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
+        .footer-links a:hover { color:#ff6600; }
+        .footer-copy span { color:#ff6600; font-weight:600; }
+
+        @media(max-width:650px) { .grid-info { grid-template-columns:1fr; } }
+        @media print {
+            .navbar, .breadcrumb, .acciones-bar, .estado-form, .dashboard-footer { display:none !important; }
+            body { background:white; }
+            .main-container { margin:0; padding:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
+        <a href="{{ url_for('cotizaciones') }}">Cotizaciones</a> › {{ cot.folio }}
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+            <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <!-- Cabecera -->
+    <div class="cot-header">
+        <div>
+            <div class="cot-folio">{{ cot.folio }}</div>
+            <div class="cot-fecha">Emitida el {{ cot.fecha_emision.strftime('%d/%m/%Y %H:%M') }}</div>
+        </div>
+        <span class="badge-estado {{ cot.estado }}">{{ cot.estado | title }}</span>
+    </div>
+
+    <!-- Acciones -->
+    <div class="acciones-bar">
+        <a href="{{ url_for('cotizaciones') }}" class="btn-accion-lg btn-volver">← Volver</a>
+        <button onclick="window.print()" class="btn-accion-lg btn-imprimir">🖨️ Imprimir</button>
+    </div>
+
+    <!-- Cambiar estado -->
+    <div class="estado-form">
+        <h4>🔄 Cambiar estado</h4>
+        <form method="POST" action="{{ url_for('cambiar_estado_cotizacion', cotizacion_id=cot.id) }}">
+            <div class="estados-grid">
+                {% for est in ['borrador','enviada','aprobada','rechazada','vencida'] %}
+                <button type="submit" name="estado" value="{{ est }}"
+                        class="btn-estado {{ 'activo' if cot.estado == est }}">
+                    {{ est | title }}
+                </button>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Info cliente y detalles -->
+    <div class="grid-info">
+        <div class="info-card">
+            <h4>👥 Cliente</h4>
+            <div class="info-row"><span class="key">Nombre</span><span class="val">{{ cot.nombre_cliente }}</span></div>
+            <div class="info-row"><span class="key">Teléfono</span><span class="val">{{ cot.telefono or '—' }}</span></div>
+            <div class="info-row"><span class="key">Email</span><span class="val">{{ cot.email or '—' }}</span></div>
+        </div>
+        <div class="info-card">
+            <h4>📋 Detalles</h4>
+            <div class="info-row"><span class="key">Folio</span><span class="val">{{ cot.folio }}</span></div>
+            <div class="info-row"><span class="key">Creada por</span><span class="val">{{ cot.creado_por_nombre }}</span></div>
+            <div class="info-row"><span class="key">Orden vinculada</span>
+                <span class="val">{{ cot.orden_folio or '—' }}</span></div>
+            <div class="info-row"><span class="key">Válida hasta</span>
+                <span class="val">{{ cot.fecha_vencimiento.strftime('%d/%m/%Y') if cot.fecha_vencimiento else '—' }}</span></div>
+        </div>
+    </div>
+
+    <!-- Conceptos -->
+    <div class="conceptos-card">
+        <h4>📋 Conceptos cotizados</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:50%">Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio unit.</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.descripcion }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ '%.2f' % item.precio_unitario }}</td>
+                    <td style="font-weight:600;">${{ '%.2f' % item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="totales-section">
+            <div class="totales-row">
+                <span class="lbl">Subtotal</span>
+                <span class="val">${{ '%.2f' % cot.subtotal }}</span>
+            </div>
+            {% if cot.descuento > 0 %}
+            <div class="totales-row">
+                <span class="lbl">Descuento</span>
+                <span class="val" style="color:#c62828;">-${{ '%.2f' % cot.descuento }}</span>
+            </div>
+            {% endif %}
+            <div class="totales-row final">
+                <span class="lbl">Total</span>
+                <span class="val">${{ '%.2f' % cot.total }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notas -->
+    {% if cot.notas %}
+    <div class="notas-card">
+        <h4>📝 Notas para el cliente</h4>
+        <p>{{ cot.notas }}</p>
+    </div>
+    {% endif %}
+
+    {% if cot.notas_internas %}
+    <div class="notas-card" style="border-left:4px solid #ff6600;">
+        <h4>🔒 Notas internas</h4>
+        <p>{{ cot.notas_internas }}</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<div class="dashboard-footer">
+    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+</body>
+</html>

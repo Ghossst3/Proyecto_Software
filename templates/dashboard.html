@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard · STIHL Workshop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f0f3f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Barra de navegación superior */
+        .navbar {
+            background-color: #2d2d2d; /* gris oscuro STIHL */
+            color: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar .logo span {
+            color: #ff6600; /* naranja STIHL */
+        }
+
+        .navbar .logo .badge {
+            background-color: #ff6600;
+            color: #2d2d2d;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .user-greeting {
+            text-align: right;
+        }
+
+        .user-greeting .name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-greeting .role {
+            font-size: 0.8rem;
+            color: #cccccc;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            border: 2px solid #ff6600;
+            color: #ff6600;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background-color: #ff6600;
+            color: white;
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Mensajes flash */
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+
+        .mensaje {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 5px solid;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .mensaje.error {
+            border-left-color: #c62828;
+            color: #c62828;
+        }
+
+        .mensaje.success {
+            border-left-color: #2e7d32;
+            color: #2e7d32;
+        }
+
+        .mensaje.info {
+            border-left-color: #1565c0;
+            color: #1565c0;
+        }
+
+        /* Tarjeta de bienvenida */
+        .welcome-card {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            color: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card::after {
+            content: "STIHL";
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+            font-size: 8rem;
+            font-weight: 800;
+            color: rgba(255,102,0,0.1);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .welcome-card h2 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-card h2 strong {
+            color: #ff6600;
+            font-weight: 700;
+        }
+
+        .welcome-card p {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+            max-width: 70%;
+        }
+
+        .role-chip {
+            background-color: #ff6600;
+            color: #2d2d2d;
+            font-weight: 700;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        /* Sección de módulos (accesos directos) */
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: #2d2d2d;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span {
+            background-color: #ff6600;
+            width: 8px;
+            height: 30px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eaeef2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #ff6600;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 0.8rem;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-top: 1rem;
+            flex: 1;
+        }
+
+        .card li {
+            margin-bottom: 0.8rem;
+            color: #3e4a5e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .card li::before {
+            content: "⚙️";
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .card .badge-count {
+            background-color: #ff6600;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 40px;
+            margin-left: 8px;
+        }
+
+        .card-footer {
+            margin-top: 1.5rem;
+            border-top: 1px solid #eaeef2;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-card {
+            background: none;
+            border: none;
+            color: #ff6600;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .btn-card:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            background-color: #2d2d2d;
+            color: #a0a0a0;
+            padding: 1.5rem 2rem;
+            margin-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-links a {
+            color: #cccccc;
+            text-decoration: none;
+            margin-right: 2rem;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #ff6600;
+        }
+
+        .footer-copy {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-copy span {
+            color: #ff6600;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            .user-area {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+            .welcome-card p {
+                max-width: 100%;
+            }
+            .footer-links a {
+                margin-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <h1>STIHL <span>Workshop</span></h1>
+            <div class="badge">Taller</div>
+        </div>
+        <div class="user-area">
+            <div class="user-greeting">
+                <div class="name">{{ nombre }}</div>
+                <div class="role">{{ rol }}</div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Mensajes flash -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mensaje {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Tarjeta de bienvenida personalizada -->
+        <div class="welcome-card">
+            <h2>Hola, <strong>{{ nombre }}</strong></h2>
+            <p>Panel de control del taller. Tienes acceso a las herramientas según tu perfil.</p>
+            <div class="role-chip">{{ rol }}</div>
+        </div>
+
+        <!-- Módulos según rol (se pueden adaptar con lógica flask) -->
+        <div class="section-title">
+            <span></span> Accesos rápidos
+        </div>
+
+        <div class="cards-grid">
+            <!-- Tarjeta Para editar usuarios del sistema -->
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <h3>Gestion de Usuarios del sistema</h3>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('usuarios') }}" style="color:inherit;text-decoration:none;">
+                            Ver usuarios 
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('nuevo_usuario') }}" style="color:inherit;text-decoration:none;">
+                            Agregar un nuevo usuario
+                        </a>
+                    </li>
+                    <li style="opacity:0.4; cursor:not-allowed;">
+                        Editar usuarios
+                    </li>
+                </ul>
+                <div class="card-footer">
+                    <a href="{{ url_for('usuarios') }}" class="btn-card">Gestionar →</a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Órdenes de servicio -->
+            <div class="card">
+                <div class="card-icon">📋</div>
+                <h3>Órdenes de servicio</h3>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('ordenes') }}" style="color:inherit;text-decoration:none;">
+                            Ver pendientes <span class="badge-count">3</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('nueva_orden') }}" style="color:inherit;text-decoration:none;">
+                            Crear nueva orden
+                        </a>
+                    </li>
+                    <li style="opacity:0.4; cursor:not-allowed;">
+                        Buscar orden
+                    </li>
+                </ul>
+                <div class="card-footer">
+                    <a href="{{ url_for('ordenes') }}" class="btn-card">Gestionar →</a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Clientes -->
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <h3>Clientes</h3>
+                <ul>
+                    <li><a href="{{ url_for('nuevo_cliente') }}" style="color:inherit;text-decoration:none;">Registrar cliente</a></li>
+                    <li><a href="{{ url_for('clientes') }}" style="color:inherit;text-decoration:none;">Lista de clientes</a></li>
+                    <li>Historial de servicios</li>
+                </ul>
+                <div class="card-footer">
+                    <a href="{{ url_for('clientes') }}" class="btn-card">Ver clientes →</a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Equipos ← NUEVA -->
+             <div class="card">
+                <div class="card-icon">🔧</div>
+                <h3>Equipos</h3>
+                <ul>
+                    <li><a href="{{ url_for('nuevo_equipo') }}" style="color:inherit;text-decoration:none;">Registrar equipo</a></li>
+                    <li><a href="{{ url_for('equipos') }}" style="color:inherit;text-decoration:none;">Lista de equipos</a></li>
+                </ul>
+                <div class="card-footer">
+                     <a href="{{ url_for('equipos') }}" class="btn-card">Ver equipos →</a>
+                </div>
+             </div>
+
+            <!-- Tarjeta Refacciones (para almacenista/técnico) -->
+            <div class="card">
+                <div class="card-icon">🔩</div>
+                <h3>Refacciones</h3>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('refacciones') }}" style="color:inherit;text-decoration:none;">
+                            Inventario actual
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('nueva_refaccion') }}" style="color:inherit;text-decoration:none;">
+                            Agregar refacción
+                        </a>
+                    </li>
+                    <li>
+                        <a style="opacity:0.4; cursor:not-allowed;">
+                            Reporte de stock
+                        </a>
+                    </li>
+                </ul>
+                <div class="card-footer">
+                    <a href="{{ url_for('refacciones') }}" class="btn-card">Administrar →</a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Cotizaciones (para mostrador) -->
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <h3>Cotizaciones</h3>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('nueva_cotizacion') }}" style="color:inherit;text-decoration:none;">
+                            Generar cotización
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('cotizaciones') }}" style="color:inherit;text-decoration:none;">
+                            Ver historial
+                        </a>
+                    </li>
+                    <li>
+                        <a style="opacity:0.4; cursor:not-allowed;">
+                            Enviadas / Aprobadas 
+                        </a>
+                    </li>
+                </ul>
+                <div class="card-footer">
+                    <a href="{{ url_for('cotizaciones') }}" class="btn-card">Ver cotizaciones →</a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Reportes (para administrador) -->
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>Reportes</h3>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('reportes') }}" style="color:inherit;text-decoration:none;">
+                            Ver reportes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('reportes') }}" style="color:inherit;text-decoration:none;">
+                            Filtrar por fechas
+                        </a>
+                    </li>
+                    <li>
+                        <a style="opacity:0.4; cursor:not-allowed;">
+                            Exportar a PDF
+                        </a>
+                    </li>
+                </ul>
+                <div class="card-footer">
+                    <a href="{{ url_for('reportes') }}" class="btn-card">Generar reportes →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Puedes añadir más secciones: últimas órdenes, avisos, etc. -->
+        <div style="background-color: white; border-radius: 20px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.02);">
+            <h3 style="color: #2d2d2d; margin-bottom: 1rem;">📌 Últimas órdenes registradas</h3>
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ff6600; color: #2d2d2d;">
+                        <th style="padding: 0.8rem 0;">ID</th>
+                        <th>Cliente</th>
+                        <th>Equipo</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #eaeef2;">
+                        <td style="padding: 0.8rem 0;">#OS-1024</td>
+                        <td>Motocultores Pérez</td>
+                        <td>Motobomba STIHL MB 235</td>
+                        <td><span style="background-color: #ff6600; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">En reparación</span></td>
+                        <td>25/02/2025</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #eaeef2;">
+                        <td style="padding: 0.8rem 0;">#OS-1023</td>
+                        <td>Jardines del Norte</td>
+                        <td>Cortadora FS 94</td>
+                        <td><span style="background-color: #2e7d32; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Diagnosticado</span></td>
+                        <td>24/02/2025</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 1rem; text-align: right;">
+                <a href="#" style="color: #ff6600; text-decoration: none; font-weight: 600;">Ver todas las órdenes →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="dashboard-footer">
+        <div class="footer-links">
+            <a href="#">SOPORTE TÉCNICO</a>
+            <a href="#">CONTACTO</a>
+        </div>
+        <div class="footer-copy">
+            © Acceso Seguro <span>STIHL Digital</span>
+        </div>
+    </div>
+</body>
+</html>

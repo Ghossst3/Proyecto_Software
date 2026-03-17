@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes · STIHL Workshop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
+
+        /* ── Navbar ── */
+        .navbar {
+            background:#2d2d2d; color:white; padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
+        .navbar .logo span { color:#ff6600; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-greeting .name { font-weight:600; }
+        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+        .btn-logout {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-logout:hover { background:#ff6600; color:white; }
+
+        /* ── Layout ── */
+        .main-container { max-width:1300px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
+        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
+        .breadcrumb a { color:#ff6600; text-decoration:none; }
+
+        .section-header {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
+        }
+        .section-title {
+            font-size:1.8rem; font-weight:600; color:#2d2d2d;
+            display:flex; align-items:center; gap:10px;
+        }
+        .section-title .bar {
+            background:#ff6600; width:8px; height:32px;
+            border-radius:4px; display:inline-block;
+        }
+
+        /* ── Filtro fechas ── */
+        .filtro-bar {
+            background:white; border-radius:16px; padding:1rem 1.5rem;
+            display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); margin-bottom:1.5rem;
+        }
+        .filtro-bar label { font-size:0.85rem; font-weight:600; color:#6f7d8c; }
+        .filtro-bar input[type="date"] {
+            border:1px solid #d9e0e6; border-radius:10px;
+            padding:0.5rem 0.9rem; font-size:0.9rem; outline:none; background:#fafbfc;
+        }
+        .filtro-bar input[type="date"]:focus { border-color:#ff6600; }
+        .btn-filtrar {
+            background:#ff6600; color:white; border:none;
+            padding:0.55rem 1.4rem; border-radius:20px; font-weight:600;
+            font-size:0.9rem; cursor:pointer; transition:all 0.2s;
+        }
+        .btn-filtrar:hover { background:#e65c00; }
+        .btn-mes, .btn-trimestre {
+            background:#f0f3f7; color:#6f7d8c; border:none;
+            padding:0.55rem 1rem; border-radius:20px; font-size:0.85rem;
+            font-weight:600; cursor:pointer; transition:all 0.2s;
+        }
+        .btn-mes:hover, .btn-trimestre:hover { background:#d9e0e6; }
+
+        /* ── KPI Cards ── */
+        .kpi-grid {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+            gap:1rem; margin-bottom:1.5rem;
+        }
+        .kpi-card {
+            background:white; border-radius:16px; padding:1.4rem 1.5rem;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04);
+            border-left:5px solid #eaeef2; transition:transform 0.2s;
+        }
+        .kpi-card:hover { transform:translateY(-3px); }
+        .kpi-card.naranja  { border-left-color:#ff6600; }
+        .kpi-card.verde    { border-left-color:#2e7d32; }
+        .kpi-card.azul     { border-left-color:#1565c0; }
+        .kpi-card.rojo     { border-left-color:#c62828; }
+        .kpi-card.amarillo { border-left-color:#f9a825; }
+        .kpi-card .icon { font-size:1.8rem; margin-bottom:0.5rem; }
+        .kpi-card .valor { font-size:2rem; font-weight:800; color:#2d2d2d; }
+        .kpi-card .label { font-size:0.8rem; color:#6f7d8c; text-transform:uppercase;
+            font-weight:600; letter-spacing:0.3px; }
+
+        /* ── Grid secciones ── */
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+
+        .report-card {
+            background:white; border-radius:20px; overflow:hidden;
+            box-shadow:0 8px 20px rgba(0,0,0,0.04);
+        }
+        .report-card .card-header {
+            padding:1rem 1.5rem; border-bottom:2px solid #ff6600;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .report-card .card-header h3 {
+            font-size:0.88rem; text-transform:uppercase;
+            color:#2d2d2d; font-weight:700; letter-spacing:0.4px;
+        }
+        .report-card .card-body { padding:1.5rem; }
+
+        /* Gráficas */
+        .chart-container { position:relative; height:220px; }
+        .chart-container-tall { position:relative; height:280px; }
+
+        /* Tablas internas */
+        .mini-table { width:100%; border-collapse:collapse; }
+        .mini-table th {
+            padding:0.5rem 0.8rem; text-align:left; font-size:0.75rem;
+            text-transform:uppercase; color:#6f7d8c; border-bottom:2px solid #ff6600; font-weight:600;
+        }
+        .mini-table td { padding:0.65rem 0.8rem; font-size:0.88rem;
+            color:#3e4a5e; border-bottom:1px solid #eaeef2; }
+        .mini-table tr:last-child td { border-bottom:none; }
+        .mini-table tr:hover td { background:#fff8f4; }
+
+        /* Barras de progreso inline */
+        .bar-wrap { display:flex; align-items:center; gap:8px; }
+        .bar-bg { flex:1; height:8px; background:#f0f3f7; border-radius:4px; overflow:hidden; }
+        .bar-fill { height:100%; background:#ff6600; border-radius:4px; transition:width 0.6s; }
+        .bar-fill.verde  { background:#2e7d32; }
+        .bar-fill.azul   { background:#1565c0; }
+
+        /* Estado badges */
+        .badge {
+            padding:0.2rem 0.7rem; border-radius:20px; font-size:0.75rem; font-weight:700;
+        }
+        .badge.recibido              { background:#e3f2fd; color:#1565c0; }
+        .badge.diagnosticando        { background:#fff8e1; color:#f57f17; }
+        .badge.esperando_refacciones { background:#fce4ec; color:#880e4f; }
+        .badge.en_reparacion         { background:#fff3e0; color:#e65100; }
+        .badge.listo                 { background:#e8f5e9; color:#2e7d32; }
+        .badge.entregado             { background:#f3e5f5; color:#6a1b9a; }
+
+        /* Alerta stock bajo */
+        .alerta-stock {
+            background:#fff3e0; border-left:5px solid #ff6600;
+            border-radius:12px; padding:1rem 1.5rem; margin-bottom:1.5rem;
+            display:flex; align-items:center; gap:12px;
+        }
+        .alerta-stock .icon { font-size:1.5rem; }
+        .alerta-stock p { color:#e65100; font-weight:600; font-size:0.9rem; }
+
+        .empty-mini { text-align:center; padding:2rem; color:#9aa9b7; font-size:0.9rem; }
+
+        .mensaje { padding:1rem 1.5rem; border-radius:12px; font-weight:500;
+            display:flex; align-items:center; gap:12px; border-left:5px solid;
+            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+
+        /* Footer */
+        .dashboard-footer {
+            background:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
+            margin-top:3rem; display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
+        .footer-links a:hover { color:#ff6600; }
+        .footer-copy span { color:#ff6600; font-weight:600; }
+
+        @media(max-width:900px) {
+            .grid-2 { grid-template-columns:1fr; }
+            .grid-3 { grid-template-columns:1fr; }
+        }
+        @media print {
+            .navbar, .breadcrumb, .filtro-bar, .dashboard-footer { display:none !important; }
+            body { background:white; }
+            .main-container { margin:0; padding:0; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> › Reportes
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+            <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="section-header">
+        <div class="section-title"><span class="bar"></span> 📊 Reportes</div>
+        <button onclick="window.print()" style="background:#e3f2fd;color:#1565c0;border:none;
+            padding:0.6rem 1.4rem;border-radius:20px;font-weight:600;cursor:pointer;">
+            🖨️ Imprimir reporte
+        </button>
+    </div>
+
+    <!-- Filtro fechas -->
+    <form method="GET" action="{{ url_for('reportes') }}">
+        <div class="filtro-bar">
+            <label>Desde</label>
+            <input type="date" name="desde" value="{{ desde }}">
+            <label>Hasta</label>
+            <input type="date" name="hasta" value="{{ hasta }}">
+            <button type="submit" class="btn-filtrar">Filtrar</button>
+            <button type="button" class="btn-mes"      onclick="setMes()">Este mes</button>
+            <button type="button" class="btn-trimestre" onclick="setTrimestre()">Últimos 3 meses</button>
+        </div>
+    </form>
+
+    <!-- Alerta stock bajo -->
+    {% if kpis_ref.refacciones_bajo_stock > 0 %}
+    <div class="alerta-stock">
+        <div class="icon">⚠️</div>
+        <p>{{ kpis_ref.refacciones_bajo_stock }} refacción(es) con stock bajo o agotado.
+           <a href="{{ url_for('refacciones') }}" style="color:#e65100; font-weight:700;">Ver inventario →</a>
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card naranja">
+            <div class="icon">📋</div>
+            <div class="valor">{{ kpis.total_ordenes or 0 }}</div>
+            <div class="label">Órdenes recibidas</div>
+        </div>
+        <div class="kpi-card verde">
+            <div class="icon">✅</div>
+            <div class="valor">{{ kpis.entregadas or 0 }}</div>
+            <div class="label">Órdenes entregadas</div>
+        </div>
+        <div class="kpi-card azul">
+            <div class="icon">🔧</div>
+            <div class="valor">{{ kpis.en_proceso or 0 }}</div>
+            <div class="label">En proceso</div>
+        </div>
+        <div class="kpi-card rojo">
+            <div class="icon">🚨</div>
+            <div class="valor">{{ kpis.urgentes or 0 }}</div>
+            <div class="label">Urgentes</div>
+        </div>
+        <div class="kpi-card naranja">
+            <div class="icon">💵</div>
+            <div class="valor">${{ '{:,.0f}'.format(kpis.ingresos_total) }}</div>
+            <div class="label">Ingresos (refacciones)</div>
+        </div>
+        <div class="kpi-card verde">
+            <div class="icon">💰</div>
+            <div class="valor">{{ kpis_cot.total_cotizaciones or 0 }}</div>
+            <div class="label">Cotizaciones emitidas</div>
+        </div>
+        <div class="kpi-card azul">
+            <div class="icon">🤝</div>
+            <div class="valor">{{ kpis_cot.aprobadas or 0 }}</div>
+            <div class="label">Cotizaciones aprobadas</div>
+        </div>
+        <div class="kpi-card amarillo">
+            <div class="icon">⚠️</div>
+            <div class="valor">{{ kpis_ref.refacciones_bajo_stock or 0 }}</div>
+            <div class="label">Refacciones stock bajo</div>
+        </div>
+    </div>
+
+    <!-- Gráfica ingresos por día + estados -->
+    <div class="grid-2">
+        <div class="report-card">
+            <div class="card-header"><h3>📈 Órdenes e ingresos por día</h3></div>
+            <div class="card-body">
+                {% if ingresos_dia %}
+                <div class="chart-container-tall">
+                    <canvas id="chartIngresos"></canvas>
+                </div>
+                {% else %}
+                <div class="empty-mini">Sin datos en el período seleccionado.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="card-header"><h3>🥧 Órdenes por estado</h3></div>
+            <div class="card-body">
+                {% if ordenes_por_estado %}
+                <div class="chart-container">
+                    <canvas id="chartEstados"></canvas>
+                </div>
+                {% else %}
+                <div class="empty-mini">Sin órdenes en el período.</div>
+                {% endif %}
+                <table class="mini-table" style="margin-top:1rem;">
+                    {% for e in ordenes_por_estado %}
+                    <tr>
+                        <td><span class="badge {{ e.estado }}">{{ e.estado | replace('_',' ') | title }}</span></td>
+                        <td style="font-weight:700;">{{ e.total }}</td>
+                        <td>
+                            {% set pct = ((e.total / kpis.total_ordenes * 100) | int) if kpis.total_ordenes else 0 %}
+                            <div class="bar-wrap">
+                                <div class="bar-bg">
+                                    <div class="bar-fill" style="width:{{ pct }}%"></div>
+                                </div>
+                                <span style="font-size:0.78rem;color:#9aa9b7;min-width:35px;">{{ pct }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Técnicos + Clientes + Refacciones -->
+    <div class="grid-3">
+
+        <div class="report-card">
+            <div class="card-header"><h3>👨‍🔧 Top técnicos</h3></div>
+            <div class="card-body" style="padding:0;">
+                {% if top_tecnicos %}
+                <table class="mini-table">
+                    <thead><tr><th>Técnico</th><th>Órdenes</th><th>Entregadas</th></tr></thead>
+                    <tbody>
+                    {% for t in top_tecnicos %}
+                    <tr>
+                        <td>{{ t.tecnico }}</td>
+                        <td style="font-weight:700;">{{ t.total_ordenes }}</td>
+                        <td>
+                            <span style="color:#2e7d32; font-weight:600;">
+                                {{ t.entregadas or 0 }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-mini">Sin datos.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="card-header"><h3>👥 Top clientes</h3></div>
+            <div class="card-body" style="padding:0;">
+                {% if top_clientes %}
+                <table class="mini-table">
+                    <thead><tr><th>Cliente</th><th>Órdenes</th><th></th></tr></thead>
+                    <tbody>
+                    {% set max_c = top_clientes[0].total %}
+                    {% for c in top_clientes %}
+                    <tr>
+                        <td>{{ c.cliente }}</td>
+                        <td style="font-weight:700;">{{ c.total }}</td>
+                        <td>
+                            <div class="bar-bg" style="min-width:60px;">
+                                {% set pct_c = (c.total / max_c * 100) | int %}
+                                <div class="bar-fill azul" style="width:{{ pct_c }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-mini">Sin datos.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="card-header"><h3>🔩 Refacciones más usadas</h3></div>
+            <div class="card-body" style="padding:0;">
+                {% if top_refacciones %}
+                <table class="mini-table">
+                    <thead><tr><th>Refacción</th><th>Usado</th></tr></thead>
+                    <tbody>
+                    {% for r in top_refacciones %}
+                    <tr>
+                        <td>
+                            <span style="font-weight:600;">{{ r.nombre }}</span><br>
+                            <span style="font-size:0.75rem;color:#9aa9b7;">{{ r.codigo }}</span>
+                        </td>
+                        <td style="font-weight:700;color:#ff6600;">{{ r.total_usado }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-mini">Sin datos en el período.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock bajo -->
+    {% if stock_bajo %}
+    <div class="report-card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+            <h3>⚠️ Refacciones con stock bajo</h3>
+            <a href="{{ url_for('refacciones') }}"
+               style="color:#ff6600;font-size:0.85rem;font-weight:600;text-decoration:none;">
+                Ver inventario →
+            </a>
+        </div>
+        <div class="card-body" style="padding:0;">
+            <table class="mini-table">
+                <thead>
+                    <tr><th>Código</th><th>Nombre</th><th>Stock actual</th><th>Mínimo</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                {% for s in stock_bajo %}
+                <tr>
+                    <td><code style="background:#f0f3f7;padding:2px 6px;border-radius:4px;font-size:0.8rem;">
+                        {{ s.codigo }}</code></td>
+                    <td style="font-weight:600;">{{ s.nombre }}</td>
+                    <td style="font-weight:700;color:#c62828;">{{ s.stock_actual }} {{ s.unidad }}</td>
+                    <td>{{ s.stock_minimo }}</td>
+                    <td>
+                        {% if s.stock_actual == 0 %}
+                            <span class="badge" style="background:#ffebee;color:#c62828;">Agotado</span>
+                        {% else %}
+                            <span class="badge" style="background:#fff3e0;color:#e65100;">Bajo</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+</div><!-- /main-container -->
+
+<div class="dashboard-footer">
+    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+
+<script>
+// ── Datos desde Jinja (fuera de bloques condicionales) ───────────────────────
+const diasLabels    = {{ ingresos_dia | map(attribute='dia')          | list | tojson | safe }};
+const diasOrdenes   = {{ ingresos_dia | map(attribute='num_ordenes')  | list | tojson | safe }};
+const diasIngresos  = {{ ingresos_dia | map(attribute='ingresos')     | list | tojson | safe }};
+const estadosLabels = {{ ordenes_por_estado | map(attribute='estado') | list | tojson | safe }};
+const estadosData   = {{ ordenes_por_estado | map(attribute='total')  | list | tojson | safe }};
+
+// ── Accesos directos de fechas ───────────────────────────────────────────────
+function setMes() {
+    const hoy   = new Date();
+    const desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    document.querySelector('[name="desde"]').value = desde.toISOString().slice(0,10);
+    document.querySelector('[name="hasta"]').value = hoy.toISOString().slice(0,10);
+}
+function setTrimestre() {
+    const hoy   = new Date();
+    const desde = new Date(hoy);
+    desde.setMonth(desde.getMonth() - 3);
+    document.querySelector('[name="desde"]').value = desde.toISOString().slice(0,10);
+    document.querySelector('[name="hasta"]').value = hoy.toISOString().slice(0,10);
+}
+
+// ── Gráfica ingresos por día ─────────────────────────────────────────────────
+if (diasLabels.length > 0 && document.getElementById('chartIngresos')) {
+    new Chart(document.getElementById('chartIngresos'), {
+        type: 'bar',
+        data: {
+            labels: diasLabels,
+            datasets: [
+                {
+                    label: 'Órdenes',
+                    data: diasOrdenes,
+                    backgroundColor: 'rgba(255,102,0,0.8)',
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Ingresos ($)',
+                    data: diasIngresos,
+                    type: 'line',
+                    borderColor: '#1565c0',
+                    backgroundColor: 'rgba(21,101,192,0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position:'bottom' } },
+            scales: {
+                y:  { position:'left',  beginAtZero:true, title:{ display:true, text:'Órdenes' } },
+                y1: { position:'right', beginAtZero:true, title:{ display:true, text:'Ingresos $' },
+                      grid:{ drawOnChartArea:false } }
+            }
+        }
+    });
+}
+
+// ── Gráfica estados (dona) ───────────────────────────────────────────────────
+if (estadosLabels.length > 0 && document.getElementById('chartEstados')) {
+    new Chart(document.getElementById('chartEstados'), {
+        type: 'doughnut',
+        data: {
+            labels: estadosLabels.map(e => e.replace(/_/g,' ')),
+            datasets: [{
+                data: estadosData,
+                backgroundColor: [
+                    '#1565c0','#f57f17','#880e4f','#e65100','#2e7d32','#6a1b9a'
+                ],
+                borderWidth: 2, borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position:'bottom', labels:{ font:{ size:11 } } } },
+            cutout: '60%'
+        }
+    });
+}
+</script>
+</body>
+</html>

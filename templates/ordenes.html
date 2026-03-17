@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Órdenes de Servicio · STIHL Workshop</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
+
+        .navbar {
+            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        }
+        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
+        .navbar .logo span { color:#ff6600; }
+        .user-area { display:flex; align-items:center; gap:20px; }
+        .user-greeting .name { font-weight:600; }
+        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+        .btn-logout {
+            background:transparent; border:2px solid #ff6600; color:#ff6600;
+            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
+            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-logout:hover { background-color:#ff6600; color:white; }
+
+        .main-container { max-width:1300px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
+
+        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
+        .breadcrumb a { color:#ff6600; text-decoration:none; }
+
+        .section-header {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
+        }
+        .section-title { font-size:1.8rem; font-weight:600; color:#2d2d2d;
+            display:flex; align-items:center; gap:10px; }
+        .section-title .bar { background-color:#ff6600; width:8px; height:32px;
+            border-radius:4px; display:inline-block; }
+
+        .btn-nuevo {
+            background-color:#ff6600; color:white; padding:0.7rem 1.5rem;
+            border-radius:40px; font-weight:600; font-size:0.95rem;
+            text-decoration:none; transition:all 0.2s;
+            box-shadow:0 6px 15px rgba(255,102,0,0.35);
+        }
+        .btn-nuevo:hover { background-color:#e65c00; transform:scale(1.02); }
+
+        /* Tarjetas resumen */
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+            gap:1rem; margin-bottom:1.5rem;
+        }
+        .stat-card {
+            background:white; border-radius:16px; padding:1.2rem 1.5rem;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); border-left:4px solid #eaeef2;
+            display:flex; flex-direction:column; gap:4px;
+        }
+        .stat-card .count { font-size:2rem; font-weight:700; color:#2d2d2d; }
+        .stat-card .label { font-size:0.8rem; color:#6f7d8c; text-transform:uppercase; letter-spacing:0.3px; }
+        .stat-card.recibido          { border-left-color:#1565c0; }
+        .stat-card.diagnosticando    { border-left-color:#f57c00; }
+        .stat-card.en_reparacion     { border-left-color:#7b1fa2; }
+        .stat-card.listo             { border-left-color:#2e7d32; }
+        .stat-card.urgente           { border-left-color:#c62828; }
+
+        .mensaje {
+            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
+            display:flex; align-items:center; gap:12px; border-left:5px solid;
+            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
+        }
+        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+        .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
+
+        .search-bar {
+            background:white; border-radius:16px; padding:1rem 1.5rem;
+            margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center;
+            box-shadow:0 4px 10px rgba(0,0,0,0.04); flex-wrap:wrap;
+        }
+        .search-bar input, .search-bar select {
+            border:1px solid #d9e0e6; border-radius:10px;
+            padding:0.6rem 1rem; font-size:0.95rem; outline:none; background:#fafbfc;
+        }
+        .search-bar input { flex:1; min-width:200px; }
+        .search-bar input:focus, .search-bar select:focus {
+            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12);
+        }
+
+        .table-card { background:white; border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.04); overflow:hidden; }
+        .table-responsive { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; }
+        thead tr { border-bottom:2px solid #ff6600; }
+        thead th {
+            padding:1rem 1rem; text-align:left; font-size:0.82rem;
+            text-transform:uppercase; letter-spacing:0.5px; color:#2d2d2d; font-weight:600;
+        }
+        tbody tr { border-bottom:1px solid #eaeef2; transition:background 0.15s; }
+        tbody tr:hover { background-color:#fff8f4; }
+        tbody tr:last-child { border-bottom:none; }
+        td { padding:0.9rem 1rem; font-size:0.92rem; color:#3e4a5e; vertical-align:middle; }
+
+        /* Badges de estado */
+        .badge-estado {
+            padding:0.25rem 0.8rem; border-radius:20px;
+            font-size:0.78rem; font-weight:700; white-space:nowrap;
+        }
+        .badge-estado.recibido               { background:#e3f2fd; color:#1565c0; }
+        .badge-estado.diagnosticando         { background:#fff3e0; color:#e65100; }
+        .badge-estado.esperando_refacciones  { background:#fce4ec; color:#ad1457; }
+        .badge-estado.en_reparacion          { background:#f3e5f5; color:#6a1b9a; }
+        .badge-estado.listo                  { background:#e8f5e9; color:#2e7d32; }
+        .badge-estado.entregado              { background:#f5f5f5; color:#757575; }
+
+        .badge-prioridad {
+            padding:0.2rem 0.6rem; border-radius:20px; font-size:0.75rem; font-weight:700;
+        }
+        .badge-prioridad.urgente { background:#ffebee; color:#c62828; }
+        .badge-prioridad.normal  { background:#f5f5f5; color:#9e9e9e; }
+
+        .folio-link {
+            font-weight:700; color:#ff6600; text-decoration:none; font-size:0.95rem;
+        }
+        .folio-link:hover { text-decoration:underline; }
+
+        .equipo-cell strong { display:block; font-size:0.9rem; color:#2d2d2d; }
+        .equipo-cell small  { color:#9aa9b7; font-size:0.8rem; }
+
+        .acciones { display:flex; gap:0.5rem; }
+        .btn-accion {
+            padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem;
+            font-weight:600; text-decoration:none; transition:all 0.2s;
+        }
+        .btn-ver    { background:#fff3e0; color:#e65100; }
+        .btn-ver:hover    { background:#e65100; color:white; }
+        .btn-editar { background:#e3f2fd; color:#1565c0; }
+        .btn-editar:hover { background:#1565c0; color:white; }
+
+        .empty-state { text-align:center; padding:4rem 2rem; color:#6f7d8c; }
+        .empty-state .icon { font-size:4rem; margin-bottom:1rem; }
+
+        .dashboard-footer {
+            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
+            margin-top:3rem; display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:1rem;
+        }
+        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
+        .footer-links a:hover { color:#ff6600; }
+        .footer-copy span { color:#ff6600; font-weight:600; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
+    <div class="user-area">
+        <div class="user-greeting">
+            <div class="name">{{ nombre }}</div>
+            <div class="role">{{ rol }}</div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+    </div>
+</div>
+
+<div class="main-container">
+
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> › Órdenes de servicio
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+            <div class="mensaje {{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="section-header">
+        <div class="section-title"><span class="bar"></span> 📋 Órdenes de servicio</div>
+        <a href="{{ url_for('nueva_orden') }}" class="btn-nuevo">+ Nueva orden</a>
+    </div>
+
+    <!-- Tarjetas resumen -->
+    <div class="stats-grid">
+        <div class="stat-card recibido">
+            <div class="count">{{ ordenes | selectattr('estado','eq','recibido') | list | length }}</div>
+            <div class="label">Recibidos</div>
+        </div>
+        <div class="stat-card diagnosticando">
+            <div class="count">{{ ordenes | selectattr('estado','eq','diagnosticando') | list | length }}</div>
+            <div class="label">Diagnosticando</div>
+        </div>
+        <div class="stat-card en_reparacion">
+            <div class="count">{{ ordenes | selectattr('estado','eq','en_reparacion') | list | length }}</div>
+            <div class="label">En reparación</div>
+        </div>
+        <div class="stat-card listo">
+            <div class="count">{{ ordenes | selectattr('estado','eq','listo') | list | length }}</div>
+            <div class="label">Listos</div>
+        </div>
+        <div class="stat-card urgente">
+            <div class="count">{{ ordenes | selectattr('prioridad','eq','urgente') | list | length }}</div>
+            <div class="label">Urgentes</div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar por folio, cliente o equipo…" oninput="filtrar()">
+        <select id="filtroEstado" onchange="filtrar()">
+            <option value="">Todos los estados</option>
+            <option value="recibido">Recibido</option>
+            <option value="diagnosticando">Diagnosticando</option>
+            <option value="esperando_refacciones">Esperando refacciones</option>
+            <option value="en_reparacion">En reparación</option>
+            <option value="listo">Listo</option>
+            <option value="entregado">Entregado</option>
+        </select>
+        <select id="filtroPrioridad" onchange="filtrar()">
+            <option value="">Toda prioridad</option>
+            <option value="urgente">Urgente</option>
+            <option value="normal">Normal</option>
+        </select>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Cliente</th>
+                        <th>Equipo</th>
+                        <th>Técnico</th>
+                        <th>Estado</th>
+                        <th>Prioridad</th>
+                        <th>Ingreso</th>
+                        <th>Entrega est.</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ordenes %}
+                        {% for o in ordenes %}
+                        <tr class="fila-orden"
+                            data-estado="{{ o.estado }}"
+                            data-prioridad="{{ o.prioridad }}">
+                            <td>
+                                <a href="{{ url_for('detalle_orden', orden_id=o.id) }}" class="folio-link">
+                                    {{ o.folio }}
+                                </a>
+                            </td>
+                            <td>{{ o.nombre_cliente }}</td>
+                            <td>
+                                <div class="equipo-cell">
+                                    <strong>{{ o.tipo_equipo }}</strong>
+                                    <small>{{ o.marca }} {{ o.modelo or '' }}</small>
+                                </div>
+                            </td>
+                            <td>{{ o.nombre_tecnico or '—' }}</td>
+                            <td>
+                                <span class="badge-estado {{ o.estado }}">
+                                    {{ o.estado | replace('_', ' ') | title }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-prioridad {{ o.prioridad }}">
+                                    {{ o.prioridad | title }}
+                                </span>
+                            </td>
+                            <td>{{ o.fecha_ingreso.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ o.fecha_estimada.strftime('%d/%m/%Y') if o.fecha_estimada else '—' }}</td>
+                            <td>
+                                <div class="acciones">
+                                    <a href="{{ url_for('detalle_orden', orden_id=o.id) }}" class="btn-accion btn-ver">Ver</a>
+                                    <a href="{{ url_for('editar_orden', orden_id=o.id) }}" class="btn-accion btn-editar">Editar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="9">
+                            <div class="empty-state">
+                                <div class="icon">📋</div>
+                                <p>No hay órdenes de servicio registradas.</p>
+                            </div>
+                        </td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-footer">
+    <div class="footer-links">
+        <a href="#">SOPORTE TÉCNICO</a>
+        <a href="#">CONTACTO</a>
+    </div>
+    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
+</div>
+
+<script>
+function filtrar() {
+    const texto     = document.getElementById('searchInput').value.toLowerCase();
+    const estado    = document.getElementById('filtroEstado').value;
+    const prioridad = document.getElementById('filtroPrioridad').value;
+    document.querySelectorAll('.fila-orden').forEach(fila => {
+        const okTexto     = fila.textContent.toLowerCase().includes(texto);
+        const okEstado    = !estado    || fila.dataset.estado    === estado;
+        const okPrioridad = !prioridad || fila.dataset.prioridad === prioridad;
+        fila.style.display = (okTexto && okEstado && okPrioridad) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>
