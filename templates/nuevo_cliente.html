@@ -145,22 +145,35 @@
                            placeholder="Ej. Juan Pérez García" required autofocus>
                 </div>
 
+                <!-- Telefono: solo numeros y guiones, maximo 15 caracteres -->
                 <div class="grid-2">
                     <div class="input-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="text" id="telefono" name="telefono" placeholder="844-123-4567">
+                        <input type="text" id="telefono" name="telefono" 
+                               value="{{ cliente.telefono or '' if cliente is defined else '' }}"
+                               placeholder="844-123-4567"
+                               pattern="[0-9\-\+\(\) ]{7,15}"
+                               maxlength="15"
+                               oninput="this.value = this.value.replace(/[^0-9\-\+\(\) ]/g, '')">
                     </div>
+                    
                     <div class="input-group">
                         <label for="email">Correo electrónico</label>
                         <input type="email" id="email" name="email" placeholder="correo@ejemplo.com">
                     </div>
                 </div>
 
+                <!-- RFC: solo mayusculas automaticamente, maximo 13 caracteres -->
                 <div class="grid-2">
                     <div class="input-group">
                         <label for="rfc">RFC</label>
-                        <input type="text" id="rfc" name="rfc" placeholder="PEGJ900101XXX" maxlength="20">
+                        <input type="text" id="rfc" name="rfc"
+                               value="{{ cliente.rfc or '' if cliente is defined else '' }}"
+                               placeholder="PEGJ900101XXX" 
+                               maxlength="13"
+                               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
                     </div>
+                    
                     <div class="input-group">
                         <label for="tipo_cliente">Tipo de cliente</label>
                         <select id="tipo_cliente" name="tipo_cliente">
