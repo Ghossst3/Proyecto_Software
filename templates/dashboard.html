@@ -394,7 +394,7 @@
             <div class="role-chip">{{ rol }}</div>
         </div>
 
-        <!-- Módulos según rol (se pueden adaptar con lógica flask) -->
+        <!-- Modulos segun rol (se pueden adaptar con logica flask) -->
         <div class="section-title">
             <span></span> Accesos rápidos
         </div>
@@ -560,7 +560,7 @@
             <table style="width: 100%; border-collapse: collapse; text-align: left;">
                 <thead>
                     <tr style="border-bottom: 2px solid #ff6600; color: #2d2d2d;">
-                        <th style="padding: 0.8rem 0;">ID</th>
+                        <th style="padding: 0.8rem 0;">Folio</th>
                         <th>Cliente</th>
                         <th>Equipo</th>
                         <th>Estado</th>
@@ -568,24 +568,43 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if ultimas_ordenes %}
+                        {% for o in ultimas_ordenes %}
+                        {% set colores = {
+                            'recibido':              '#1565c0',
+                            'diagnosticando':        '#f57f17',
+                            'esperando_refacciones': '#880e4f',
+                            'en_reparacion':         '#ff6600',
+                            'listo':                 '#2e7d32',
+                            'entregado':             '#6a1b9a'
+                        } %}
                     <tr style="border-bottom: 1px solid #eaeef2;">
-                        <td style="padding: 0.8rem 0;">#OS-1024</td>
-                        <td>Motocultores Pérez</td>
-                        <td>Motobomba STIHL MB 235</td>
-                        <td><span style="background-color: #ff6600; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">En reparación</span></td>
-                        <td>25/02/2025</td>
+                        <td style="padding: 0.8rem 0;">{{ o.folio }}</td>
+                        <td>{{ o.nombre_cliente }}</td>
+                        <td>{{ o.tipo_equipo }} {{ o.marca }} {{ o.modelo or '' }}</td>
+                        <td>
+                            <span style="background-color: #ff6600; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">
+                                {{ o.estado | replace('_',' ') | title }}
+                            </span>
+                        </td>
+                        <td style="color:#9aa9b7; font-size:0.88rem;">
+                            {{ o.fecha_ingreso.strftime('%d/%m/%Y') }}
+                        </td>
                     </tr>
+                    {% endfor %}
+                {% else %}
                     <tr style="border-bottom: 1px solid #eaeef2;">
-                        <td style="padding: 0.8rem 0;">#OS-1023</td>
-                        <td>Jardines del Norte</td>
-                        <td>Cortadora FS 94</td>
-                        <td><span style="background-color: #2e7d32; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">Diagnosticado</span></td>
-                        <td>24/02/2025</td>
+                        <td colspan="5" style="padding:2rem; text-align:center; color:#9aa9b7;">
+                            No hay órdenes registradas aún.
+                        </td>
                     </tr>
+                {% endif %}
                 </tbody>
             </table>
             <div style="margin-top: 1rem; text-align: right;">
-                <a href="#" style="color: #ff6600; text-decoration: none; font-weight: 600;">Ver todas las órdenes →</a>
+                <a href="{{ url_for('ordenes') }}" style="color:#ff6600; text-decoration:none; font-weight:600;">
+                    Ver todas las órdenes →
+                </a>
             </div>
         </div>
     </div>
