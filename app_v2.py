@@ -143,7 +143,17 @@ def nuevo_cliente():
         if not nombre:
             flash('El nombre del cliente es obligatorio', 'error')
             return redirect(url_for('nuevo_cliente'))
-
+        
+        # Validar telefono (solo numeros, guiones, espacios, parentesis)
+        if telefono and not re.match(r'^[0-9\-\+\(\) ]{7,15}$', telefono):
+            flash('El teléfono solo debe contener números', 'error')
+            return redirect(url_for('nuevo_cliente'))
+        
+        #validar RFC (12 o 13 caracteres)
+        if rfc and not re.match(r'^[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}$', rfc):
+            flash('El RFC no tiene un formato válido (Ej. PERZ850101ABC)', 'error')
+            return redirect(url_for('nuevo_cliente'))
+        
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
@@ -184,6 +194,16 @@ def editar_cliente(cliente_id):
         rfc      = request.form['rfc'].strip().upper()
         tipo     = request.form['tipo_cliente']
         notas    = request.form['notas'].strip()
+
+        # Validar telefono (solo numeros, guiones, espacios, parentesis)
+        if telefono and not re.match(r'^[0-9\-\+\(\) ]{7,15}$', telefono):
+            flash('El teléfono solo debe contener números', 'error')
+            return redirect(url_for('editar_cliente', cliente_id=cliente_id))
+        
+        #validar RFC (12 o 13 caracteres)
+        if rfc and not re.match(r'^[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}$', rfc):
+            flash('El RFC no tiene un formato válido (Ej. PERZ850101ABC)', 'error')
+            return redirect(url_for('editar_cliente', cliente_id=cliente_id))
 
         cursor.execute("""
             UPDATE clientes SET
