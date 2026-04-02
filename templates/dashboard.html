@@ -583,7 +583,9 @@
                         <td>{{ o.nombre_cliente }}</td>
                         <td>{{ o.tipo_equipo }} {{ o.marca }} {{ o.modelo or '' }}</td>
                         <td>
-                            <span style="background-color: #ff6600; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">
+                            <span style="background-color:{{ colores.get(o.estado, '#888') }};
+                                     color:white; padding:0.2rem 0.8rem;
+                                     border-radius:20px; font-size:0.8rem; font-weight:600;">
                                 {{ o.estado | replace('_',' ') | title }}
                             </span>
                         </td>
