@@ -190,12 +190,17 @@
                 <div class="grid-2">
                     <div class="input-group">
                         <label for="anio">Año</label>
-                        <input type="number" id="anio" name="anio" min="1990" max="2030"
-                               placeholder="Ej. 2022">
+                        <input type="number" id="anio" name="anio" 
+                               min="1990" max="2030"
+                               placeholder="Ej. 2022"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)">
                     </div>
                     <div class="input-group">
                         <label for="color">Color</label>
-                        <input type="text" id="color" name="color" placeholder="Ej. Naranja/Gris">
+                        <input type="text" id="color" name="color" 
+                               placeholder="Ej. Naranja/Gris"
+                               maxlength="20"
+                               oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]/g, '')">
                     </div>
                 </div>
 
