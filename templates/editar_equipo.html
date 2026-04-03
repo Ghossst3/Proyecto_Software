@@ -154,12 +154,17 @@
                 <div class="grid-2">
                     <div class="input-group">
                         <label for="anio">Año</label>
-                        <input type="number" id="anio" name="anio" min="1990" max="2030"
-                               value="{{ equipo.anio or '' }}">
+                        <input type="number" id="anio" name="anio" 
+                               min="1990" max="2030"
+                               value="{{ equipo.anio or '' }}"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)">
                     </div>
                     <div class="input-group">
                         <label for="color">Color</label>
-                        <input type="text" id="color" name="color" value="{{ equipo.color or '' }}">
+                        <input type="text" id="color" name="color"
+                               maxlength="20" 
+                               value="{{ equipo.color or '' }}"
+                               oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]/g, '')">
                     </div>
                 </div>
 
