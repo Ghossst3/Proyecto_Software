@@ -314,6 +314,16 @@ def nuevo_equipo():
         if not tipo_equipo or not cliente_id:
             flash('El tipo de equipo y el cliente son obligatorios', 'error')
             return redirect(url_for('nuevo_equipo'))
+        
+        # Validar el año del equipo
+        if anio and (not anio.isdigit() or not (1990 <= int(anio) <= 2030)):
+            flash('El año debe ser un número entre 1990 y 2030', 'error')
+            return redirect(url_for('nuevo_equipo'))
+        
+        # Validar color (solo letras, espacios, / y -)
+        if color and not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]+$', color):
+            flash('El color solo debe contener letras', 'error')
+            return redirect(url_for('nuevo_equipo'))
 
         cursor.execute("""
             INSERT INTO equipos
@@ -361,6 +371,16 @@ def editar_equipo(equipo_id):
         anio         = request.form['anio'].strip() or None
         color        = request.form['color'].strip()
         descripcion  = request.form['descripcion'].strip()
+        
+        # Validar el año del equipo
+        if anio and (not anio.isdigit() or not (1990 <= int(anio) <= 2030)):
+            flash('El año debe ser un número entre 1990 y 2030', 'error')
+            return redirect(url_for('editar_equipo', equipo_id=equipo_id))
+        
+        # Validar color (solo letras, espacios, / y -)
+        if color and not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]+$', color):
+            flash('El color solo debe contener letras', 'error')
+            return redirect(url_for('editar_equipo', equipo_id=equipo_id))
 
         cursor.execute("""
             UPDATE equipos SET
