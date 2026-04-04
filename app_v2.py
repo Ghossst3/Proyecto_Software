@@ -3,9 +3,11 @@ import mysql.connector
 import bcrypt
 import os
 import re  # para validaciones simples
+import time
 from flask import jsonify
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # necesario para sesiones
@@ -28,6 +30,10 @@ ROLES_ALMACEN  = ['dueño', 'Encargado_mostrador', 'Almacenista']
 ROLES_BITACORA = ['dueño', 'encargado_mostrador', 'Tecnico']
 ROLES_TODOS    = ['dueño', 'Encargado_mostrador', 'Tecnico', 'Almacenista']
 
+login_intentos = defaultdict(lambda: {'count': 0, 'tiempo': 0})
+MAX_INTENTOS   = 5      # intentos antes de bloquear
+BLOQUEO_SEG    = 300    # segundos de bloqueo (5 minutos)
+
 def verificar_rol(roles_permitidos):
     """Devuelve True si el usuario en sesión tiene un rol permitido."""
     return session.get('user_rol') in roles_permitidos
@@ -39,32 +45,77 @@ def home():
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
+# ─── Login ────────────────────────────────────────────────────────
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     mensaje = None
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password'].encode('utf-8')
-        
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+
+        # Validar que no vengan vacíos
+        if not username or not password:
+            mensaje = 'Por favor ingresa usuario y contraseña'
+            return render_template('login.html', mensaje=mensaje)
+
+        # Sanitizar — eliminar caracteres peligrosos del username
+        if not re.match(r'^[a-zA-Z0-9_\-\.]+$', username):
+            mensaje = 'Usuario o contraseña incorrectos'
+            return render_template('login.html', mensaje=mensaje)
+
+        # Verificar bloqueo por intentos fallidos (por IP)
+        ip = request.remote_addr
+        datos_ip = login_intentos[ip]
+        ahora = time.time()
+
+        if datos_ip['count'] >= MAX_INTENTOS:
+            tiempo_restante = int(BLOQUEO_SEG - (ahora - datos_ip['tiempo']))
+            if tiempo_restante > 0:
+                mensaje = f'Demasiados intentos fallidos. Intenta de nuevo en {tiempo_restante} segundos'
+                return render_template('login.html', mensaje=mensaje)
+            else:
+                # Resetear bloqueo si ya pasó el tiempo
+                login_intentos[ip] = {'count': 0, 'tiempo': 0}
+
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT u.*, r.nombre as rol_nombre FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.nombre_usuario = %s", (username,))
+        cursor.execute("""
+            SELECT u.*, r.nombre as rol_nombre
+            FROM usuarios u
+            JOIN roles r ON u.rol_id = r.id
+            WHERE u.nombre_usuario = %s AND u.activo = 1
+        """, (username,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
-        
-        if user and bcrypt.checkpw(password, user['contrasena_hash'].encode('utf-8')):
-            # Iniciar sesión
-            session['user_id'] = user['id']
+
+        if user and bcrypt.checkpw(password.encode('utf-8'),
+                                   user['contrasena_hash'].encode('utf-8')):
+            # Login exitoso — resetear intentos fallidos
+            login_intentos[ip] = {'count': 0, 'tiempo': 0}
+
+            session.clear()  # limpiar sesión anterior por seguridad
+            session['user_id']   = user['id']
             session['user_name'] = user['nombre_completo']
-            session['user_rol'] = user['rol_nombre']
+            session['user_rol']  = user['rol_nombre']
+            session.permanent    = False  # sesión expira al cerrar el navegador
+
             flash('Inicio de sesión exitoso', 'success')
             return redirect(url_for('dashboard'))
         else:
-            mensaje = 'Usuario o contraseña incorrectos'
-    
+            # Login fallido — registrar intento
+            login_intentos[ip]['count'] += 1
+            login_intentos[ip]['tiempo']  = ahora
+
+            intentos_restantes = MAX_INTENTOS - login_intentos[ip]['count']
+            if intentos_restantes > 0:
+                mensaje = f'Usuario o contraseña incorrectos. {intentos_restantes} intento(s) restante(s)'
+            else:
+                mensaje = f'Cuenta bloqueada temporalmente por {BLOQUEO_SEG // 60} minutos'
+
     return render_template('login.html', mensaje=mensaje)
 
+# ─── Dashboard ────────────────────────────────────────────────────────
 @app.route('/dashboard')
 # dashboard con tabla de ultimas ordenes de servicio
 def dashboard():
