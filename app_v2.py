@@ -34,6 +34,8 @@ login_intentos = defaultdict(lambda: {'count': 0, 'tiempo': 0})
 MAX_INTENTOS   = 5      # intentos antes de bloquear
 BLOQUEO_SEG    = 300    # segundos de bloqueo (5 minutos)
 
+FAKE_BCRYPT_HASH = bcrypt.hashpw(b'fake', bcrypt.gensalt()).decode('utf-8') #hash falso
+
 def verificar_rol(roles_permitidos):
     """Devuelve True si el usuario en sesión tiene un rol permitido."""
     return session.get('user_rol') in roles_permitidos
@@ -89,16 +91,19 @@ def login():
         cursor.close()
         conn.close()
 
-        if user and bcrypt.checkpw(password.encode('utf-8'),
-                                   user['contrasena_hash'].encode('utf-8')):
+        # Siempre comparar con un hash real (el del usuario o el falso)
+        stored = user['contrasena_hash'].encode() if user else FAKE_BCRYPT_HASH.encode()
+        password_ok = bcrypt.checkpw(password.encode(), stored)
+
+        if password_ok and user:
             # Login exitoso — resetear intentos fallidos
             login_intentos[ip] = {'count': 0, 'tiempo': 0}
 
-            session.clear()  # limpiar sesión anterior por seguridad
+            session.clear()  # limpiar sesion anterior por seguridad
             session['user_id']   = user['id']
             session['user_name'] = user['nombre_completo']
             session['user_rol']  = user['rol_nombre']
-            session.permanent    = False  # sesión expira al cerrar el navegador
+            session.permanent    = False  # sesion expira al cerrar el navegador
 
             flash('Inicio de sesión exitoso', 'success')
             return redirect(url_for('dashboard'))
@@ -109,7 +114,7 @@ def login():
 
             intentos_restantes = MAX_INTENTOS - login_intentos[ip]['count']
             if intentos_restantes > 0:
-                mensaje = f'Usuario o contraseña incorrectos. {intentos_restantes} intento(s) restante(s)'
+                mensaje = f'Usuario o contraseña incorrectos. Tienes intentos limitados'
             else:
                 mensaje = f'Cuenta bloqueada temporalmente por {BLOQUEO_SEG // 60} minutos'
 
