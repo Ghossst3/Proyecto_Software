@@ -3,546 +3,456 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard · STIHL Workshop</title>
+    <title>Inicio · STIHL Workshop</title>
 
-    <!-- Google Fonts: Barlow (industrial, limpio, perfecto para taller) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
-
-    <!-- FontAwesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
-            --orange:   #ff6600;
-            --dark:     #2d2d2d;
-            --darker:   #1a1a1a;
-            --bg:       #f0f3f7;
-            --white:    #ffffff;
-            --border:   #eaeef2;
-            --muted:    #9aa9b7;
-            --text:     #3e4a5e;
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    268px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Barlow', sans-serif;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
+            font-family: 'Barlow', sans-serif;
             background-color: var(--bg);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
         }
 
-        /* ── Navbar ───────────────────────────────────── */
-        .navbar {
+        /* ════════════════════ SIDEBAR ════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
             background-color: var(--dark);
-            color: white;
-            padding: 0.8rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .navbar .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .navbar .logo .logo-icon {
-            color: var(--orange);
-            font-size: 1.4rem;
-        }
-
-        .navbar .logo h1 {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .navbar .logo span {
-            color: var(--orange);
-        }
-
-        .navbar .logo .badge {
-            background-color: var(--orange);
-            color: var(--dark);
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            margin-left: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            background-color: rgba(255,102,0,0.15);
-            border: 2px solid var(--orange);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--orange);
-            font-size: 0.95rem;
-        }
-
-        .user-greeting { text-align: left; }
-        .user-greeting .name  { font-weight: 600; font-size: 0.95rem; }
-        .user-greeting .role  { font-size: 0.75rem; color: #cccccc; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .btn-logout {
-            background-color: transparent;
-            border: 2px solid var(--orange);
-            color: var(--orange);
-            padding: 0.45rem 1.1rem;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.88rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .btn-logout:hover {
-            background-color: var(--orange);
-            color: white;
-        }
-
-        /* ── Contenedor principal ─────────────────────── */
-        .main-container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            width: 100%;
-            flex: 1;
-        }
-
-        /* ── Flash messages ───────────────────────────── */
-        .flash-messages { margin-bottom: 2rem; }
-
-        .mensaje {
-            padding: 0.9rem 1.4rem;
-            border-radius: 12px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 5px solid;
-            background-color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 0.6rem;
-        }
-
-        .mensaje .msg-icon { font-size: 1rem; }
-        .mensaje.error   { border-left-color: #c62828; color: #c62828; }
-        .mensaje.success { border-left-color: #2e7d32; color: #2e7d32; }
-        .mensaje.info    { border-left-color: #1565c0; color: #1565c0; }
-
-        /* ── Welcome card ─────────────────────────────── */
-        .welcome-card {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: white;
-            border-radius: 24px;
-            padding: 2.5rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .welcome-card::after {
-            content: "STIHL";
-            position: absolute;
-            bottom: -20px;
-            right: 20px;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 8rem;
-            font-weight: 700;
-            color: rgba(255,102,0,0.1);
-            line-height: 1;
-            pointer-events: none;
-            letter-spacing: 4px;
-        }
-
-        .welcome-card h2 {
-            font-size: 2.2rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-card h2 strong {
-            color: var(--orange);
-            font-weight: 700;
-        }
-
-        .welcome-card p {
-            font-size: 1.05rem;
-            color: #e0e0e0;
-            max-width: 70%;
-            line-height: 1.6;
-        }
-
-        .role-chip {
-            background-color: var(--orange);
-            color: var(--dark);
-            font-weight: 700;
-            padding: 0.3rem 1rem;
-            border-radius: 40px;
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            margin-top: 1.2rem;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ── Section title ────────────────────────────── */
-        .section-title {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .section-title .bar {
-            background-color: var(--orange);
-            width: 5px;
-            height: 26px;
-            border-radius: 3px;
-            display: inline-block;
-        }
-
-        .section-title .title-icon {
-            color: var(--orange);
-            font-size: 1.1rem;
-        }
-
-        /* ── Cards grid ───────────────────────────────── */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.8rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .card {
-            background-color: var(--white);
-            border-radius: 20px;
-            padding: 1.8rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            border-color: var(--orange);
-        }
-
-        /* ícono de tarjeta: círculo con fondo naranja suave */
-        .card-icon {
-            width: 52px;
-            height: 52px;
-            background-color: rgba(255,102,0,0.10);
-            border-radius: 14px;
+        /* Logo */
+        .sidebar-logo {
+            padding: 1.5rem 1.4rem 1.3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: var(--orange);
-            margin-bottom: 1.1rem;
-            transition: background-color 0.2s;
+            gap: 10px;
         }
 
-        .card:hover .card-icon {
+        .logo-icon-box {
+            width: 38px; height: 38px;
             background-color: var(--orange);
-            color: white;
-        }
-
-        .card h3 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 0.8rem;
-        }
-
-        .card ul {
-            list-style: none;
-            margin-top: 0.8rem;
-            flex: 1;
-        }
-
-        .card li {
-            margin-bottom: 0.75rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            font-size: 0.95rem;
-        }
-
-        /* Ícono por cada ítem de lista */
-        .card li .li-icon {
-            color: var(--orange);
-            font-size: 0.75rem;
-            width: 14px;
-            text-align: center;
-            opacity: 0.85;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1rem;
             flex-shrink: 0;
         }
 
-        .card li.disabled {
-            opacity: 0.38;
-            cursor: not-allowed;
+        .logo-text-wrap .logo-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.3rem; font-weight: 800;
+            color: white; text-transform: uppercase; letter-spacing: 0.5px;
+            line-height: 1.1;
         }
 
-        .card li.disabled .li-icon {
-            color: var(--muted);
+        .logo-text-wrap .logo-name span { color: var(--orange); }
+
+        .logo-text-wrap .logo-sub {
+            font-size: 0.62rem; color: rgba(255,255,255,0.35);
+            font-weight: 600; letter-spacing: 1.1px; text-transform: uppercase;
         }
 
-        .card .badge-count {
-            background-color: var(--orange);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 40px;
-            margin-left: 6px;
+        /* Usuario */
+        .sidebar-user {
+            padding: 1.3rem 1.4rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; align-items: center; gap: 11px;
         }
 
-        .card-footer {
-            margin-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            padding-top: 1rem;
-            display: flex;
-            justify-content: flex-end;
+        .user-avatar {
+            width: 42px; height: 42px;
+            background-color: var(--orange-mid);
+            border: 2px solid var(--orange);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--orange); font-size: 1.05rem;
+            flex-shrink: 0;
         }
 
-        .btn-card {
-            background: none;
-            border: none;
-            color: var(--orange);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .user-name  { font-weight: 700; font-size: 0.93rem; color: white; line-height: 1.2; }
+        .user-role  { font-size: 0.7rem; color: var(--orange); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+
+        /* Nav */
+        .sidebar-nav { flex: 1; padding: 1.1rem 0.7rem; }
+
+        .nav-label {
+            font-size: 0.62rem; font-weight: 700;
+            color: rgba(255,255,255,0.28);
+            text-transform: uppercase; letter-spacing: 1.2px;
+            padding: 0.9rem 0.7rem 0.35rem;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 0.68rem 0.85rem;
+            border-radius: 9px;
+            color: rgba(255,255,255,0.55);
             text-decoration: none;
-            transition: gap 0.2s;
+            font-weight: 500; font-size: 0.9rem;
+            transition: all 0.16s;
+            margin-bottom: 2px;
         }
 
-        .btn-card:hover { gap: 10px; }
+        .nav-item:hover { background-color: rgba(255,255,255,0.07); color: white; }
 
-        /* ── Tabla de órdenes ─────────────────────────── */
+        .nav-item.active { background-color: var(--orange); color: white; font-weight: 600; }
+
+        .nav-item .ni { width: 18px; text-align: center; font-size: 0.88rem; flex-shrink: 0; }
+
+        /* Logout */
+        .sidebar-bottom {
+            padding: 0.9rem 0.7rem 1.3rem;
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .btn-logout {
+            display: flex; align-items: center; gap: 9px;
+            width: 100%; padding: 0.68rem 0.85rem;
+            border-radius: 9px;
+            background-color: rgba(255,102,0,0.10);
+            color: var(--orange);
+            font-weight: 600; font-size: 0.88rem;
+            text-decoration: none;
+            border: 1px solid rgba(255,102,0,0.20);
+            transition: all 0.16s; cursor: pointer;
+        }
+
+        .btn-logout:hover { background-color: var(--orange); color: white; border-color: var(--orange); }
+
+        /* ════════════════════ MAIN ════════════════════ */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            flex: 1; display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        /* Topbar */
+        .topbar {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .breadcrumb {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.82rem; color: var(--muted);
+        }
+
+        .breadcrumb .cur { color: var(--text); font-weight: 600; }
+        .breadcrumb i { font-size: 0.65rem; }
+
+        .topbar-right {
+            font-size: 0.8rem; color: var(--muted);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* Content area */
+        .content-area { padding: 1.8rem 2rem; flex: 1; }
+
+        /* Flash */
+        .flash-messages { margin-bottom: 1.4rem; }
+
+        .mensaje {
+            padding: 0.8rem 1.2rem; border-radius: 10px;
+            font-weight: 500; display: flex; align-items: center; gap: 10px;
+            border-left: 4px solid; background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 0.5rem; font-size: 0.9rem;
+        }
+
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
+
+        /* Page header */
+        .page-header { margin-bottom: 1.8rem; }
+
+        .page-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2.1rem; font-weight: 800;
+            color: var(--dark); line-height: 1.1;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+
+        .page-header h1 span { color: var(--orange); }
+        .page-header p { color: var(--text-light); font-size: 0.95rem; margin-top: 0.35rem; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 1.1rem; margin-bottom: 1.8rem;
+        }
+
+        .stat-card {
+            background-color: var(--white);
+            border-radius: 14px; padding: 1.2rem 1.4rem;
+            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 13px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: transform 0.16s, box-shadow 0.16s;
+        }
+
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.07); }
+
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem; flex-shrink: 0;
+        }
+
+        .si-orange { background: var(--orange-light); color: var(--orange); }
+        .si-blue   { background: rgba(21,101,192,.10); color: #1565c0; }
+        .si-green  { background: rgba(46,125,50,.10);  color: #2e7d32; }
+        .si-purple { background: rgba(106,27,154,.10); color: #6a1b9a; }
+
+        .stat-label {
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.9rem; font-weight: 800; color: var(--dark); line-height: 1.1;
+        }
+
+        /* Table section */
         .table-section {
             background-color: var(--white);
-            border-radius: 20px;
-            padding: 1.8rem;
-            margin-top: 2rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-            border: 1px solid var(--border);
+            border-radius: 16px; border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden;
         }
 
-        .table-section-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 1.4rem;
+        .table-head-bar {
+            padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .table-section-header .icon {
-            width: 36px;
-            height: 36px;
-            background-color: rgba(255,102,0,0.10);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--orange);
-            font-size: 0.95rem;
+        .thl { display: flex; align-items: center; gap: 9px; }
+
+        .thl-icon {
+            width: 32px; height: 32px; background-color: var(--orange-light);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: var(--orange); font-size: 0.85rem;
         }
 
-        .table-section-header h3 {
+        .thl h3 {
             font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--dark);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            font-size: 1.05rem; font-weight: 700;
+            color: var(--dark); text-transform: uppercase; letter-spacing: 0.3px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        thead tr {
-            border-bottom: 2px solid var(--orange);
-        }
+        table { width: 100%; border-collapse: collapse; }
 
         thead th {
-            padding: 0.7rem 0.8rem;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--dark);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        tbody tr {
+            padding: 0.8rem 1.1rem;
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px;
+            text-align: left; background-color: #fafbfc;
             border-bottom: 1px solid var(--border);
-            transition: background-color 0.15s;
         }
 
+        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+        tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background-color: #fafbfc; }
 
-        tbody td {
-            padding: 0.75rem 0.8rem;
-            font-size: 0.93rem;
-            color: var(--text);
+        tbody td { padding: 0.85rem 1.1rem; font-size: 0.88rem; color: var(--text); vertical-align: middle; }
+
+        .folio-badge {
+            font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.88rem;
+            color: var(--dark); background-color: var(--bg);
+            padding: 0.18rem 0.55rem; border-radius: 6px; border: 1px solid var(--border);
         }
 
         .status-badge {
-            color: white;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            display: inline-block;
-            font-family: 'Barlow Condensed', sans-serif;
-            letter-spacing: 0.3px;
+            color: white; padding: 0.2rem 0.7rem; border-radius: 20px;
+            font-size: 0.73rem; font-weight: 700;
+            font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
-        .table-footer {
-            margin-top: 1.2rem;
-            text-align: right;
+        .client-name { font-weight: 600; color: var(--dark); }
+        .equipo-text { color: var(--text-light); font-size: 0.85rem; }
+        .date-cell   { color: var(--muted); font-size: 0.83rem; display: flex; align-items: center; gap: 5px; }
+
+        .table-foot {
+            padding: 0.9rem 1.5rem; border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end;
         }
 
-        /* ── Footer ───────────────────────────────────── */
-        .dashboard-footer {
-            background-color: var(--dark);
-            color: #a0a0a0;
-            padding: 1.4rem 2rem;
-            margin-top: 3rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+        .btn-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--orange); font-weight: 600; font-size: 0.87rem;
+            text-decoration: none; transition: gap 0.16s;
         }
 
-        .footer-links a {
-            color: #cccccc;
-            text-decoration: none;
-            margin-right: 2rem;
-            font-size: 0.82rem;
-            font-weight: 600;
-            transition: color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .btn-link:hover { gap: 10px; }
+
+        /* Footer */
+        .main-footer {
+            background-color: var(--white); border-top: 1px solid var(--border);
+            padding: 0.9rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.78rem; color: var(--muted);
         }
 
-        .footer-links a:hover { color: var(--orange); }
-
-        .footer-copy {
-            font-size: 0.82rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .main-footer a {
+            color: var(--muted); text-decoration: none;
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-right: 1.2rem; transition: color 0.14s;
         }
 
-        .footer-copy span { color: var(--orange); font-weight: 600; }
+        .main-footer a:hover { color: var(--orange); }
+        .main-footer .brand { color: var(--orange); font-weight: 700; }
 
-        @media (max-width: 768px) {
-            .navbar { padding: 1rem; }
-            .user-area { width: 100%; justify-content: space-between; margin-top: 10px; }
-            .welcome-card p { max-width: 100%; }
-            .footer-links a { margin-right: 1rem; }
+        /* Responsive */
+        @media (max-width: 860px) {
+            .sidebar { width: 60px; }
+            .logo-text-wrap, .user-name, .user-role,
+            .nav-item span, .nav-label, .btn-logout span { display: none; }
+            .sidebar-user { justify-content: center; }
+            .nav-item { justify-content: center; padding: 0.72rem; }
+            .btn-logout { justify-content: center; }
+            .main-content { margin-left: 60px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ── Navbar ──────────────────────────────────────── -->
-    <div class="navbar">
-        <div class="logo">
-            <span class="logo-icon"><i class="fas fa-screwdriver-wrench"></i></span>
-            <h1>STIHL <span>Workshop</span></h1>
-            <div class="badge">Taller</div>
-        </div>
-        <div class="user-area">
-            <div class="user-info">
-                <div class="user-avatar"><i class="fas fa-user"></i></div>
-                <div class="user-greeting">
-                    <div class="name">{{ nombre }}</div>
-                    <div class="role">{{ rol }}</div>
-                </div>
-            </div>
-            <a href="{{ url_for('logout') }}" class="btn-logout">
-                <i class="fas fa-right-from-bracket"></i> Cerrar sesión
-            </a>
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+
+    <div class="sidebar-logo">
+        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
+        <div class="logo-text-wrap">
+            <div class="logo-name">STIHL <span>WS</span></div>
+            <div class="logo-sub">Workshop System</div>
         </div>
     </div>
 
-    <div class="main-container">
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div>
+            <div class="user-name">{{ nombre }}</div>
+            <div class="user-role">{{ rol }}</div>
+        </div>
+    </div>
 
-        <!-- ── Flash messages ────────────────────────────── -->
+    <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+
+        <a href="#" class="nav-item active">
+            <i class="fas fa-house ni"></i>
+            <span>Inicio</span>
+        </a>
+
+        <div class="nav-label">Módulos</div>
+
+        <a href="{{ url_for('ordenes') }}" class="nav-item">
+            <i class="fas fa-clipboard-list ni"></i>
+            <span>Órdenes de servicio</span>
+        </a>
+
+        <a href="{{ url_for('clientes') }}" class="nav-item">
+            <i class="fas fa-address-book ni"></i>
+            <span>Clientes</span>
+        </a>
+
+        <a href="{{ url_for('equipos') }}" class="nav-item">
+            <i class="fas fa-toolbox ni"></i>
+            <span>Equipos</span>
+        </a>
+
+        <a href="{{ url_for('refacciones') }}" class="nav-item">
+            <i class="fas fa-gears ni"></i>
+            <span>Refacciones</span>
+        </a>
+
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item">
+            <i class="fas fa-file-invoice-dollar ni"></i>
+            <span>Cotizaciones</span>
+        </a>
+
+        <a href="{{ url_for('reportes') }}" class="nav-item">
+            <i class="fas fa-chart-column ni"></i>
+            <span>Reportes</span>
+        </a>
+
+        <div class="nav-label">Administración</div>
+
+        <a href="{{ url_for('usuarios') }}" class="nav-item">
+            <i class="fas fa-users-gear ni"></i>
+            <span>Usuarios del sistema</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i>
+            <span>Cerrar sesión</span>
+        </a>
+    </div>
+
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
+
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <span>Dashboard</span>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">Inicio</span>
+        </div>
+        <div class="topbar-right">
+            <i class="fas fa-calendar-days"></i>
+            <span id="date-label"></span>
+        </div>
+    </div>
+
+    <div class="content-area">
+
+        <!-- Flash messages -->
         <div class="flash-messages">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
                         <div class="mensaje {{ category }}">
                             {% if category == 'error' %}
-                                <i class="fas fa-circle-xmark msg-icon"></i>
+                                <i class="fas fa-circle-xmark"></i>
                             {% elif category == 'success' %}
-                                <i class="fas fa-circle-check msg-icon"></i>
+                                <i class="fas fa-circle-check"></i>
                             {% else %}
-                                <i class="fas fa-circle-info msg-icon"></i>
+                                <i class="fas fa-circle-info"></i>
                             {% endif %}
                             {{ message }}
                         </div>
@@ -551,204 +461,60 @@
             {% endwith %}
         </div>
 
-        <!-- ── Welcome card ──────────────────────────────── -->
-        <div class="welcome-card">
-            <h2>Hola, <strong>{{ nombre }}</strong></h2>
-            <p>Panel de control del taller. Tienes acceso a las herramientas según tu perfil asignado.</p>
-            <div class="role-chip">
-                <i class="fas fa-shield-halved"></i> {{ rol }}
+        <!-- Encabezado -->
+        <div class="page-header">
+            <h1>Bienvenido, <span>{{ nombre }}</span></h1>
+            <p>Panel de control del taller · Acceso activo como <strong>{{ rol }}</strong>.</p>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon si-orange"><i class="fas fa-clipboard-list"></i></div>
+                <div>
+                    <div class="stat-label">Órdenes recientes</div>
+                    <div class="stat-value">{{ ultimas_ordenes | length if ultimas_ordenes else 0 }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon si-blue"><i class="fas fa-screwdriver-wrench"></i></div>
+                <div>
+                    <div class="stat-label">En reparación</div>
+                    <div class="stat-value">
+                        {{ ultimas_ordenes | selectattr('estado','equalto','en_reparacion') | list | length if ultimas_ordenes else 0 }}
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon si-green"><i class="fas fa-circle-check"></i></div>
+                <div>
+                    <div class="stat-label">Listas para entrega</div>
+                    <div class="stat-value">
+                        {{ ultimas_ordenes | selectattr('estado','equalto','listo') | list | length if ultimas_ordenes else 0 }}
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon si-purple"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="stat-label">Clientes únicos</div>
+                    <div class="stat-value">
+                        {{ ultimas_ordenes | map(attribute='nombre_cliente') | unique | list | length if ultimas_ordenes else 0 }}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ── Sección módulos ────────────────────────────── -->
-        <div class="section-title">
-            <span class="bar"></span>
-            <i class="fas fa-table-cells-large title-icon"></i>
-            Accesos rápidos
-        </div>
-
-        <div class="cards-grid">
-
-            <!-- Gestión de Usuarios -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-users-gear"></i></div>
-                <h3>Gestión de Usuarios</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('usuarios') }}" style="color:inherit;text-decoration:none;">Ver usuarios</a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('nuevo_usuario') }}" style="color:inherit;text-decoration:none;">Agregar nuevo usuario</a>
-                    </li>
-                    <li class="disabled">
-                        <i class="fas fa-lock li-icon"></i>
-                        Editar usuarios
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('usuarios') }}" class="btn-card">
-                        Gestionar <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Órdenes de servicio -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
-                <h3>Órdenes de servicio</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('ordenes') }}" style="color:inherit;text-decoration:none;">
-                            Ver pendientes <span class="badge-count">3</span>
-                        </a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('nueva_orden') }}" style="color:inherit;text-decoration:none;">Crear nueva orden</a>
-                    </li>
-                    <li class="disabled">
-                        <i class="fas fa-lock li-icon"></i>
-                        Buscar orden
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('ordenes') }}" class="btn-card">
-                        Gestionar <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Clientes -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-address-book"></i></div>
-                <h3>Clientes</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('nuevo_cliente') }}" style="color:inherit;text-decoration:none;">Registrar cliente</a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('clientes') }}" style="color:inherit;text-decoration:none;">Lista de clientes</a>
-                    </li>
-                    <li class="disabled">
-                        <i class="fas fa-lock li-icon"></i>
-                        Historial de servicios
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('clientes') }}" class="btn-card">
-                        Ver clientes <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Equipos -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-toolbox"></i></div>
-                <h3>Equipos</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('nuevo_equipo') }}" style="color:inherit;text-decoration:none;">Registrar equipo</a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('equipos') }}" style="color:inherit;text-decoration:none;">Lista de equipos</a>
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('equipos') }}" class="btn-card">
-                        Ver equipos <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Refacciones -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-gears"></i></div>
-                <h3>Refacciones</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('refacciones') }}" style="color:inherit;text-decoration:none;">Inventario actual</a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('nueva_refaccion') }}" style="color:inherit;text-decoration:none;">Agregar refacción</a>
-                    </li>
-                    <li class="disabled">
-                        <i class="fas fa-lock li-icon"></i>
-                        Reporte de stock
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('refacciones') }}" class="btn-card">
-                        Administrar <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Cotizaciones -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                <h3>Cotizaciones</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('nueva_cotizacion') }}" style="color:inherit;text-decoration:none;">Generar cotización</a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('cotizaciones') }}" style="color:inherit;text-decoration:none;">Ver historial</a>
-                    </li>
-                    <li class="disabled">
-                        <i class="fas fa-lock li-icon"></i>
-                        Enviadas / Aprobadas
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('cotizaciones') }}" class="btn-card">
-                        Ver cotizaciones <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Reportes -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-chart-column"></i></div>
-                <h3>Reportes</h3>
-                <ul>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('reportes') }}" style="color:inherit;text-decoration:none;">Ver reportes</a>
-                    </li>
-                    <li>
-                        <i class="fas fa-chevron-right li-icon"></i>
-                        <a href="{{ url_for('reportes') }}" style="color:inherit;text-decoration:none;">Filtrar por fechas</a>
-                    </li>
-                    <li class="disabled">
-                        <i class="fas fa-lock li-icon"></i>
-                        Exportar a PDF
-                    </li>
-                </ul>
-                <div class="card-footer">
-                    <a href="{{ url_for('reportes') }}" class="btn-card">
-                        Generar reportes <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ── Tabla de últimas órdenes ───────────────────── -->
+        <!-- Tabla de órdenes -->
         <div class="table-section">
-            <div class="table-section-header">
-                <div class="icon"><i class="fas fa-clock-rotate-left"></i></div>
-                <h3>Últimas órdenes registradas</h3>
+            <div class="table-head-bar">
+                <div class="thl">
+                    <div class="thl-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                    <h3>Últimas órdenes registradas</h3>
+                </div>
+                <a href="{{ url_for('nueva_orden') }}" class="btn-link">
+                    <i class="fas fa-plus"></i> Nueva orden
+                </a>
             </div>
 
             <table>
@@ -758,7 +524,7 @@
                         <th>Cliente</th>
                         <th>Equipo</th>
                         <th>Estado</th>
-                        <th>Fecha</th>
+                        <th>Fecha ingreso</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -766,31 +532,34 @@
                         {% for o in ultimas_ordenes %}
                         {% set colores = {
                             'recibido':              '#1565c0',
-                            'diagnosticando':        '#f57f17',
+                            'diagnosticando':        '#e65100',
                             'esperando_refacciones': '#880e4f',
                             'en_reparacion':         '#ff6600',
                             'listo':                 '#2e7d32',
                             'entregado':             '#6a1b9a'
                         } %}
                         <tr>
-                            <td><strong>{{ o.folio }}</strong></td>
-                            <td>{{ o.nombre_cliente }}</td>
-                            <td>{{ o.tipo_equipo }} {{ o.marca }} {{ o.modelo or '' }}</td>
+                            <td><span class="folio-badge">{{ o.folio }}</span></td>
+                            <td><span class="client-name">{{ o.nombre_cliente }}</span></td>
+                            <td><span class="equipo-text">{{ o.tipo_equipo }} {{ o.marca }} {{ o.modelo or '' }}</span></td>
                             <td>
                                 <span class="status-badge"
-                                      style="background-color:{{ colores.get(o.estado, '#888') }};">
+                                      style="background-color:{{ colores.get(o.estado,'#888') }};">
                                     {{ o.estado | replace('_',' ') | title }}
                                 </span>
                             </td>
-                            <td style="color: var(--muted); font-size: 0.88rem;">
-                                {{ o.fecha_ingreso.strftime('%d/%m/%Y') }}
+                            <td>
+                                <span class="date-cell">
+                                    <i class="fas fa-calendar-days"></i>
+                                    {{ o.fecha_ingreso.strftime('%d/%m/%Y') }}
+                                </span>
                             </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="5" style="padding:2.5rem; text-align:center; color:var(--muted);">
-                                <i class="fas fa-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+                            <td colspan="5" style="padding:3rem; text-align:center; color:var(--muted);">
+                                <i class="fas fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:0.5rem;opacity:0.35;"></i>
                                 No hay órdenes registradas aún.
                             </td>
                         </tr>
@@ -798,26 +567,33 @@
                 </tbody>
             </table>
 
-            <div class="table-footer">
-                <a href="{{ url_for('ordenes') }}" class="btn-card">
+            <div class="table-foot">
+                <a href="{{ url_for('ordenes') }}" class="btn-link">
                     Ver todas las órdenes <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
 
-    </div><!-- /main-container -->
+    </div><!-- /content-area -->
 
-    <!-- ── Footer ──────────────────────────────────────── -->
-    <div class="dashboard-footer">
-        <div class="footer-links">
-            <a href="#"><i class="fas fa-headset"></i> Soporte técnico</a>
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
             <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
         </div>
-        <div class="footer-copy">
-            <i class="fas fa-lock" style="font-size:0.75rem;"></i>
-            © Acceso Seguro &nbsp;<span>STIHL Digital</span>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
         </div>
-    </div>
+    </footer>
+
+</div><!-- /main-content -->
+
+<script>
+    const d = new Date();
+    document.getElementById('date-label').textContent =
+        d.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+</script>
 
 </body>
 </html>
