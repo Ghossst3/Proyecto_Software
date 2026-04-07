@@ -4,106 +4,238 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizaciones · STIHL Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box;
-            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
-        .navbar {
-            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        :root {
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    268px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
-        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
-        .navbar .logo span { color:#ff6600; }
-        .user-area { display:flex; align-items:center; gap:20px; }
-        .user-greeting .name { font-weight:600; }
-        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
+
+        /* ══════════ SIDEBAR ══════════ */
+        .sidebar {
+            width:var(--sidebar-w); min-height:100vh; background-color:var(--dark);
+            display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100; overflow-y:auto;
+        }
+        .sidebar-logo {
+            padding:1.5rem 1.4rem 1.3rem; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; align-items:center; gap:10px;
+        }
+        .logo-icon-box {
+            width:38px; height:38px; background-color:var(--orange); border-radius:10px;
+            display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; flex-shrink:0;
+        }
+        .logo-text-wrap .logo-name {
+            font-family:'Barlow Condensed', sans-serif; font-size:1.3rem; font-weight:800;
+            color:white; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1;
+        }
+        .logo-text-wrap .logo-name span { color:var(--orange); }
+        .logo-text-wrap .logo-sub {
+            font-size:0.62rem; color:rgba(255,255,255,0.35); font-weight:600;
+            letter-spacing:1.1px; text-transform:uppercase;
+        }
+        .sidebar-user {
+            padding:1.3rem 1.4rem; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; align-items:center; gap:11px;
+        }
+        .user-avatar {
+            width:42px; height:42px; background-color:var(--orange-mid); border:2px solid var(--orange);
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:1.05rem; flex-shrink:0;
+        }
+        .user-name { font-weight:700; font-size:0.93rem; color:white; line-height:1.2; }
+        .user-role { font-size:0.7rem; color:var(--orange); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; }
+        .sidebar-nav { flex:1; padding:1.1rem 0.7rem; }
+        .nav-label {
+            font-size:0.62rem; font-weight:700; color:rgba(255,255,255,0.28);
+            text-transform:uppercase; letter-spacing:1.2px; padding:0.9rem 0.7rem 0.35rem;
+        }
+        .nav-item {
+            display:flex; align-items:center; gap:10px; padding:0.68rem 0.85rem; border-radius:9px;
+            color:rgba(255,255,255,0.55); text-decoration:none; font-weight:500; font-size:0.9rem;
+            transition:all 0.16s; margin-bottom:2px;
+        }
+        .nav-item:hover  { background-color:rgba(255,255,255,0.07); color:white; }
+        .nav-item.active { background-color:var(--orange); color:white; font-weight:600; }
+        .nav-item .ni { width:18px; text-align:center; font-size:0.88rem; flex-shrink:0; }
+        .sidebar-bottom { padding:0.9rem 0.7rem 1.3rem; border-top:1px solid rgba(255,255,255,0.07); }
         .btn-logout {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+            display:flex; align-items:center; gap:9px; width:100%; padding:0.68rem 0.85rem; border-radius:9px;
+            background-color:rgba(255,102,0,0.10); color:var(--orange); font-weight:600; font-size:0.88rem;
+            text-decoration:none; border:1px solid rgba(255,102,0,0.20); transition:all 0.16s; cursor:pointer;
         }
-        .btn-logout:hover { background-color:#ff6600; color:white; }
+        .btn-logout:hover { background-color:var(--orange); color:white; border-color:var(--orange); }
 
-        .main-container { max-width:1200px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
-        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
-        .breadcrumb a { color:#ff6600; text-decoration:none; }
+        /* ══════════ MAIN ══════════ */
+        .main-content { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+        .topbar {
+            background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50;
+        }
+        .breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--muted); }
+        .breadcrumb a { color:var(--orange); text-decoration:none; font-weight:500; }
+        .breadcrumb a:hover { text-decoration:underline; }
+        .breadcrumb .cur { color:var(--text); font-weight:600; }
+        .breadcrumb i { font-size:0.65rem; }
+        .topbar-right { font-size:0.8rem; color:var(--muted); display:flex; align-items:center; gap:6px; }
+        .content-area { padding:1.8rem 2rem; flex:1; }
 
-        .section-header {
-            display:flex; justify-content:space-between; align-items:center;
-            margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
-        }
-        .section-title { font-size:1.8rem; font-weight:600; color:#2d2d2d;
-            display:flex; align-items:center; gap:10px; }
-        .section-title .bar { background-color:#ff6600; width:8px; height:32px;
-            border-radius:4px; display:inline-block; }
-        .btn-nuevo {
-            background-color:#ff6600; color:white; padding:0.7rem 1.5rem;
-            border-radius:40px; font-weight:600; font-size:0.95rem;
-            text-decoration:none; transition:all 0.2s;
-            box-shadow:0 6px 15px rgba(255,102,0,0.35);
-        }
-        .btn-nuevo:hover { background-color:#e65c00; transform:scale(1.02); }
-
-        /* Stats */
-        .stats-grid {
-            display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
-            gap:1rem; margin-bottom:1.5rem;
-        }
-        .stat-card {
-            background:white; border-radius:16px; padding:1.2rem 1.5rem;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04); border-left:4px solid #eaeef2;
-        }
-        .stat-card .count { font-size:2rem; font-weight:700; color:#2d2d2d; }
-        .stat-card .label { font-size:0.8rem; color:#6f7d8c; text-transform:uppercase; }
-        .stat-card.borrador  { border-left-color:#9e9e9e; }
-        .stat-card.enviada   { border-left-color:#1565c0; }
-        .stat-card.aprobada  { border-left-color:#2e7d32; }
-        .stat-card.rechazada { border-left-color:#c62828; }
-
+        /* Flash */
         .mensaje {
-            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
-            display:flex; align-items:center; gap:12px; border-left:5px solid;
-            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
+            padding:0.8rem 1.2rem; border-radius:10px; font-weight:500;
+            display:flex; align-items:center; gap:10px; border-left:4px solid;
+            background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom:0.8rem; font-size:0.9rem;
         }
-        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
         .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
         .mensaje.warning { border-left-color:#e65100; color:#e65100; }
         .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
 
-        .search-bar {
-            background:white; border-radius:16px; padding:1rem 1.5rem;
-            margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04); flex-wrap:wrap;
+        /* Page header */
+        .page-header {
+            display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:1rem; margin-bottom:1.6rem;
         }
-        .search-bar input, .search-bar select {
-            border:1px solid #d9e0e6; border-radius:10px;
-            padding:0.6rem 1rem; font-size:0.95rem; outline:none; background:#fafbfc;
+        .page-title-wrap h1 {
+            font-family:'Barlow Condensed', sans-serif; font-size:2rem; font-weight:800;
+            color:var(--dark); text-transform:uppercase; letter-spacing:0.4px; line-height:1.1;
         }
-        .search-bar input { flex:1; min-width:200px; }
-        .search-bar input:focus, .search-bar select:focus {
-            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12);
+        .page-title-wrap p { color:var(--text-light); font-size:0.9rem; margin-top:0.3rem; }
+        .btn-nuevo {
+            display:inline-flex; align-items:center; gap:8px;
+            background-color:var(--orange); color:white; padding:0.65rem 1.3rem; border-radius:10px;
+            font-weight:700; font-size:0.9rem; text-decoration:none;
+            box-shadow:0 4px 14px rgba(255,102,0,0.35); transition:background 0.18s, transform 0.15s;
         }
+        .btn-nuevo:hover { background-color:#e65c00; transform:translateY(-1px); }
 
-        .table-card { background:white; border-radius:20px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.04); overflow:hidden; }
+        /* Stats */
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+            gap:1rem; margin-bottom:1.6rem;
+        }
+        .stat-card {
+            background:white; border-radius:14px; padding:1.1rem 1.3rem;
+            border:1px solid var(--border); border-left:4px solid var(--border);
+            box-shadow:0 2px 6px rgba(0,0,0,0.03);
+            display:flex; align-items:center; gap:12px;
+            transition:transform 0.16s, box-shadow 0.16s;
+        }
+        .stat-card:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.07); }
+        .stat-card.borrador  { border-left-color:#9e9e9e; }
+        .stat-card.enviada   { border-left-color:#1565c0; }
+        .stat-card.aprobada  { border-left-color:#2e7d32; }
+        .stat-card.rechazada { border-left-color:#c62828; }
+        .stat-icon-box {
+            width:40px; height:40px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0;
+        }
+        .stat-card.borrador  .stat-icon-box { background:rgba(158,158,158,.12); color:#9e9e9e; }
+        .stat-card.enviada   .stat-icon-box { background:rgba(21,101,192,.10);  color:#1565c0; }
+        .stat-card.aprobada  .stat-icon-box { background:rgba(46,125,50,.10);   color:#2e7d32; }
+        .stat-card.rechazada .stat-icon-box { background:rgba(198,40,40,.10);   color:#c62828; }
+        .stat-count { font-family:'Barlow Condensed', sans-serif; font-size:1.8rem; font-weight:800; color:var(--dark); line-height:1; }
+        .stat-label { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+
+        /* Search bar */
+        .search-bar {
+            background:white; border-radius:14px; padding:0.85rem 1.3rem;
+            margin-bottom:1.4rem; display:flex; gap:0.85rem; align-items:center;
+            border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,0.04); flex-wrap:wrap;
+        }
+        .search-input-wrap { flex:1; min-width:200px; position:relative; display:flex; align-items:center; }
+        .search-input-wrap i { position:absolute; left:0.9rem; color:var(--muted); font-size:0.85rem; }
+        .search-bar input {
+            width:100%; border:1px solid var(--border); border-radius:9px;
+            padding:0.55rem 1rem 0.55rem 2.4rem; font-size:0.88rem;
+            font-family:'Barlow', sans-serif; outline:none;
+            background-color:var(--bg); transition:border-color 0.18s, box-shadow 0.18s;
+        }
+        .search-bar input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10); background-color:white; }
+        .filter-wrap { position:relative; display:flex; align-items:center; }
+        .filter-wrap i { position:absolute; left:0.9rem; color:var(--muted); font-size:0.78rem; pointer-events:none; }
+        .search-bar select {
+            border:1px solid var(--border); border-radius:9px;
+            padding:0.55rem 1rem 0.55rem 2.3rem; font-size:0.85rem;
+            font-family:'Barlow', sans-serif; outline:none;
+            background:var(--bg); cursor:pointer; color:var(--text); appearance:none; min-width:175px;
+        }
+        .search-bar select:focus { border-color:var(--orange); }
+
+        /* Tabla */
+        .table-section {
+            background:white; border-radius:16px; border:1px solid var(--border);
+            box-shadow:0 2px 8px rgba(0,0,0,0.04); overflow:hidden;
+        }
+        .table-head-bar {
+            padding:1.1rem 1.5rem; border-bottom:1px solid var(--border);
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .thl { display:flex; align-items:center; gap:9px; }
+        .thl-icon {
+            width:32px; height:32px; background-color:var(--orange-light); border-radius:8px;
+            display:flex; align-items:center; justify-content:center; color:var(--orange); font-size:0.85rem;
+        }
+        .thl h3 {
+            font-family:'Barlow Condensed', sans-serif; font-size:1.05rem; font-weight:700;
+            color:var(--dark); text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .count-badge {
+            background-color:var(--orange-light); color:var(--orange); font-weight:700; font-size:0.78rem;
+            padding:0.18rem 0.6rem; border-radius:20px; font-family:'Barlow Condensed', sans-serif;
+        }
         .table-responsive { overflow-x:auto; }
         table { width:100%; border-collapse:collapse; }
-        thead tr { border-bottom:2px solid #ff6600; }
         thead th {
-            padding:1rem; text-align:left; font-size:0.82rem;
-            text-transform:uppercase; letter-spacing:0.5px; color:#2d2d2d; font-weight:600;
+            padding:0.8rem 1.1rem; font-size:0.7rem; font-weight:700; color:var(--muted);
+            text-transform:uppercase; letter-spacing:0.6px; text-align:left;
+            background-color:#fafbfc; border-bottom:1px solid var(--border); white-space:nowrap;
         }
-        tbody tr { border-bottom:1px solid #eaeef2; transition:background 0.15s; }
-        tbody tr:hover { background-color:#fff8f4; }
+        tbody tr { border-bottom:1px solid var(--border); transition:background 0.12s; }
         tbody tr:last-child { border-bottom:none; }
-        td { padding:0.9rem 1rem; font-size:0.92rem; color:#3e4a5e; vertical-align:middle; }
+        tbody tr:hover { background-color:#fafbfc; }
+        td { padding:0.85rem 1.1rem; font-size:0.88rem; color:var(--text); vertical-align:middle; }
 
-        .folio-link { font-weight:700; color:#ff6600; text-decoration:none; }
-        .folio-link:hover { text-decoration:underline; }
+        /* Folio */
+        .folio-link {
+            font-family:'Barlow Condensed', sans-serif; font-weight:700;
+            color:var(--orange); text-decoration:none; font-size:0.95rem;
+            background-color:var(--orange-light); padding:0.18rem 0.6rem;
+            border-radius:6px; white-space:nowrap; transition:background 0.15s;
+        }
+        .folio-link:hover { background-color:var(--orange); color:white; }
 
+        .client-name { font-weight:600; color:var(--dark); }
+
+        /* Orden vinculada */
+        .orden-chip {
+            background:#fff3e0; color:#e65100; padding:0.2rem 0.7rem;
+            border-radius:20px; font-size:0.75rem; font-weight:700;
+            font-family:'Barlow Condensed', sans-serif; white-space:nowrap;
+            display:inline-flex; align-items:center; gap:4px;
+        }
+
+        /* Badges estado */
         .badge-estado {
-            padding:0.25rem 0.8rem; border-radius:20px; font-size:0.78rem; font-weight:700;
+            padding:0.22rem 0.75rem; border-radius:20px; font-size:0.73rem; font-weight:700;
+            font-family:'Barlow Condensed', sans-serif; white-space:nowrap; letter-spacing:0.3px;
         }
         .badge-estado.borrador  { background:#f5f5f5; color:#757575; }
         .badge-estado.enviada   { background:#e3f2fd; color:#1565c0; }
@@ -111,168 +243,336 @@
         .badge-estado.rechazada { background:#ffebee; color:#c62828; }
         .badge-estado.vencida   { background:#fff3e0; color:#e65100; }
 
-        .acciones { display:flex; gap:0.5rem; }
+        /* Total */
+        .total-cell { font-weight:700; color:var(--dark); font-size:0.92rem; white-space:nowrap; }
+
+        /* Fecha */
+        .date-cell { color:var(--muted); font-size:0.83rem; display:flex; align-items:center; gap:5px; white-space:nowrap; }
+        .date-cell.vence { color:#e65100; }
+
+        /* Acciones */
+        .acciones { display:flex; gap:6px; }
         .btn-accion {
-            padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem;
-            font-weight:600; text-decoration:none; transition:all 0.2s;
+            width:32px; height:32px; border-radius:8px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.82rem; text-decoration:none; transition:all 0.16s; border:none; cursor:pointer;
         }
         .btn-ver      { background:#fff3e0; color:#e65100; }
         .btn-ver:hover      { background:#e65100; color:white; }
         .btn-eliminar { background:#ffebee; color:#c62828; }
         .btn-eliminar:hover { background:#c62828; color:white; }
 
-        .empty-state { text-align:center; padding:4rem 2rem; color:#6f7d8c; }
-        .empty-state .icon { font-size:4rem; margin-bottom:1rem; }
+        /* Empty state */
+        .empty-state { text-align:center; padding:3.5rem 2rem; color:var(--muted); }
+        .empty-state i { font-size:2.5rem; display:block; margin-bottom:0.7rem; opacity:0.35; }
 
-        .dashboard-footer {
-            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
-            margin-top:3rem; display:flex; justify-content:space-between;
-            align-items:center; flex-wrap:wrap; gap:1rem;
+        /* Footer */
+        .main-footer {
+            background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem;
+            display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--muted);
         }
-        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
-        .footer-links a:hover { color:#ff6600; }
-        .footer-copy span { color:#ff6600; font-weight:600; }
+        .main-footer a {
+            color:var(--muted); text-decoration:none; display:inline-flex; align-items:center;
+            gap:5px; margin-right:1.2rem; transition:color 0.14s;
+        }
+        .main-footer a:hover { color:var(--orange); }
+        .main-footer .brand { color:var(--orange); font-weight:700; }
+
+        /* Responsive */
+        @media (max-width:860px) {
+            .sidebar { width:60px; }
+            .logo-text-wrap, .user-name, .user-role,
+            .nav-item span, .nav-label, .btn-logout span { display:none; }
+            .sidebar-user { justify-content:center; }
+            .nav-item { justify-content:center; padding:0.72rem; }
+            .btn-logout { justify-content:center; }
+            .main-content { margin-left:60px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
-    <div class="user-area">
-        <div class="user-greeting">
-            <div class="name">{{ nombre }}</div>
-            <div class="role">{{ rol }}</div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
-    </div>
-</div>
-
-<div class="main-container">
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a> › Cotizaciones
-    </div>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-            <div class="mensaje {{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
-
-    <div class="section-header">
-        <div class="section-title"><span class="bar"></span> 💰 Cotizaciones</div>
-        <a href="{{ url_for('nueva_cotizacion') }}" class="btn-nuevo">+ Nueva cotización</a>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card borrador">
-            <div class="count">{{ cotizaciones | selectattr('estado','eq','borrador') | list | length }}</div>
-            <div class="label">Borrador</div>
-        </div>
-        <div class="stat-card enviada">
-            <div class="count">{{ cotizaciones | selectattr('estado','eq','enviada') | list | length }}</div>
-            <div class="label">Enviadas</div>
-        </div>
-        <div class="stat-card aprobada">
-            <div class="count">{{ cotizaciones | selectattr('estado','eq','aprobada') | list | length }}</div>
-            <div class="label">Aprobadas</div>
-        </div>
-        <div class="stat-card rechazada">
-            <div class="count">{{ cotizaciones | selectattr('estado','eq','rechazada') | list | length }}</div>
-            <div class="label">Rechazadas</div>
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
+        <div class="logo-text-wrap">
+            <div class="logo-name">STIHL <span>WS</span></div>
+            <div class="logo-sub">Workshop System</div>
         </div>
     </div>
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div>
+            <div class="user-name">{{ nombre }}</div>
+            <div class="user-role">{{ rol }}</div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <i class="fas fa-house ni"></i><span>Inicio</span>
+        </a>
+        <div class="nav-label">Módulos</div>
+        <a href="{{ url_for('ordenes') }}" class="nav-item">
+            <i class="fas fa-clipboard-list ni"></i><span>Órdenes de servicio</span>
+        </a>
+        <a href="{{ url_for('clientes') }}" class="nav-item">
+            <i class="fas fa-address-book ni"></i><span>Clientes</span>
+        </a>
+        <a href="{{ url_for('equipos') }}" class="nav-item">
+            <i class="fas fa-toolbox ni"></i><span>Equipos</span>
+        </a>
+        <a href="{{ url_for('refacciones') }}" class="nav-item">
+            <i class="fas fa-gears ni"></i><span>Refacciones</span>
+        </a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item active">
+            <i class="fas fa-file-invoice-dollar ni"></i><span>Cotizaciones</span>
+        </a>
+        <a href="{{ url_for('reportes') }}" class="nav-item">
+            <i class="fas fa-chart-column ni"></i><span>Reportes</span>
+        </a>
+        <div class="nav-label">Administración</div>
+        <a href="{{ url_for('usuarios') }}" class="nav-item">
+            <i class="fas fa-users-gear ni"></i><span>Usuarios del sistema</span>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i><span>Cerrar sesión</span>
+        </a>
+    </div>
+</aside>
 
-    <!-- Filtros -->
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Buscar por folio o cliente…" oninput="filtrar()">
-        <select id="filtroEstado" onchange="filtrar()">
-            <option value="">Todos los estados</option>
-            <option value="borrador">Borrador</option>
-            <option value="enviada">Enviada</option>
-            <option value="aprobada">Aprobada</option>
-            <option value="rechazada">Rechazada</option>
-            <option value="vencida">Vencida</option>
-        </select>
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
+
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">Cotizaciones</span>
+        </div>
+        <div class="topbar-right">
+            <i class="fas fa-calendar-days"></i>
+            <span id="date-label"></span>
+        </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="table-card">
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Cliente</th>
-                        <th>Orden vinculada</th>
-                        <th>Estado</th>
-                        <th>Total</th>
-                        <th>Emisión</th>
-                        <th>Vencimiento</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if cotizaciones %}
-                        {% for c in cotizaciones %}
-                        <tr class="fila-cot" data-estado="{{ c.estado }}">
-                            <td>
-                                <a href="{{ url_for('detalle_cotizacion', cotizacion_id=c.id) }}"
-                                   class="folio-link">{{ c.folio }}</a>
-                            </td>
-                            <td>{{ c.nombre_cliente }}</td>
-                            <td>
-                                {% if c.orden_folio %}
-                                    <span style="background:#fff3e0; color:#e65100; padding:2px 8px; border-radius:20px; font-size:0.8rem; font-weight:600;">
-                                        {{ c.orden_folio }}
-                                    </span>
-                                {% else %}—{% endif %}
-                            </td>
-                            <td><span class="badge-estado {{ c.estado }}">{{ c.estado | title }}</span></td>
-                            <td style="font-weight:700; color:#2d2d2d;">${{ '%.2f' % c.total }}</td>
-                            <td>{{ c.fecha_emision.strftime('%d/%m/%Y') }}</td>
-                            <td>{{ c.fecha_vencimiento.strftime('%d/%m/%Y') if c.fecha_vencimiento else '—' }}</td>
-                            <td>
-                                <div class="acciones">
-                                    <a href="{{ url_for('detalle_cotizacion', cotizacion_id=c.id) }}"
-                                       class="btn-accion btn-ver">Ver</a>
-                                    <a href="{{ url_for('eliminar_cotizacion', cotizacion_id=c.id) }}"
-                                       class="btn-accion btn-eliminar"
-                                       data-folio="{{ c.folio }}"
-                                       onclick="return confirm('¿Eliminar ' + this.dataset.folio + '?')">Eliminar</a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="8">
-                            <div class="empty-state">
-                                <div class="icon">💰</div>
-                                <p>No hay cotizaciones registradas.</p>
-                            </div>
-                        </td></tr>
+    <div class="content-area">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="mensaje {{ category }}">
+                    {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
+                    {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
+                    {% else %}                      <i class="fas fa-circle-info"></i>
                     {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    {{ message }}
+                </div>
+            {% endfor %}{% endif %}
+        {% endwith %}
 
-<div class="dashboard-footer">
-    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
-    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
-</div>
+        <!-- Encabezado -->
+        <div class="page-header">
+            <div class="page-title-wrap">
+                <h1>Cotizaciones</h1>
+                <p>Historial y seguimiento de cotizaciones emitidas a clientes.</p>
+            </div>
+            <a href="{{ url_for('nueva_cotizacion') }}" class="btn-nuevo">
+                <i class="fas fa-plus"></i> Nueva cotización
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card borrador">
+                <div class="stat-icon-box"><i class="fas fa-file-pen"></i></div>
+                <div>
+                    <div class="stat-count">{{ cotizaciones | selectattr('estado','eq','borrador') | list | length }}</div>
+                    <div class="stat-label">Borrador</div>
+                </div>
+            </div>
+            <div class="stat-card enviada">
+                <div class="stat-icon-box"><i class="fas fa-paper-plane"></i></div>
+                <div>
+                    <div class="stat-count">{{ cotizaciones | selectattr('estado','eq','enviada') | list | length }}</div>
+                    <div class="stat-label">Enviadas</div>
+                </div>
+            </div>
+            <div class="stat-card aprobada">
+                <div class="stat-icon-box"><i class="fas fa-circle-check"></i></div>
+                <div>
+                    <div class="stat-count">{{ cotizaciones | selectattr('estado','eq','aprobada') | list | length }}</div>
+                    <div class="stat-label">Aprobadas</div>
+                </div>
+            </div>
+            <div class="stat-card rechazada">
+                <div class="stat-icon-box"><i class="fas fa-circle-xmark"></i></div>
+                <div>
+                    <div class="stat-count">{{ cotizaciones | selectattr('estado','eq','rechazada') | list | length }}</div>
+                    <div class="stat-label">Rechazadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="search-bar">
+            <div class="search-input-wrap">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="searchInput"
+                       placeholder="Buscar por folio o cliente…"
+                       oninput="filtrar()">
+            </div>
+            <div class="filter-wrap">
+                <i class="fas fa-filter"></i>
+                <select id="filtroEstado" onchange="filtrar()">
+                    <option value="">Todos los estados</option>
+                    <option value="borrador">Borrador</option>
+                    <option value="enviada">Enviada</option>
+                    <option value="aprobada">Aprobada</option>
+                    <option value="rechazada">Rechazada</option>
+                    <option value="vencida">Vencida</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-section">
+            <div class="table-head-bar">
+                <div class="thl">
+                    <div class="thl-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <h3>Historial de cotizaciones</h3>
+                    {% if cotizaciones %}
+                        <span class="count-badge">{{ cotizaciones | length }} registros</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Cliente</th>
+                            <th>Orden vinculada</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th>Emisión</th>
+                            <th>Vencimiento</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if cotizaciones %}
+                            {% for c in cotizaciones %}
+                            <tr class="fila-cot" data-estado="{{ c.estado }}">
+                                <td>
+                                    <a href="{{ url_for('detalle_cotizacion', cotizacion_id=c.id) }}"
+                                       class="folio-link">{{ c.folio }}</a>
+                                </td>
+                                <td><span class="client-name">{{ c.nombre_cliente }}</span></td>
+                                <td>
+                                    {% if c.orden_folio %}
+                                        <span class="orden-chip">
+                                            <i class="fas fa-clipboard-list"></i>
+                                            {{ c.orden_folio }}
+                                        </span>
+                                    {% else %}
+                                        <span style="color:var(--muted);">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge-estado {{ c.estado }}">
+                                        {{ c.estado | title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="total-cell">
+                                        ${{ '%.2f' % c.total }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="date-cell">
+                                        <i class="fas fa-calendar-days"></i>
+                                        {{ c.fecha_emision.strftime('%d/%m/%Y') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if c.fecha_vencimiento %}
+                                        <span class="date-cell {{ 'vence' if c.estado == 'vencida' }}">
+                                            <i class="fas fa-calendar-xmark"></i>
+                                            {{ c.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                                        </span>
+                                    {% else %}
+                                        <span style="color:var(--muted);">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="acciones">
+                                        <a href="{{ url_for('detalle_cotizacion', cotizacion_id=c.id) }}"
+                                           class="btn-accion btn-ver" title="Ver cotización">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('eliminar_cotizacion', cotizacion_id=c.id) }}"
+                                           class="btn-accion btn-eliminar" title="Eliminar cotización"
+                                           data-folio="{{ c.folio }}"
+                                           onclick="return confirm('¿Eliminar ' + this.dataset.folio + '?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                        <p>No hay cotizaciones registradas.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /content-area -->
+
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
+        </div>
+    </footer>
+
+</div><!-- /main-content -->
 
 <script>
-function filtrar() {
-    const texto  = document.getElementById('searchInput').value.toLowerCase();
-    const estado = document.getElementById('filtroEstado').value;
-    document.querySelectorAll('.fila-cot').forEach(fila => {
-        const okTexto  = fila.textContent.toLowerCase().includes(texto);
-        const okEstado = !estado || fila.dataset.estado === estado;
-        fila.style.display = (okTexto && okEstado) ? '' : 'none';
-    });
-}
+    const d = new Date();
+    document.getElementById('date-label').textContent =
+        d.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+    function filtrar() {
+        const texto  = document.getElementById('searchInput').value.toLowerCase();
+        const estado = document.getElementById('filtroEstado').value;
+        document.querySelectorAll('.fila-cot').forEach(fila => {
+            const okTexto  = fila.textContent.toLowerCase().includes(texto);
+            const okEstado = !estado || fila.dataset.estado === estado;
+            fila.style.display = (okTexto && okEstado) ? '' : 'none';
+        });
+    }
 </script>
+
 </body>
+</html>
 </html>
