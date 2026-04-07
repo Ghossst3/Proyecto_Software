@@ -4,160 +4,255 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refacciones · STIHL Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box;
-            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
-
-        .navbar {
-            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        :root {
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    268px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
-        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
-        .navbar .logo span { color:#ff6600; }
-        .user-area { display:flex; align-items:center; gap:20px; }
-        .user-greeting .name { font-weight:600; }
-        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
+
+        /* ══════════ SIDEBAR ══════════ */
+        .sidebar {
+            width:var(--sidebar-w); min-height:100vh; background-color:var(--dark);
+            display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100; overflow-y:auto;
+        }
+        .sidebar-logo {
+            padding:1.5rem 1.4rem 1.3rem; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; align-items:center; gap:10px;
+        }
+        .logo-icon-box {
+            width:38px; height:38px; background-color:var(--orange); border-radius:10px;
+            display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; flex-shrink:0;
+        }
+        .logo-text-wrap .logo-name {
+            font-family:'Barlow Condensed', sans-serif; font-size:1.3rem; font-weight:800;
+            color:white; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1;
+        }
+        .logo-text-wrap .logo-name span { color:var(--orange); }
+        .logo-text-wrap .logo-sub {
+            font-size:0.62rem; color:rgba(255,255,255,0.35); font-weight:600; letter-spacing:1.1px; text-transform:uppercase;
+        }
+        .sidebar-user {
+            padding:1.3rem 1.4rem; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:11px;
+        }
+        .user-avatar {
+            width:42px; height:42px; background-color:var(--orange-mid); border:2px solid var(--orange);
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:1.05rem; flex-shrink:0;
+        }
+        .user-name { font-weight:700; font-size:0.93rem; color:white; line-height:1.2; }
+        .user-role  { font-size:0.7rem; color:var(--orange); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; }
+        .sidebar-nav { flex:1; padding:1.1rem 0.7rem; }
+        .nav-label {
+            font-size:0.62rem; font-weight:700; color:rgba(255,255,255,0.28);
+            text-transform:uppercase; letter-spacing:1.2px; padding:0.9rem 0.7rem 0.35rem;
+        }
+        .nav-item {
+            display:flex; align-items:center; gap:10px; padding:0.68rem 0.85rem; border-radius:9px;
+            color:rgba(255,255,255,0.55); text-decoration:none; font-weight:500; font-size:0.9rem;
+            transition:all 0.16s; margin-bottom:2px;
+        }
+        .nav-item:hover  { background-color:rgba(255,255,255,0.07); color:white; }
+        .nav-item.active { background-color:var(--orange); color:white; font-weight:600; }
+        .nav-item .ni { width:18px; text-align:center; font-size:0.88rem; flex-shrink:0; }
+        .sidebar-bottom { padding:0.9rem 0.7rem 1.3rem; border-top:1px solid rgba(255,255,255,0.07); }
         .btn-logout {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+            display:flex; align-items:center; gap:9px; width:100%; padding:0.68rem 0.85rem; border-radius:9px;
+            background-color:rgba(255,102,0,0.10); color:var(--orange); font-weight:600; font-size:0.88rem;
+            text-decoration:none; border:1px solid rgba(255,102,0,0.20); transition:all 0.16s; cursor:pointer;
         }
-        .btn-logout:hover { background-color:#ff6600; color:white; }
+        .btn-logout:hover { background-color:var(--orange); color:white; border-color:var(--orange); }
 
-        .main-container { max-width:1300px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
-
-        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
-        .breadcrumb a { color:#ff6600; text-decoration:none; }
-
-        .section-header {
-            display:flex; justify-content:space-between; align-items:center;
-            margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
+        /* ══════════ MAIN ══════════ */
+        .main-content { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+        .topbar {
+            background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50;
         }
-        .section-title { font-size:1.8rem; font-weight:600; color:#2d2d2d;
-            display:flex; align-items:center; gap:10px; }
-        .section-title .bar { background-color:#ff6600; width:8px; height:32px;
-            border-radius:4px; display:inline-block; }
-        .btn-nuevo {
-            background-color:#ff6600; color:white; padding:0.7rem 1.5rem;
-            border-radius:40px; font-weight:600; font-size:0.95rem;
-            text-decoration:none; transition:all 0.2s;
-            box-shadow:0 6px 15px rgba(255,102,0,0.35);
-        }
-        .btn-nuevo:hover { background-color:#e65c00; transform:scale(1.02); }
+        .breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--muted); }
+        .breadcrumb a { color:var(--orange); text-decoration:none; font-weight:500; }
+        .breadcrumb a:hover { text-decoration:underline; }
+        .breadcrumb .cur { color:var(--text); font-weight:600; }
+        .breadcrumb i { font-size:0.65rem; }
+        .topbar-right { font-size:0.8rem; color:var(--muted); display:flex; align-items:center; gap:6px; }
+        .content-area { padding:1.8rem 2rem; flex:1; }
 
-        /* Stats */
-        .stats-grid {
-            display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr));
-            gap:1rem; margin-bottom:1.5rem;
-        }
-        .stat-card {
-            background:white; border-radius:16px; padding:1.2rem 1.5rem;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04); border-left:4px solid #eaeef2;
-        }
-        .stat-card .count { font-size:2rem; font-weight:700; color:#2d2d2d; }
-        .stat-card .label { font-size:0.8rem; color:#6f7d8c; text-transform:uppercase; }
-        .stat-card.total   { border-left-color:#ff6600; }
-        .stat-card.bajo    { border-left-color:#c62828; }
-        .stat-card.ok      { border-left-color:#2e7d32; }
-
+        /* Flash */
         .mensaje {
-            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
-            display:flex; align-items:center; gap:12px; border-left:5px solid;
-            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
+            padding:0.8rem 1.2rem; border-radius:10px; font-weight:500;
+            display:flex; align-items:center; gap:10px; border-left:4px solid;
+            background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:0.8rem; font-size:0.9rem;
         }
-        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
         .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
         .mensaje.warning { border-left-color:#e65100; color:#e65100; }
         .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
 
-        .search-bar {
-            background:white; border-radius:16px; padding:1rem 1.5rem;
-            margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04); flex-wrap:wrap;
+        /* Page header */
+        .page-header {
+            display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:1rem; margin-bottom:1.6rem;
         }
-        .search-bar input, .search-bar select {
-            border:1px solid #d9e0e6; border-radius:10px;
-            padding:0.6rem 1rem; font-size:0.95rem; outline:none; background:#fafbfc;
+        .page-title-wrap h1 {
+            font-family:'Barlow Condensed', sans-serif; font-size:2rem; font-weight:800;
+            color:var(--dark); text-transform:uppercase; letter-spacing:0.4px; line-height:1.1;
         }
-        .search-bar input { flex:1; min-width:200px; }
-        .search-bar input:focus, .search-bar select:focus {
-            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12);
+        .page-title-wrap p { color:var(--text-light); font-size:0.9rem; margin-top:0.3rem; }
+        .btn-nuevo {
+            display:inline-flex; align-items:center; gap:8px;
+            background-color:var(--orange); color:white; padding:0.65rem 1.3rem; border-radius:10px;
+            font-weight:700; font-size:0.9rem; text-decoration:none;
+            box-shadow:0 4px 14px rgba(255,102,0,0.35); transition:background 0.18s, transform 0.15s;
         }
+        .btn-nuevo:hover { background-color:#e65c00; transform:translateY(-1px); }
 
-        .table-card { background:white; border-radius:20px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.04); overflow:hidden; }
+        /* Stats */
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr));
+            gap:1rem; margin-bottom:1.6rem;
+        }
+        .stat-card {
+            background:white; border-radius:14px; padding:1.1rem 1.3rem;
+            border:1px solid var(--border); border-left:4px solid var(--border);
+            box-shadow:0 2px 6px rgba(0,0,0,0.03);
+            display:flex; align-items:center; gap:12px;
+            transition:transform 0.16s, box-shadow 0.16s;
+        }
+        .stat-card:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.07); }
+        .stat-card.total { border-left-color:var(--orange); }
+        .stat-card.bajo  { border-left-color:#c62828; }
+        .stat-card.ok    { border-left-color:#2e7d32; }
+        .stat-icon-box {
+            width:40px; height:40px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0;
+        }
+        .stat-card.total .stat-icon-box { background:var(--orange-light); color:var(--orange); }
+        .stat-card.bajo  .stat-icon-box { background:rgba(198,40,40,.10); color:#c62828; }
+        .stat-card.ok    .stat-icon-box { background:rgba(46,125,50,.10);  color:#2e7d32; }
+        .stat-count { font-family:'Barlow Condensed', sans-serif; font-size:1.8rem; font-weight:800; color:var(--dark); line-height:1; }
+        .stat-label { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+
+        /* Search bar */
+        .search-bar {
+            background:white; border-radius:14px; padding:0.85rem 1.3rem;
+            margin-bottom:1.4rem; display:flex; gap:0.85rem; align-items:center;
+            border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,0.04); flex-wrap:wrap;
+        }
+        .search-input-wrap { flex:1; min-width:200px; position:relative; display:flex; align-items:center; }
+        .search-input-wrap i { position:absolute; left:0.9rem; color:var(--muted); font-size:0.85rem; }
+        .search-bar input {
+            width:100%; border:1px solid var(--border); border-radius:9px;
+            padding:0.55rem 1rem 0.55rem 2.4rem; font-size:0.88rem;
+            font-family:'Barlow', sans-serif; outline:none;
+            background-color:var(--bg); transition:border-color 0.18s, box-shadow 0.18s;
+        }
+        .search-bar input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10); background-color:white; }
+        .filter-wrap { position:relative; display:flex; align-items:center; }
+        .filter-wrap i { position:absolute; left:0.9rem; color:var(--muted); font-size:0.78rem; pointer-events:none; }
+        .search-bar select {
+            border:1px solid var(--border); border-radius:9px;
+            padding:0.55rem 1rem 0.55rem 2.3rem; font-size:0.85rem;
+            font-family:'Barlow', sans-serif; outline:none;
+            background:var(--bg); cursor:pointer; color:var(--text); appearance:none; min-width:175px;
+        }
+        .search-bar select:focus { border-color:var(--orange); }
+
+        /* Tabla */
+        .table-section {
+            background:white; border-radius:16px; border:1px solid var(--border);
+            box-shadow:0 2px 8px rgba(0,0,0,0.04); overflow:hidden;
+        }
+        .table-head-bar {
+            padding:1.1rem 1.5rem; border-bottom:1px solid var(--border);
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .thl { display:flex; align-items:center; gap:9px; }
+        .thl-icon {
+            width:32px; height:32px; background-color:var(--orange-light); border-radius:8px;
+            display:flex; align-items:center; justify-content:center; color:var(--orange); font-size:0.85rem;
+        }
+        .thl h3 {
+            font-family:'Barlow Condensed', sans-serif; font-size:1.05rem; font-weight:700;
+            color:var(--dark); text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .count-badge {
+            background-color:var(--orange-light); color:var(--orange); font-weight:700; font-size:0.78rem;
+            padding:0.18rem 0.6rem; border-radius:20px; font-family:'Barlow Condensed', sans-serif;
+        }
         .table-responsive { overflow-x:auto; }
         table { width:100%; border-collapse:collapse; }
-        thead tr { border-bottom:2px solid #ff6600; }
         thead th {
-            padding:1rem 1rem; text-align:left; font-size:0.82rem;
-            text-transform:uppercase; letter-spacing:0.5px; color:#2d2d2d; font-weight:600;
+            padding:0.8rem 1.1rem; font-size:0.7rem; font-weight:700; color:var(--muted);
+            text-transform:uppercase; letter-spacing:0.6px; text-align:left;
+            background-color:#fafbfc; border-bottom:1px solid var(--border); white-space:nowrap;
         }
-        tbody tr { border-bottom:1px solid #eaeef2; transition:background 0.15s; }
-        tbody tr:hover { background-color:#fff8f4; }
-        tbody tr.stock-bajo { background-color:#fff5f5; }
-        tbody tr.stock-bajo:hover { background-color:#ffebeb; }
+        tbody tr { border-bottom:1px solid var(--border); transition:background 0.12s; }
         tbody tr:last-child { border-bottom:none; }
-        td { padding:0.9rem 1rem; font-size:0.92rem; color:#3e4a5e; vertical-align:middle; }
+        tbody tr:hover { background-color:#fafbfc; }
+        tbody tr.stock-bajo { background-color:#fff8f8; }
+        tbody tr.stock-bajo:hover { background-color:#ffefef; }
+        td { padding:0.85rem 1.1rem; font-size:0.88rem; color:var(--text); vertical-align:middle; }
 
+        /* Código */
+        .codigo-cell {
+            font-family:'Courier New', monospace; background:var(--bg);
+            padding:0.18rem 0.6rem; border-radius:6px; font-size:0.82rem;
+            border:1px solid var(--border); color:var(--text); white-space:nowrap;
+        }
+
+        /* Nombre */
+        .ref-nombre { font-weight:600; color:var(--dark); font-size:0.9rem; display:block; }
+        .ref-desc   { color:var(--muted); font-size:0.78rem; margin-top:2px; }
+
+        /* Categoría */
         .badge-cat {
-            background-color:#f0f3f7; color:#3e4a5e;
-            padding:0.2rem 0.8rem; border-radius:20px; font-size:0.78rem; font-weight:600;
+            background-color:var(--bg); color:var(--text); padding:0.2rem 0.75rem;
+            border-radius:20px; font-size:0.73rem; font-weight:700;
+            font-family:'Barlow Condensed', sans-serif; border:1px solid var(--border);
         }
 
-        .stock-indicator {
-            display:flex; align-items:center; gap:8px;
-        }
-        .stock-num { font-weight:700; font-size:1rem; }
+        /* Stock */
+        .stock-indicator { display:flex; align-items:center; gap:7px; }
+        .stock-num { font-family:'Barlow Condensed', sans-serif; font-weight:800; font-size:1.05rem; }
         .stock-num.ok   { color:#2e7d32; }
         .stock-num.bajo { color:#c62828; }
         .stock-alerta {
-            background:#ffebee; color:#c62828; font-size:0.72rem;
+            display:inline-flex; align-items:center; gap:4px;
+            background:#ffebee; color:#c62828; font-size:0.7rem;
             font-weight:700; padding:2px 8px; border-radius:20px;
+            font-family:'Barlow Condensed', sans-serif;
         }
+        .stock-minimo { font-size:0.75rem; color:var(--muted); margin-top:2px; }
 
-        /* Modal ajuste stock */
-        .modal-overlay {
-            display:none; position:fixed; inset:0;
-            background:rgba(0,0,0,0.5); z-index:1000;
-            justify-content:center; align-items:center;
-        }
-        .modal-overlay.open { display:flex; }
-        .modal {
-            background:white; border-radius:20px; padding:2rem;
-            width:90%; max-width:420px;
-            box-shadow:0 20px 40px rgba(0,0,0,0.2);
-        }
-        .modal h3 { font-size:1.3rem; margin-bottom:0.5rem; color:#2d2d2d; }
-        .modal .ref-nombre { color:#ff6600; font-weight:600; margin-bottom:1.5rem; font-size:0.95rem; }
-        .modal .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-bottom:1.2rem; }
-        .modal label { font-size:0.82rem; font-weight:600; color:#2d3e50;
-            text-transform:uppercase; display:block; margin-bottom:4px; }
-        .modal input, .modal select {
-            width:100%; padding:0.65rem 0.9rem; border:1px solid #d9e0e6;
-            border-radius:10px; font-size:0.95rem; outline:none;
-        }
-        .modal input:focus, .modal select:focus {
-            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12);
-        }
-        .modal-actions { display:flex; gap:0.8rem; justify-content:flex-end; margin-top:1.2rem; }
-        .btn-modal-ok {
-            background:#ff6600; color:white; border:none;
-            padding:0.65rem 1.5rem; border-radius:40px; font-weight:600; cursor:pointer;
-        }
-        .btn-modal-ok:hover { background:#e65c00; }
-        .btn-modal-cancel {
-            background:none; border:2px solid #d9e0e6; color:#6f7d8c;
-            padding:0.65rem 1.2rem; border-radius:40px; font-weight:600; cursor:pointer;
-        }
-        .btn-modal-cancel:hover { border-color:#ff6600; color:#ff6600; }
+        /* Precio */
+        .precio-cell { font-weight:700; color:var(--dark); font-size:0.9rem; white-space:nowrap; }
 
-        .acciones { display:flex; gap:0.5rem; flex-wrap:wrap; }
+        /* Ubicación */
+        .ubicacion-cell { display:flex; align-items:center; gap:5px; font-size:0.85rem; color:var(--text-light); }
+
+        /* Acciones */
+        .acciones { display:flex; gap:6px; flex-wrap:wrap; }
         .btn-accion {
-            padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem;
-            font-weight:600; text-decoration:none; transition:all 0.2s; border:none; cursor:pointer;
+            width:32px; height:32px; border-radius:8px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.82rem; text-decoration:none; transition:all 0.16s; border:none; cursor:pointer;
         }
         .btn-stock   { background:#e8f5e9; color:#2e7d32; }
         .btn-stock:hover   { background:#2e7d32; color:white; }
@@ -166,174 +261,385 @@
         .btn-eliminar{ background:#ffebee; color:#c62828; }
         .btn-eliminar:hover{ background:#c62828; color:white; }
 
-        .empty-state { text-align:center; padding:4rem 2rem; color:#6f7d8c; }
-        .empty-state .icon { font-size:4rem; margin-bottom:1rem; }
+        /* Empty state */
+        .empty-state { text-align:center; padding:3.5rem 2rem; color:var(--muted); }
+        .empty-state i { font-size:2.5rem; display:block; margin-bottom:0.7rem; opacity:0.35; }
 
-        .dashboard-footer {
-            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
-            margin-top:3rem; display:flex; justify-content:space-between;
-            align-items:center; flex-wrap:wrap; gap:1rem;
+        /* ══════════ MODAL ══════════ */
+        /* ID único: modal-overlay-stock (no conflicto con el span de stock) */
+        .modal-overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,0.45); z-index:1000;
+            justify-content:center; align-items:center;
         }
-        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
-        .footer-links a:hover { color:#ff6600; }
-        .footer-copy span { color:#ff6600; font-weight:600; }
+        .modal-overlay.open { display:flex; }
+        .modal {
+            background:white; border-radius:20px; padding:2rem;
+            width:90%; max-width:430px;
+            box-shadow:0 20px 50px rgba(0,0,0,0.2);
+            animation: modalIn 0.18s ease;
+        }
+        @keyframes modalIn {
+            from { opacity:0; transform:translateY(-12px) scale(0.97); }
+            to   { opacity:1; transform:none; }
+        }
+        .modal-header { display:flex; align-items:center; gap:10px; margin-bottom:0.4rem; }
+        .modal-header .modal-icon {
+            width:36px; height:36px; background:var(--orange-light); border-radius:9px;
+            display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:0.95rem; flex-shrink:0;
+        }
+        .modal-header h3 { font-family:'Barlow Condensed', sans-serif; font-size:1.25rem; font-weight:800; color:var(--dark); text-transform:uppercase; }
+        .modal-ref-nombre { color:var(--orange); font-weight:600; font-size:0.95rem; margin-bottom:1.4rem; padding-left:46px; }
+        .modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; margin-bottom:1rem; }
+        .modal label { font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:4px; }
+        .modal input, .modal select {
+            width:100%; padding:0.62rem 0.9rem; border:1px solid var(--border);
+            border-radius:9px; font-size:0.92rem; font-family:'Barlow', sans-serif; outline:none;
+            background-color:var(--bg); transition:border-color 0.18s;
+        }
+        .modal input:focus, .modal select:focus {
+            border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10);
+            background-color:white;
+        }
+        .modal-stock-info {
+            background-color:var(--bg); border-radius:10px; padding:0.7rem 1rem;
+            font-size:0.88rem; color:var(--text-light); margin-bottom:1.2rem;
+            display:flex; align-items:center; gap:8px;
+        }
+        .modal-stock-info i { color:var(--muted); }
+        .modal-stock-info strong { color:var(--dark); font-size:1rem; }
+        .modal-actions { display:flex; gap:0.8rem; justify-content:flex-end; }
+        .btn-modal-ok {
+            display:inline-flex; align-items:center; gap:7px;
+            background:var(--orange); color:white; border:none;
+            padding:0.65rem 1.4rem; border-radius:9px; font-weight:700;
+            font-size:0.9rem; cursor:pointer; transition:background 0.16s;
+        }
+        .btn-modal-ok:hover { background:#e65c00; }
+        .btn-modal-cancel {
+            background:none; border:1px solid var(--border); color:var(--muted);
+            padding:0.65rem 1.2rem; border-radius:9px; font-weight:600;
+            font-size:0.9rem; cursor:pointer; transition:all 0.16s;
+        }
+        .btn-modal-cancel:hover { border-color:var(--orange); color:var(--orange); }
+
+        /* Footer */
+        .main-footer {
+            background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem;
+            display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--muted);
+        }
+        .main-footer a {
+            color:var(--muted); text-decoration:none; display:inline-flex; align-items:center;
+            gap:5px; margin-right:1.2rem; transition:color 0.14s;
+        }
+        .main-footer a:hover { color:var(--orange); }
+        .main-footer .brand { color:var(--orange); font-weight:700; }
+
+        /* Responsive */
+        @media (max-width:860px) {
+            .sidebar { width:60px; }
+            .logo-text-wrap, .user-name, .user-role,
+            .nav-item span, .nav-label, .btn-logout span { display:none; }
+            .sidebar-user { justify-content:center; }
+            .nav-item { justify-content:center; padding:0.72rem; }
+            .btn-logout { justify-content:center; }
+            .main-content { margin-left:60px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
-    <div class="user-area">
-        <div class="user-greeting">
-            <div class="name">{{ nombre }}</div>
-            <div class="role">{{ rol }}</div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
-    </div>
-</div>
-
-<div class="main-container">
-
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a> › Refacciones
-    </div>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-            <div class="mensaje {{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
-
-    <div class="section-header">
-        <div class="section-title"><span class="bar"></span> 🔩 Inventario de Refacciones</div>
-        <a href="{{ url_for('nueva_refaccion') }}" class="btn-nuevo">+ Agregar refacción</a>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card total">
-            <div class="count">{{ refacciones | length }}</div>
-            <div class="label">Total en inventario</div>
-        </div>
-        <div class="stat-card bajo">
-            <div class="count">{{ refacciones | selectattr('stock_bajo', 'eq', true) | list | length }}</div>
-            <div class="label">Stock bajo</div>
-        </div>
-        <div class="stat-card ok">
-            <div class="count">{{ refacciones | selectattr('stock_bajo', 'eq', false) | list | length }}</div>
-            <div class="label">Stock OK</div>
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
+        <div class="logo-text-wrap">
+            <div class="logo-name">STIHL <span>WS</span></div>
+            <div class="logo-sub">Workshop System</div>
         </div>
     </div>
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div>
+            <div class="user-name">{{ nombre }}</div>
+            <div class="user-role">{{ rol }}</div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <i class="fas fa-house ni"></i><span>Inicio</span>
+        </a>
+        <div class="nav-label">Módulos</div>
+        <a href="{{ url_for('ordenes') }}" class="nav-item">
+            <i class="fas fa-clipboard-list ni"></i><span>Órdenes de servicio</span>
+        </a>
+        <a href="{{ url_for('clientes') }}" class="nav-item">
+            <i class="fas fa-address-book ni"></i><span>Clientes</span>
+        </a>
+        <a href="{{ url_for('equipos') }}" class="nav-item">
+            <i class="fas fa-toolbox ni"></i><span>Equipos</span>
+        </a>
+        <a href="{{ url_for('refacciones') }}" class="nav-item active">
+            <i class="fas fa-gears ni"></i><span>Refacciones</span>
+        </a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item">
+            <i class="fas fa-file-invoice-dollar ni"></i><span>Cotizaciones</span>
+        </a>
+        <a href="{{ url_for('reportes') }}" class="nav-item">
+            <i class="fas fa-chart-column ni"></i><span>Reportes</span>
+        </a>
+        <div class="nav-label">Administración</div>
+        <a href="{{ url_for('usuarios') }}" class="nav-item">
+            <i class="fas fa-users-gear ni"></i><span>Usuarios del sistema</span>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i><span>Cerrar sesión</span>
+        </a>
+    </div>
+</aside>
 
-    <!-- Filtros -->
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Buscar por nombre, código o categoría…" oninput="filtrar()">
-        <select id="filtroCategoria" onchange="filtrar()">
-            <option value="">Todas las categorías</option>
-            <option>Carburador</option>
-            <option>Filtro</option>
-            <option>Cadena</option>
-            <option>Lubricante</option>
-            <option>Encendido</option>
-            <option>Motor</option>
-            <option>Kit</option>
-        </select>
-        <select id="filtroStock" onchange="filtrar()">
-            <option value="">Todo el stock</option>
-            <option value="bajo">⚠️ Stock bajo</option>
-            <option value="ok">✅ Stock OK</option>
-        </select>
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
+
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">Refacciones</span>
+        </div>
+        <div class="topbar-right">
+            <i class="fas fa-calendar-days"></i>
+            <span id="date-label"></span>
+        </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="table-card">
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Compatible con</th>
-                        <th>Stock</th>
-                        <th>Precio venta</th>
-                        <th>Ubicación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if refacciones %}
-                        {% for r in refacciones %}
-                        {% set stock_bajo = r.stock_actual <= r.stock_minimo %}
-                        <tr class="fila-ref {{ 'stock-bajo' if stock_bajo }}"
-                            data-categoria="{{ r.categoria or '' }}"
-                            data-stock="{{ 'bajo' if stock_bajo else 'ok' }}">
-                            <td><code style="background:#f0f3f7; padding:2px 8px; border-radius:6px; font-size:0.82rem;">{{ r.codigo }}</code></td>
-                            <td>
-                                <strong style="color:#2d2d2d;">{{ r.nombre }}</strong>
-                                {% if r.descripcion %}<br><small style="color:#9aa9b7;">{{ r.descripcion[:50] }}…</small>{% endif %}
-                            </td>
-                            <td><span class="badge-cat">{{ r.categoria or '—' }}</span></td>
-                            <td style="font-size:0.85rem;">{{ r.marca_compatible or '—' }}</td>
-                            <td>
-                                <div class="stock-indicator">
-                                    <span class="stock-num {{ 'bajo' if stock_bajo else 'ok' }}">
-                                        {{ r.stock_actual }} {{ r.unidad }}
-                                    </span>
-                                    {% if stock_bajo %}
-                                        <span class="stock-alerta">⚠️ Bajo</span>
-                                    {% endif %}
-                                </div>
-                                <div style="font-size:0.75rem; color:#9aa9b7; margin-top:2px;">Mínimo: {{ r.stock_minimo }}</div>
-                            </td>
-                            <td style="font-weight:600; color:#2d2d2d;">
-                                {{ '$%.2f' | format(r.precio_venta) if r.precio_venta else '—' }}
-                            </td>
-                            <td style="font-size:0.85rem;">{{ r.ubicacion or '—' }}</td>
-                            <td>
-                                <div class="acciones">
-                                    <button class="btn-accion btn-stock"
-                                            data-id="{{ r.id }}"
-                                            data-nombre="{{ r.nombre }}"
-                                            data-stock="{{ r.stock_actual }}"
-                                            onclick="abrirModal(this.dataset.id, this.dataset.nombre, this.dataset.stock)">
-                                            +/− Stock
-                                    </button>
-                                    <a href="{{ url_for('editar_refaccion', ref_id=r.id) }}" class="btn-accion btn-editar">Editar</a>
-                                    <a href="{{ url_for('eliminar_refaccion', ref_id=r.id) }}"
-                                       class="btn-accion btn-eliminar"
-                                       data-nombre="{{ r.nombre }}"
-                                       onclick="return confirm('¿Eliminar {{ r.nombre }} del inventario?')">Eliminar</a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="8">
-                            <div class="empty-state">
-                                <div class="icon">🔩</div>
-                                <p>No hay refacciones en el inventario.</p>
-                            </div>
-                        </td></tr>
+    <div class="content-area">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="mensaje {{ category }}">
+                    {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
+                    {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
+                    {% else %}                      <i class="fas fa-circle-info"></i>
                     {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    {{ message }}
+                </div>
+            {% endfor %}{% endif %}
+        {% endwith %}
 
-<!-- Modal ajuste de stock -->
-<div class="modal-overlay" id="modalStock">
+        <!-- Encabezado -->
+        <div class="page-header">
+            <div class="page-title-wrap">
+                <h1>Refacciones</h1>
+                <p>Control de inventario y ajuste de stock de refacciones.</p>
+            </div>
+            <a href="{{ url_for('nueva_refaccion') }}" class="btn-nuevo">
+                <i class="fas fa-plus"></i> Agregar refacción
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-icon-box"><i class="fas fa-boxes-stacked"></i></div>
+                <div>
+                    <div class="stat-count">{{ refacciones | length }}</div>
+                    <div class="stat-label">Total en inventario</div>
+                </div>
+            </div>
+            <div class="stat-card bajo">
+                <div class="stat-icon-box"><i class="fas fa-triangle-exclamation"></i></div>
+                <div>
+                    <div class="stat-count">{{ refacciones | selectattr('stock_bajo','eq',true) | list | length }}</div>
+                    <div class="stat-label">Stock bajo</div>
+                </div>
+            </div>
+            <div class="stat-card ok">
+                <div class="stat-icon-box"><i class="fas fa-circle-check"></i></div>
+                <div>
+                    <div class="stat-count">{{ refacciones | selectattr('stock_bajo','eq',false) | list | length }}</div>
+                    <div class="stat-label">Stock OK</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="search-bar">
+            <div class="search-input-wrap">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre, código o categoría…" oninput="filtrar()">
+            </div>
+            <div class="filter-wrap">
+                <i class="fas fa-tag"></i>
+                <select id="filtroCategoria" onchange="filtrar()">
+                    <option value="">Todas las categorías</option>
+                    <option>Carburador</option>
+                    <option>Filtro</option>
+                    <option>Cadena</option>
+                    <option>Lubricante</option>
+                    <option>Encendido</option>
+                    <option>Motor</option>
+                    <option>Kit</option>
+                </select>
+            </div>
+            <div class="filter-wrap">
+                <i class="fas fa-filter"></i>
+                <select id="filtroStock" onchange="filtrar()">
+                    <option value="">Todo el stock</option>
+                    <option value="bajo">Stock bajo</option>
+                    <option value="ok">Stock OK</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-section">
+            <div class="table-head-bar">
+                <div class="thl">
+                    <div class="thl-icon"><i class="fas fa-gears"></i></div>
+                    <h3>Inventario de refacciones</h3>
+                    {% if refacciones %}
+                        <span class="count-badge">{{ refacciones | length }} registros</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Compatible con</th>
+                            <th>Stock</th>
+                            <th>Precio venta</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if refacciones %}
+                            {% for r in refacciones %}
+                            {% set stock_bajo = r.stock_actual <= r.stock_minimo %}
+                            <tr class="fila-ref {{ 'stock-bajo' if stock_bajo }}"
+                                data-categoria="{{ r.categoria or '' }}"
+                                data-stock="{{ 'bajo' if stock_bajo else 'ok' }}">
+                                <td><span class="codigo-cell">{{ r.codigo }}</span></td>
+                                <td>
+                                    <span class="ref-nombre">{{ r.nombre }}</span>
+                                    {% if r.descripcion %}
+                                        <span class="ref-desc">{{ r.descripcion[:50] }}…</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge-cat">{{ r.categoria or '—' }}</span></td>
+                                <td style="font-size:0.85rem; color:var(--text-light);">{{ r.marca_compatible or '—' }}</td>
+                                <td>
+                                    <div class="stock-indicator">
+                                        <span class="stock-num {{ 'bajo' if stock_bajo else 'ok' }}">
+                                            {{ r.stock_actual }}
+                                        </span>
+                                        <span style="font-size:0.8rem; color:var(--muted);">{{ r.unidad }}</span>
+                                        {% if stock_bajo %}
+                                            <span class="stock-alerta">
+                                                <i class="fas fa-triangle-exclamation"></i> Bajo
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="stock-minimo">Mínimo: {{ r.stock_minimo }}</div>
+                                </td>
+                                <td>
+                                    <span class="precio-cell">
+                                        {{ '$%.2f' | format(r.precio_venta) if r.precio_venta else '—' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if r.ubicacion %}
+                                        <span class="ubicacion-cell">
+                                            <i class="fas fa-location-dot"></i> {{ r.ubicacion }}
+                                        </span>
+                                    {% else %}
+                                        <span style="color:var(--muted);">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="acciones">
+                                        <!-- Botón +/- stock: pasa id, nombre y stock al modal -->
+                                        <button class="btn-accion btn-stock"
+                                                title="Ajustar stock"
+                                                onclick="abrirModal('{{ r.id }}', '{{ r.nombre | replace("'","\\'" ) }}', {{ r.stock_actual }})">
+                                            <i class="fas fa-arrows-up-down"></i>
+                                        </button>
+                                        <a href="{{ url_for('editar_refaccion', ref_id=r.id) }}"
+                                           class="btn-accion btn-editar" title="Editar refacción">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <a href="{{ url_for('eliminar_refaccion', ref_id=r.id) }}"
+                                           class="btn-accion btn-eliminar" title="Eliminar refacción"
+                                           onclick="return confirm('¿Eliminar {{ r.nombre }} del inventario?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-gears"></i>
+                                        <p>No hay refacciones en el inventario.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /content-area -->
+
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
+        </div>
+    </footer>
+
+</div><!-- /main-content -->
+
+<!-- ══════════ MODAL AJUSTE DE STOCK ══════════
+     CORRECCIÓN: el overlay ahora tiene id="modalOverlay"  (antes "modalStock")
+     y el span del stock actual tiene id="modalStockActual" (antes "modalStock" también)
+     → ya no hay IDs duplicados que hacían que getElementById tomara el overlay
+       y borrara todo su contenido HTML al hacer .textContent = valor
+-->
+<div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-        <h3>Ajuste de Stock</h3>
-        <div class="ref-nombre" id="modalNombre"></div>
+        <div class="modal-header">
+            <div class="modal-icon"><i class="fas fa-arrows-up-down"></i></div>
+            <h3>Ajuste de stock</h3>
+        </div>
+        <div class="modal-ref-nombre" id="modalNombre"></div>
+
         <form id="formStock" method="POST">
-            <div class="grid-2">
+            <div class="modal-grid">
                 <div>
                     <label>Operación</label>
                     <select name="operacion" id="modalOperacion">
-                        <option value="entrada">📥 Entrada</option>
-                        <option value="salida">📤 Salida</option>
+                        <option value="entrada">Entrada  ↑</option>
+                        <option value="salida">Salida  ↓</option>
                     </select>
                 </div>
                 <div>
@@ -341,54 +647,65 @@
                     <input type="number" name="cantidad" id="modalCantidad" min="1" value="1" required>
                 </div>
             </div>
-            <div style="font-size:0.85rem; color:#6f7d8c; margin-bottom:0.5rem;">
-                Stock actual: <strong id="modalStock">0</strong>
+
+            <!-- id único: modalStockActual  (ya no choca con el overlay) -->
+            <div class="modal-stock-info">
+                <i class="fas fa-boxes-stacked"></i>
+                Stock actual: <strong id="modalStockActual">0</strong>
             </div>
+
             <div class="modal-actions">
                 <button type="button" class="btn-modal-cancel" onclick="cerrarModal()">Cancelar</button>
-                <button type="submit" class="btn-modal-ok">Guardar →</button>
+                <button type="submit" class="btn-modal-ok">
+                    <i class="fas fa-floppy-disk"></i> Guardar
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<div class="dashboard-footer">
-    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
-    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
-</div>
-
 <script>
-function filtrar() {
-    const texto     = document.getElementById('searchInput').value.toLowerCase();
-    const categoria = document.getElementById('filtroCategoria').value;
-    const stock     = document.getElementById('filtroStock').value;
-    document.querySelectorAll('.fila-ref').forEach(fila => {
-        const okTexto     = fila.textContent.toLowerCase().includes(texto);
-        const okCategoria = !categoria || fila.dataset.categoria === categoria;
-        const okStock     = !stock     || fila.dataset.stock     === stock;
-        fila.style.display = (okTexto && okCategoria && okStock) ? '' : 'none';
+    // Fecha topbar
+    const d = new Date();
+    document.getElementById('date-label').textContent =
+        d.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+    // Filtro
+    function filtrar() {
+        const texto     = document.getElementById('searchInput').value.toLowerCase();
+        const categoria = document.getElementById('filtroCategoria').value;
+        const stock     = document.getElementById('filtroStock').value;
+        document.querySelectorAll('.fila-ref').forEach(fila => {
+            const okTexto     = fila.textContent.toLowerCase().includes(texto);
+            const okCategoria = !categoria || fila.dataset.categoria === categoria;
+            const okStock     = !stock     || fila.dataset.stock     === stock;
+            fila.style.display = (okTexto && okCategoria && okStock) ? '' : 'none';
+        });
+    }
+
+    // Modal — ahora usa los IDs correctos sin duplicados
+    function abrirModal(id, nombre, stockActual) {
+        document.getElementById('modalNombre').textContent      = nombre;
+        document.getElementById('modalStockActual').textContent = stockActual;
+        document.getElementById('modalCantidad').value          = 1;
+        document.getElementById('modalOperacion').value         = 'entrada';
+        document.getElementById('formStock').action             = `/refacciones/stock/${id}`;
+        document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    // Cerrar al hacer clic fuera del modal
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
     });
-}
 
-function abrirModal(id, nombre, stockActual) {
-    document.getElementById('modalNombre').textContent  = nombre;
-    document.getElementById('modalStock').textContent   = stockActual;
-    document.getElementById('modalCantidad').value      = 1;
-    document.getElementById('formStock').action         = `/refacciones/stock/${id}`;
-    document.getElementById('modalStock').classList.add('open');
-    document.getElementById('modalStock') // fix: use overlay id
-    document.getElementById('modalStock').parentElement; // noop
-    document.querySelector('.modal-overlay').classList.add('open');
-}
-
-function cerrarModal() {
-    document.querySelector('.modal-overlay').classList.remove('open');
-}
-
-// Cerrar modal al hacer clic fuera
-document.getElementById('modalStock').addEventListener('click', function(e) {
-    if (e.target === this) cerrarModal();
-});
+    // Cerrar con Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') cerrarModal();
+    });
 </script>
 </body>
 </html>
