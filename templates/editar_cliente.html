@@ -4,184 +4,502 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Cliente · STIHL Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box;
-            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
-        .navbar {
-            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        :root {
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    64px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
-        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
-        .navbar .logo span { color:#ff6600; }
-        .user-area { display:flex; align-items:center; gap:20px; }
-        .user-greeting .name { font-weight:600; }
-        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
+
+        /* ══════════ SIDEBAR COLAPSADA ══════════ */
+        .sidebar {
+            width: var(--sidebar-w); min-height: 100vh; background-color: var(--dark);
+            display: flex; flex-direction: column; align-items: center;
+            position: fixed; top: 0; left: 0; z-index: 100; overflow-y: auto; overflow-x: hidden;
+        }
+        .sidebar-logo {
+            width: 100%; padding: 1.25rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; justify-content: center;
+        }
+        .logo-icon-box {
+            width: 36px; height: 36px; background-color: var(--orange); border-radius: 9px;
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 0.95rem;
+        }
+        .sidebar-user {
+            width: 100%; padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; justify-content: center;
+        }
+        .user-avatar {
+            width: 36px; height: 36px; background-color: var(--orange-mid);
+            border: 2px solid var(--orange); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--orange); font-size: 0.9rem;
+        }
+        .sidebar-nav {
+            flex: 1; width: 100%; padding: 0.9rem 0;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+        }
+        .nav-item {
+            width: 42px; height: 42px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.45); text-decoration: none;
+            font-size: 0.95rem; transition: all 0.16s; position: relative;
+        }
+        .nav-item:hover  { background-color: rgba(255,255,255,0.09); color: white; }
+        .nav-item.active { background-color: var(--orange); color: white; }
+        .nav-item::after {
+            content: attr(data-tip);
+            position: absolute; left: calc(100% + 13px); top: 50%; transform: translateY(-50%);
+            background-color: #111; color: white;
+            font-family: 'Barlow', sans-serif; font-size: 0.76rem; font-weight: 600;
+            padding: 0.32rem 0.7rem; border-radius: 7px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.14s;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.35); z-index: 300;
+        }
+        .nav-item:hover::after { opacity: 1; }
+        .nav-sep { width: 26px; height: 1px; background-color: rgba(255,255,255,0.08); margin: 5px 0; }
+        .sidebar-bottom {
+            width: 100%; padding: 0.8rem 0;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex; justify-content: center;
+        }
         .btn-logout {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+            width: 42px; height: 42px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--orange); background-color: var(--orange-light);
+            border: 1px solid rgba(255,102,0,0.20); text-decoration: none;
+            font-size: 0.95rem; transition: all 0.16s; position: relative;
         }
-        .btn-logout:hover { background-color:#ff6600; color:white; }
-        .main-container { max-width:700px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
-        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
-        .breadcrumb a { color:#ff6600; text-decoration:none; }
-        .form-card { background:white; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.06); overflow:hidden; }
-        .form-header { background-color:#2d2d2d; padding:1.8rem 2rem; color:white; }
-        .form-header h2 { font-size:1.5rem; font-weight:600; }
-        .form-header p { color:#a0a0a0; font-size:0.9rem; margin-top:4px; }
-        .form-body { padding:2rem; }
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
-        .input-group { margin-bottom:1.2rem; }
-        .input-group label {
-            display:block; font-size:0.88rem; font-weight:600;
-            color:#2d3e50; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.3px;
+        .btn-logout:hover { background-color: var(--orange); color: white; border-color: var(--orange); }
+        .btn-logout::after {
+            content: 'Cerrar sesión';
+            position: absolute; left: calc(100% + 13px); top: 50%; transform: translateY(-50%);
+            background-color: #111; color: white;
+            font-family: 'Barlow', sans-serif; font-size: 0.76rem; font-weight: 600;
+            padding: 0.32rem 0.7rem; border-radius: 7px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.14s;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.35); z-index: 300;
         }
-        .input-group input, .input-group select, .input-group textarea {
-            width:100%; padding:0.75rem 1rem; border:1px solid #d9e0e6;
-            border-radius:10px; font-size:0.95rem; background:#fafbfc;
-            transition:all 0.2s; outline:none; resize:vertical;
+        .btn-logout:hover::after { opacity: 1; }
+
+        /* ══════════ MAIN ══════════ */
+        .main-content { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+        .topbar {
+            background-color: var(--white); border-bottom: 1px solid var(--border); padding: 0.8rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 50;
         }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12); background:white;
+        .breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--muted); }
+        .breadcrumb a { color: var(--orange); text-decoration: none; font-weight: 500; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb .cur { color: var(--text); font-weight: 600; }
+        .breadcrumb i { font-size: 0.65rem; }
+        .btn-volver {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 0.45rem 1rem; border-radius: 8px;
+            border: 1px solid var(--border); background: var(--white);
+            color: var(--text-light); font-weight: 600; font-size: 0.82rem;
+            text-decoration: none; font-family: 'Barlow', sans-serif; transition: all 0.16s;
         }
-        .form-actions {
-            display:flex; gap:1rem; justify-content:flex-end;
-            padding-top:1.5rem; border-top:1px solid #eaeef2; margin-top:1.5rem;
+        .btn-volver:hover { border-color: var(--orange); color: var(--orange); }
+
+        .content-area { flex: 1; padding: 2rem; display: flex; flex-direction: column; align-items: center; }
+
+        /* Flash */
+        .flash-wrap { width: 100%; max-width: 680px; margin-bottom: 1rem; }
+        .mensaje {
+            padding: 0.8rem 1.2rem; border-radius: 10px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px; border-left: 4px solid;
+            background-color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 0.5rem; font-size: 0.9rem;
         }
-        .btn-submit {
-            background-color:#ff6600; color:white; border:none;
-            padding:0.8rem 2rem; border-radius:40px; font-size:1rem;
-            font-weight:600; cursor:pointer; transition:all 0.2s;
-            box-shadow:0 6px 15px rgba(255,102,0,0.35);
-        }
-        .btn-submit:hover { background-color:#e65c00; transform:scale(1.02); }
-        .btn-cancel {
-            background:none; border:2px solid #d9e0e6; color:#6f7d8c;
-            padding:0.8rem 1.8rem; border-radius:40px; font-size:1rem;
-            font-weight:600; cursor:pointer; text-decoration:none; transition:all 0.2s;
-        }
-        .btn-cancel:hover { border-color:#ff6600; color:#ff6600; }
-        .mensaje { padding:1rem 1.5rem; border-radius:12px; font-weight:500;
-            display:flex; align-items:center; gap:12px; border-left:5px solid;
-            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem; }
-        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
         .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
-        .dashboard-footer {
-            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
-            margin-top:3rem; display:flex; justify-content:space-between;
-            align-items:center; flex-wrap:wrap; gap:1rem;
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+        .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
+
+        /* ══════════ FORM CARD ══════════ */
+        .form-card {
+            width: 100%; max-width: 680px;
+            background: var(--white); border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden;
         }
-        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
-        .footer-links a:hover { color:#ff6600; }
-        .footer-copy span { color:#ff6600; font-weight:600; }
-        @media(max-width:600px) { .grid-2 { grid-template-columns:1fr; } }
+
+        /* Cabecera — color distinto al de "nuevo" para diferenciar visualmente */
+        .form-card-header {
+            background: linear-gradient(135deg, #1a2a3a 0%, #0f1e2e 100%);
+            padding: 1.5rem 1.8rem;
+            display: flex; align-items: center; gap: 13px;
+            position: relative; overflow: hidden;
+        }
+        .form-card-header::after {
+            content: "STIHL";
+            position: absolute; right: 1.4rem; bottom: -10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 4.2rem; font-weight: 800;
+            color: rgba(255,102,0,0.08); letter-spacing: 4px; pointer-events: none;
+        }
+        .form-header-icon {
+            width: 42px; height: 42px; background-color: #1565c0;
+            border-radius: 11px; display: flex; align-items: center;
+            justify-content: center; color: white; font-size: 1.05rem; flex-shrink: 0;
+        }
+        .form-card-header h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.45rem; font-weight: 800;
+            color: white; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-card-header p { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+        /* Chip con el nombre del cliente en edición */
+        .client-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,102,0,0.15); border: 1px solid rgba(255,102,0,0.3);
+            color: #ffb380; border-radius: 20px;
+            padding: 0.2rem 0.75rem; font-size: 0.78rem; font-weight: 700;
+            font-family: 'Barlow Condensed', sans-serif; margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-body { padding: 1.8rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.2rem; }
+
+        .input-group { margin-bottom: 1.2rem; }
+        .input-group:last-child { margin-bottom: 0; }
+
+        .input-group label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; font-weight: 700; color: var(--text);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .input-group label i { color: var(--muted); font-size: 0.68rem; }
+        .input-group label .req { color: var(--orange); font-size: 0.85rem; line-height: 1; }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%; padding: 0.65rem 1rem;
+            border: 1px solid var(--border); border-radius: 10px;
+            font-size: 0.92rem; font-family: 'Barlow', sans-serif;
+            color: var(--text); background-color: var(--bg);
+            outline: none; transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+            resize: vertical;
+        }
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.10);
+            background-color: white;
+        }
+        .input-group input::placeholder,
+        .input-group textarea::placeholder { color: var(--muted); }
+        .input-group select { cursor: pointer; appearance: none; }
+
+        .icon-wrap { position: relative; }
+        .icon-wrap .field-icon {
+            position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%);
+            color: var(--muted); font-size: 0.78rem; pointer-events: none;
+        }
+        .icon-wrap input,
+        .icon-wrap select { padding-left: 2.3rem; }
+        .icon-wrap.ta-wrap .field-icon { top: 0.85rem; transform: none; }
+        .icon-wrap.ta-wrap textarea { padding-left: 2.3rem; }
+        .select-arrow {
+            position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%);
+            color: var(--muted); font-size: 0.72rem; pointer-events: none;
+        }
+
+        /* Footer del form */
+        .form-footer {
+            padding: 1.1rem 1.8rem; border-top: 1px solid var(--border);
+            background-color: #fafbfc;
+            display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem;
+        }
+        .btn-cancelar {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 0.62rem 1.2rem; border-radius: 10px;
+            border: 1px solid var(--border); background: var(--white);
+            color: var(--text-light); font-weight: 600; font-size: 0.88rem;
+            text-decoration: none; cursor: pointer;
+            font-family: 'Barlow', sans-serif; transition: all 0.16s;
+        }
+        .btn-cancelar:hover { border-color: var(--muted); color: var(--text); }
+        .btn-guardar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0.62rem 1.4rem; border-radius: 10px;
+            background-color: #1565c0; color: white;
+            font-weight: 700; font-size: 0.88rem; border: none; cursor: pointer;
+            font-family: 'Barlow', sans-serif;
+            box-shadow: 0 4px 14px rgba(21,101,192,0.35);
+            transition: background 0.18s, transform 0.15s;
+        }
+        .btn-guardar:hover { background-color: #0d47a1; transform: translateY(-1px); }
+
+        /* Footer página */
+        .main-footer {
+            background-color: var(--white); border-top: 1px solid var(--border); padding: 0.9rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.78rem; color: var(--muted);
+        }
+        .main-footer a {
+            color: var(--muted); text-decoration: none; display: inline-flex;
+            align-items: center; gap: 5px; margin-right: 1.2rem; transition: color 0.14s;
+        }
+        .main-footer a:hover { color: var(--orange); }
+        .main-footer .brand { color: var(--orange); font-weight: 700; }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .content-area { padding: 1rem; }
+            .form-body { padding: 1.3rem; }
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
-    <div class="user-area">
-        <div class="user-greeting">
-            <div class="name">{{ nombre }}</div>
-            <div class="role">{{ rol }}</div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+<!-- ══════════ SIDEBAR COLAPSADA ══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
     </div>
-</div>
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-item" data-tip="Inicio">
+            <i class="fas fa-house"></i>
+        </a>
+        <div class="nav-sep"></div>
+        <a href="{{ url_for('ordenes') }}" class="nav-item" data-tip="Órdenes de servicio">
+            <i class="fas fa-clipboard-list"></i>
+        </a>
+        <a href="{{ url_for('clientes') }}" class="nav-item active" data-tip="Clientes">
+            <i class="fas fa-address-book"></i>
+        </a>
+        <a href="{{ url_for('equipos') }}" class="nav-item" data-tip="Equipos">
+            <i class="fas fa-toolbox"></i>
+        </a>
+        <a href="{{ url_for('refacciones') }}" class="nav-item" data-tip="Refacciones">
+            <i class="fas fa-gears"></i>
+        </a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item" data-tip="Cotizaciones">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </a>
+        <a href="{{ url_for('reportes') }}" class="nav-item" data-tip="Reportes">
+            <i class="fas fa-chart-column"></i>
+        </a>
+        <div class="nav-sep"></div>
+        <a href="{{ url_for('usuarios') }}" class="nav-item" data-tip="Usuarios del sistema">
+            <i class="fas fa-users-gear"></i>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i>
+        </a>
+    </div>
+</aside>
 
-<div class="main-container">
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
 
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
-        <a href="{{ url_for('clientes') }}">Clientes</a> › Editar
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{{ url_for('clientes') }}">Clientes</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">Editar</span>
+        </div>
+        <a href="{{ url_for('clientes') }}" class="btn-volver">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
     </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-            <div class="mensaje {{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
+    <div class="content-area">
 
-    <div class="form-card">
-        <div class="form-header">
-            <h2>✏️ Editar cliente</h2>
-            <p>Modifica los datos del cliente y guarda los cambios.</p>
+        <!-- Flash messages -->
+        <div class="flash-wrap">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}{% for category, message in messages %}
+                    <div class="mensaje {{ category }}">
+                        {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
+                        {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
+                        {% else %}                      <i class="fas fa-circle-info"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}{% endif %}
+            {% endwith %}
         </div>
-        <div class="form-body">
+
+        <!-- Form card -->
+        <div class="form-card">
+
+            <!-- Cabecera azul (diferencia visualmente "editar" de "nuevo") -->
+            <div class="form-card-header">
+                <div class="form-header-icon"><i class="fas fa-user-pen"></i></div>
+                <div>
+                    <h2>Editar cliente</h2>
+                    <p>Modifica los datos del cliente y guarda los cambios.</p>
+                    <!-- Chip con el nombre actual del cliente -->
+                    <div class="client-chip">
+                        <i class="fas fa-user" style="font-size:0.65rem;"></i>
+                        {{ cliente.nombre_completo }}
+                    </div>
+                </div>
+            </div>
+
             <form action="{{ url_for('editar_cliente', cliente_id=cliente.id) }}" method="POST">
+                <div class="form-body">
 
-                <div class="input-group">
-                    <label for="nombre_completo">Nombre completo / Razón social *</label>
-                    <input type="text" id="nombre_completo" name="nombre_completo"
-                           value="{{ cliente.nombre_completo }}" required autofocus>
-                </div>
-
-                <!-- Telefono: solo numeros y guiones, maximo 15 caracteres -->
-                <div class="grid-2">
+                    <!-- Nombre completo -->
                     <div class="input-group">
-                        <label for="telefono">Teléfono</label>
-                        <input type="text" id="telefono" name="telefono" 
-                               value="{{ cliente.telefono or '' if cliente is defined else '' }}"
-                               placeholder="844-123-4567"
-                               pattern="[0-9\-\+\(\) ]{7,15}"
-                               maxlength="15"
-                               oninput="this.value = this.value.replace(/[^0-9\-\+\(\) ]/g, '')">
+                        <label>
+                            <i class="fas fa-user"></i>
+                            Nombre completo / Razón social
+                            <span class="req">*</span>
+                        </label>
+                        <div class="icon-wrap">
+                            <i class="fas fa-user field-icon"></i>
+                            <input type="text" name="nombre_completo"
+                                   value="{{ cliente.nombre_completo }}"
+                                   required autofocus>
+                        </div>
                     </div>
-                    
+
+                    <!-- Telefono + Email -->
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label><i class="fas fa-phone"></i> Teléfono</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-phone field-icon"></i>
+                                <input type="text" name="telefono"
+                                       placeholder="844-123-4567"
+                                       pattern="[0-9\-\+\(\) ]{7,15}"
+                                       maxlength="15"
+                                       value="{{ cliente.telefono or '' }}"
+                                       oninput="this.value = this.value.replace(/[^0-9\-\+\(\) ]/g, '')">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-envelope"></i> Correo electrónico</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-envelope field-icon"></i>
+                                <input type="email" name="email"
+                                       value="{{ cliente.email or '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RFC + Tipo de cliente -->
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label><i class="fas fa-id-card"></i> RFC</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-id-card field-icon"></i>
+                                <input type="text" name="rfc"
+                                       placeholder="PEGJ900101XXX"
+                                       maxlength="13"
+                                       value="{{ cliente.rfc or '' }}"
+                                       oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-tag"></i> Tipo de cliente</label>
+                            <div class="icon-wrap" style="position:relative;">
+                                <i class="fas fa-tag field-icon"></i>
+                                <select name="tipo_cliente">
+                                    <option value="persona_fisica"
+                                        {{ 'selected' if cliente.tipo_cliente == 'persona_fisica' }}>
+                                        Persona física
+                                    </option>
+                                    <option value="empresa"
+                                        {{ 'selected' if cliente.tipo_cliente == 'empresa' }}>
+                                        Empresa
+                                    </option>
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direccion -->
                     <div class="input-group">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com">
+                        <label><i class="fas fa-location-dot"></i> Dirección</label>
+                        <div class="icon-wrap">
+                            <i class="fas fa-location-dot field-icon"></i>
+                            <input type="text" name="direccion"
+                                   placeholder="Calle, Colonia, Ciudad"
+                                   value="{{ cliente.direccion or '' }}">
+                        </div>
                     </div>
-                </div>
 
-                <!-- RFC: solo mayusculas automaticamente, maximo 13 caracteres -->
-                <div class="grid-2">
+                    <!-- Notas internas -->
                     <div class="input-group">
-                        <label for="rfc">RFC</label>
-                        <input type="text" id="rfc" name="rfc"
-                               value="{{ cliente.rfc or '' if cliente is defined else '' }}"
-                               placeholder="PEGJ900101XXX" 
-                               maxlength="13"
-                               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                        <label><i class="fas fa-note-sticky"></i> Notas internas</label>
+                        <div class="icon-wrap ta-wrap">
+                            <i class="fas fa-note-sticky field-icon"></i>
+                            <textarea name="notas" rows="3">{{ cliente.notas or '' }}</textarea>
+                        </div>
                     </div>
-                    
-                    <div class="input-group">
-                        <label for="tipo_cliente">Tipo de cliente</label>
-                        <select id="tipo_cliente" name="tipo_cliente">
-                            <option value="persona_fisica" {{ 'selected' if cliente.tipo_cliente == 'persona_fisica' }}>Persona física</option>
-                            <option value="empresa"        {{ 'selected' if cliente.tipo_cliente == 'empresa' }}>Empresa</option>
-                        </select>
-                    </div>
+
+                </div><!-- /form-body -->
+
+                <!-- Acciones -->
+                <div class="form-footer">
+                    <a href="{{ url_for('clientes') }}" class="btn-cancelar">
+                        <i class="fas fa-xmark"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-floppy-disk"></i> Guardar cambios
+                    </button>
                 </div>
 
-                <div class="input-group">
-                    <label for="direccion">Dirección</label>
-                    <input type="text" id="direccion" name="direccion" value="{{ cliente.direccion or '' }}">
-                </div>
-
-                <div class="input-group">
-                    <label for="notas">Notas internas</label>
-                    <textarea id="notas" name="notas" rows="3">{{ cliente.notas or '' }}</textarea>
-                </div>
-
-                <div class="form-actions">
-                    <a href="{{ url_for('clientes') }}" class="btn-cancel">Cancelar</a>
-                    <button type="submit" class="btn-submit">Guardar cambios →</button>
-                </div>
             </form>
-        </div>
-    </div>
-</div>
+        </div><!-- /form-card -->
 
-<div class="dashboard-footer">
-    <div class="footer-links">
-        <a href="#">SOPORTE TÉCNICO</a>
-        <a href="#">CONTACTO</a>
-    </div>
-    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
-</div>
+    </div><!-- /content-area -->
+
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
+        </div>
+    </footer>
+
+</div><!-- /main-content -->
+
 </body>
 </html>
