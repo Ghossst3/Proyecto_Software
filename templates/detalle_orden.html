@@ -1,332 +1,756 @@
-<!-- ============================================================
-     detalle_orden.html
-     ============================================================ -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ orden.folio }} · STIHL Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box;
-            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
-        .navbar {
-            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        :root {
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    268px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
-        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
-        .navbar .logo span { color:#ff6600; }
-        .user-area { display:flex; align-items:center; gap:20px; }
-        .user-greeting .name { font-weight:600; }
-        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
+
+        /* ══════════ SIDEBAR COMPLETA ══════════ */
+        .sidebar {
+            width:var(--sidebar-w); min-height:100vh; background-color:var(--dark);
+            display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100; overflow-y:auto;
+        }
+        .sidebar-logo {
+            padding:1.5rem 1.4rem 1.3rem; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; align-items:center; gap:10px;
+        }
+        .logo-icon-box {
+            width:38px; height:38px; background-color:var(--orange); border-radius:10px;
+            display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; flex-shrink:0;
+        }
+        .logo-text-wrap .logo-name {
+            font-family:'Barlow Condensed', sans-serif; font-size:1.3rem; font-weight:800;
+            color:white; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1;
+        }
+        .logo-text-wrap .logo-name span { color:var(--orange); }
+        .logo-text-wrap .logo-sub {
+            font-size:0.62rem; color:rgba(255,255,255,0.35); font-weight:600; letter-spacing:1.1px; text-transform:uppercase;
+        }
+        .sidebar-user {
+            padding:1.3rem 1.4rem; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; align-items:center; gap:11px;
+        }
+        .user-avatar {
+            width:42px; height:42px; background-color:var(--orange-mid); border:2px solid var(--orange);
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:1.05rem; flex-shrink:0;
+        }
+        .user-name { font-weight:700; font-size:0.93rem; color:white; line-height:1.2; }
+        .user-role { font-size:0.7rem; color:var(--orange); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; }
+        .sidebar-nav { flex:1; padding:1.1rem 0.7rem; }
+        .nav-label {
+            font-size:0.62rem; font-weight:700; color:rgba(255,255,255,0.28);
+            text-transform:uppercase; letter-spacing:1.2px; padding:0.9rem 0.7rem 0.35rem;
+        }
+        .nav-item {
+            display:flex; align-items:center; gap:10px; padding:0.68rem 0.85rem; border-radius:9px;
+            color:rgba(255,255,255,0.55); text-decoration:none; font-weight:500; font-size:0.9rem;
+            transition:all 0.16s; margin-bottom:2px;
+        }
+        .nav-item:hover  { background-color:rgba(255,255,255,0.07); color:white; }
+        .nav-item.active { background-color:var(--orange); color:white; font-weight:600; }
+        .nav-item .ni { width:18px; text-align:center; font-size:0.88rem; flex-shrink:0; }
+        .sidebar-bottom { padding:0.9rem 0.7rem 1.3rem; border-top:1px solid rgba(255,255,255,0.07); }
         .btn-logout {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+            display:flex; align-items:center; gap:9px; width:100%; padding:0.68rem 0.85rem; border-radius:9px;
+            background-color:rgba(255,102,0,0.10); color:var(--orange); font-weight:600; font-size:0.88rem;
+            text-decoration:none; border:1px solid rgba(255,102,0,0.20); transition:all 0.16s; cursor:pointer;
         }
-        .btn-logout:hover { background-color:#ff6600; color:white; }
+        .btn-logout:hover { background-color:var(--orange); color:white; border-color:var(--orange); }
 
-        .main-container { max-width:900px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
-        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
-        .breadcrumb a { color:#ff6600; text-decoration:none; }
+        /* ══════════ MAIN ══════════ */
+        .main-content { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+        .topbar {
+            background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; z-index:50;
+        }
+        .breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--muted); }
+        .breadcrumb a { color:var(--orange); text-decoration:none; font-weight:500; }
+        .breadcrumb a:hover { text-decoration:underline; }
+        .breadcrumb .cur { color:var(--text); font-weight:600; }
+        .breadcrumb i { font-size:0.65rem; }
+        .topbar-right { font-size:0.8rem; color:var(--muted); display:flex; align-items:center; gap:6px; }
 
+        .content-area { padding:1.8rem 2rem; flex:1; }
+
+        /* Flash */
+        .mensaje {
+            padding:0.8rem 1.2rem; border-radius:10px; font-weight:500;
+            display:flex; align-items:center; gap:10px; border-left:4px solid;
+            background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom:0.9rem; font-size:0.9rem;
+        }
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+        .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
+
+        /* ══════════ CABECERA DE LA ORDEN ══════════ */
         .orden-header {
-            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
-            color:white; border-radius:20px; padding:2rem;
-            margin-bottom:1.5rem; display:flex;
-            justify-content:space-between; align-items:flex-start;
-            flex-wrap:wrap; gap:1rem;
+            background:linear-gradient(135deg, var(--dark) 0%, #1a1a1a 100%);
+            color:white; border-radius:18px; padding:1.8rem 2rem;
+            margin-bottom:1.4rem;
+            display:flex; justify-content:space-between; align-items:flex-start;
+            flex-wrap:wrap; gap:1rem; position:relative; overflow:hidden;
         }
-        .orden-folio { font-size:2.5rem; font-weight:800; color:#ff6600; }
-        .orden-fecha { font-size:0.85rem; color:#a0a0a0; margin-top:4px; }
+        .orden-header::after {
+            content:"STIHL";
+            position:absolute; right:1.5rem; bottom:-12px;
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:5rem; font-weight:800;
+            color:rgba(255,102,0,0.08); letter-spacing:4px; pointer-events:none;
+        }
+        .orden-folio {
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:2.4rem; font-weight:800; color:var(--orange); line-height:1;
+        }
+        .orden-fecha {
+            font-size:0.82rem; color:rgba(255,255,255,0.5);
+            margin-top:5px; display:flex; align-items:center; gap:5px;
+        }
+        .header-badges { display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
 
+        /* Badges estado */
         .badge-estado {
-            padding:0.4rem 1.2rem; border-radius:20px;
-            font-size:0.9rem; font-weight:700;
+            padding:0.3rem 0.9rem; border-radius:20px; font-size:0.78rem; font-weight:700;
+            font-family:'Barlow Condensed', sans-serif; white-space:nowrap; letter-spacing:0.3px;
         }
-        .badge-estado.recibido               { background:#e3f2fd; color:#1565c0; }
-        .badge-estado.diagnosticando         { background:#fff3e0; color:#e65100; }
-        .badge-estado.esperando_refacciones  { background:#fce4ec; color:#ad1457; }
-        .badge-estado.en_reparacion          { background:#f3e5f5; color:#6a1b9a; }
-        .badge-estado.listo                  { background:#e8f5e9; color:#2e7d32; }
-        .badge-estado.entregado              { background:#f5f5f5; color:#757575; }
+        .badge-estado.recibido              { background:#e3f2fd; color:#1565c0; }
+        .badge-estado.diagnosticando        { background:#fff3e0; color:#e65100; }
+        .badge-estado.esperando_refacciones { background:#fce4ec; color:#ad1457; }
+        .badge-estado.en_reparacion         { background:#f3e5f5; color:#6a1b9a; }
+        .badge-estado.listo                 { background:#e8f5e9; color:#2e7d32; }
+        .badge-estado.entregado             { background:#f5f5f5; color:#757575; }
 
-        .badge-prioridad { padding:0.3rem 0.9rem; border-radius:20px; font-size:0.82rem; font-weight:700; }
+        .badge-prioridad {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:0.28rem 0.8rem; border-radius:20px;
+            font-size:0.73rem; font-weight:700;
+            font-family:'Barlow Condensed', sans-serif;
+        }
         .badge-prioridad.urgente { background:#ffebee; color:#c62828; }
         .badge-prioridad.normal  { background:#f5f5f5; color:#9e9e9e; }
 
-        .grid-detail {
-            display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;
-            margin-bottom:1.5rem;
-        }
-        .detail-card {
-            background:white; border-radius:16px; padding:1.5rem;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04);
-        }
-        .detail-card h4 {
-            font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;
-            color:#ff6600; font-weight:700; margin-bottom:1rem;
-            padding-bottom:0.5rem; border-bottom:2px solid #ff6600;
-        }
-        .detail-row { display:flex; justify-content:space-between;
-            padding:0.4rem 0; border-bottom:1px solid #f0f3f7; font-size:0.9rem; }
-        .detail-row:last-child { border-bottom:none; }
-        .detail-row .key { color:#6f7d8c; }
-        .detail-row .val { font-weight:600; color:#2d2d2d; text-align:right; max-width:60%; }
-
-        .problema-card {
-            background:white; border-radius:16px; padding:1.5rem;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04); margin-bottom:1.5rem;
-        }
-        .problema-card h4 { font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;
-            color:#ff6600; font-weight:700; margin-bottom:0.8rem; }
-        .problema-card p { color:#3e4a5e; line-height:1.6; }
-
-        /* Cambiar estado */
-        .estado-form {
-            background:white; border-radius:16px; padding:1.5rem;
-            box-shadow:0 4px 10px rgba(0,0,0,0.04); margin-bottom:1.5rem;
-        }
-        .estado-form h4 { font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;
-            color:#ff6600; font-weight:700; margin-bottom:1rem; }
-        .estados-grid {
-            display:flex; flex-wrap:wrap; gap:0.8rem;
-        }
-        .btn-estado {
-            padding:0.5rem 1.2rem; border-radius:20px; border:2px solid #d9e0e6;
-            background:white; font-size:0.85rem; font-weight:600; cursor:pointer;
-            transition:all 0.2s; color:#3e4a5e;
-        }
-        .btn-estado:hover  { border-color:#ff6600; color:#ff6600; }
-        .btn-estado.activo { background:#ff6600; color:white; border-color:#ff6600; }
-
+        /* ══════════ BARRA DE ACCIONES ══════════ */
         .acciones-bar {
-            display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;
+            display:flex; gap:0.8rem; flex-wrap:wrap; margin-bottom:1.4rem;
         }
-        .btn-accion-lg {
-            padding:0.7rem 1.5rem; border-radius:40px; font-size:0.95rem;
-            font-weight:600; text-decoration:none; transition:all 0.2s; border:none; cursor:pointer;
+        .btn-action {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:0.58rem 1.15rem; border-radius:10px;
+            font-size:0.88rem; font-weight:600;
+            text-decoration:none; transition:all 0.16s;
+            border:none; cursor:pointer; font-family:'Barlow', sans-serif;
         }
-        .btn-editar-lg { background:#e3f2fd; color:#1565c0; }
-        .btn-editar-lg:hover { background:#1565c0; color:white; }
-        .btn-volver    { background:#f0f3f7; color:#6f7d8c; }
-        .btn-volver:hover { background:#d9e0e6; }
-
-        .mensaje { padding:1rem 1.5rem; border-radius:12px; font-weight:500;
-            display:flex; align-items:center; gap:12px; border-left:5px solid;
-            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem; }
-        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
-        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
-
-        .dashboard-footer {
-            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
-            margin-top:3rem; display:flex; justify-content:space-between;
-            align-items:center; flex-wrap:wrap; gap:1rem;
+        .btn-action.secondary {
+            background:var(--bg); color:var(--text-light);
+            border:1px solid var(--border);
         }
-        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
-        .footer-links a:hover { color:#ff6600; }
-        .footer-copy span { color:#ff6600; font-weight:600; }
+        .btn-action.secondary:hover { border-color:var(--orange); color:var(--orange); }
+        .btn-action.blue {
+            background:#e3f2fd; color:#1565c0;
+            border:1px solid rgba(21,101,192,0.2);
+        }
+        .btn-action.blue:hover { background:#1565c0; color:white; }
+        .btn-action.green {
+            background:#e8f5e9; color:#2e7d32;
+            border:1px solid rgba(46,125,50,0.2);
+        }
+        .btn-action.green:hover { background:#2e7d32; color:white; }
 
-        @media(max-width:650px) { .grid-detail { grid-template-columns:1fr; } }
+        /* ══════════ CAMBIAR ESTADO ══════════ */
+        .section-card {
+            background:var(--white); border-radius:16px; padding:1.4rem 1.6rem;
+            border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom:1.4rem;
+        }
+        .section-card-header {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:1.1rem;
+        }
+        .section-card-title {
+            display:flex; align-items:center; gap:9px;
+        }
+        .section-icon {
+            width:30px; height:30px; background-color:var(--orange-light);
+            border-radius:8px; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:0.82rem;
+        }
+        .section-card-title h4 {
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:1rem; font-weight:800; color:var(--dark);
+            text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .card-link {
+            color:var(--orange); font-size:0.82rem; font-weight:600;
+            text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+            transition:gap 0.15s;
+        }
+        .card-link:hover { gap:8px; }
+
+        .estados-grid { display:flex; flex-wrap:wrap; gap:0.7rem; }
+        .btn-estado {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:0.48rem 1rem; border-radius:9px;
+            border:1px solid var(--border); background:var(--white);
+            font-size:0.83rem; font-weight:600; cursor:pointer;
+            transition:all 0.16s; color:var(--text);
+            font-family:'Barlow', sans-serif;
+        }
+        .btn-estado:hover  { border-color:var(--orange); color:var(--orange); background:var(--orange-light); }
+        .btn-estado.activo { background:var(--orange); color:white; border-color:var(--orange); }
+        .btn-estado.activo:hover { background:#e65c00; }
+
+        /* Íconos por estado */
+        .btn-estado[value="recibido"]              i { color:#1565c0; }
+        .btn-estado[value="diagnosticando"]        i { color:#e65100; }
+        .btn-estado[value="esperando_refacciones"] i { color:#ad1457; }
+        .btn-estado[value="en_reparacion"]         i { color:#6a1b9a; }
+        .btn-estado[value="listo"]                 i { color:#2e7d32; }
+        .btn-estado[value="entregado"]             i { color:#757575; }
+        .btn-estado.activo i { color:white !important; }
+
+        /* ══════════ GRID DE DETALLE ══════════ */
+        .grid-detail { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.4rem; }
+
+        .detail-card {
+            background:var(--white); border-radius:16px; padding:1.4rem;
+            border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,0.03);
+        }
+        .detail-card-head {
+            display:flex; align-items:center; gap:8px;
+            margin-bottom:0.9rem; padding-bottom:0.7rem; border-bottom:1px solid var(--border);
+        }
+        .detail-card-icon {
+            width:28px; height:28px; background-color:var(--orange-light);
+            border-radius:7px; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:0.78rem; flex-shrink:0;
+        }
+        .detail-card-head h4 {
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:0.9rem; font-weight:800; color:var(--dark);
+            text-transform:uppercase; letter-spacing:0.3px;
+        }
+
+        .detail-row {
+            display:flex; justify-content:space-between; align-items:baseline;
+            padding:0.38rem 0; border-bottom:1px solid #f2f4f8; font-size:0.87rem;
+        }
+        .detail-row:last-child { border-bottom:none; }
+        .detail-row .key { color:var(--muted); font-size:0.82rem; }
+        .detail-row .val { font-weight:600; color:var(--dark); text-align:right; max-width:62%; }
+        .val.mono {
+            font-family:'Courier New', monospace; background:var(--bg);
+            padding:0.12rem 0.5rem; border-radius:5px; border:1px solid var(--border);
+            font-size:0.8rem; font-weight:500;
+        }
+        .val.price { color:var(--orange); font-size:0.95rem; }
+
+        /* ══════════ TARJETAS DE TEXTO ══════════ */
+        .text-card {
+            background:var(--white); border-radius:16px; padding:1.4rem 1.6rem;
+            border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,0.03);
+            margin-bottom:1.2rem;
+        }
+        .text-card-head {
+            display:flex; align-items:center; gap:8px; margin-bottom:0.8rem;
+        }
+        .text-card-icon {
+            width:28px; height:28px; background-color:var(--orange-light);
+            border-radius:7px; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:0.78rem; flex-shrink:0;
+        }
+        .text-card-head h4 {
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:0.9rem; font-weight:800; color:var(--dark);
+            text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .text-card p { color:var(--text); line-height:1.65; font-size:0.92rem; }
+
+        /* ══════════ REFACCIONES ══════════ */
+        .refacciones-total {
+            display:flex; align-items:center; gap:10px; margin-bottom:0.6rem;
+        }
+        .refacciones-total .price-big {
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:1.7rem; font-weight:800; color:var(--orange); line-height:1;
+        }
+        .refacciones-total .price-label {
+            font-size:0.78rem; color:var(--muted); text-transform:uppercase; font-weight:600; letter-spacing:0.4px;
+        }
+
+        /* ══════════ BITÁCORA ══════════ */
+        .bitacora-entry {
+            border-left:3px solid var(--border);
+            padding:0.6rem 1rem; margin-bottom:0.8rem;
+            border-radius:0 10px 10px 0; background:#fafbfc;
+            transition:border-color 0.15s;
+        }
+        .bitacora-entry.con-estado { border-left-color:var(--orange); }
+        .bitacora-meta {
+            font-size:0.76rem; color:var(--muted);
+            display:flex; align-items:center; gap:5px; margin-bottom:3px;
+        }
+        .bitacora-desc { font-size:0.9rem; color:var(--text); line-height:1.5; }
+        .bitacora-cambio {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:0.76rem; color:#e65100; margin-top:5px; font-weight:600;
+        }
+
+        /* Form rápido de avance */
+        .avance-form { display:flex; gap:0.8rem; align-items:flex-end; margin-top:1.1rem; }
+        .avance-form textarea {
+            flex:1; padding:0.62rem 0.9rem; border:1px solid var(--border);
+            border-radius:10px; font-size:0.9rem; resize:none; outline:none;
+            background:var(--bg); font-family:'Barlow', sans-serif; color:var(--text);
+            transition:border-color 0.18s, box-shadow 0.18s;
+        }
+        .avance-form textarea:focus {
+            border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10);
+            background:white;
+        }
+        .avance-form textarea::placeholder { color:var(--muted); }
+        .btn-avance {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--orange); color:white; border:none;
+            padding:0.62rem 1.1rem; border-radius:10px; font-weight:700;
+            font-size:0.87rem; cursor:pointer; font-family:'Barlow', sans-serif;
+            white-space:nowrap; box-shadow:0 4px 10px rgba(255,102,0,0.3);
+            transition:background 0.16s, transform 0.15s;
+        }
+        .btn-avance:hover { background:#e65c00; transform:translateY(-1px); }
+
+        .empty-mini { color:var(--muted); font-size:0.88rem; display:flex; align-items:center; gap:6px; }
+        .empty-mini i { opacity:0.4; }
+
+        /* Footer */
+        .main-footer {
+            background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            font-size:0.78rem; color:var(--muted);
+        }
+        .main-footer a {
+            color:var(--muted); text-decoration:none; display:inline-flex; align-items:center;
+            gap:5px; margin-right:1.2rem; transition:color 0.14s;
+        }
+        .main-footer a:hover { color:var(--orange); }
+        .main-footer .brand { color:var(--orange); font-weight:700; }
+
+        @media (max-width:860px) {
+            .sidebar { width:60px; }
+            .logo-text-wrap, .user-name, .user-role,
+            .nav-item span, .nav-label, .btn-logout span { display:none; }
+            .sidebar-user { justify-content:center; }
+            .nav-item { justify-content:center; padding:0.72rem; }
+            .btn-logout { justify-content:center; }
+            .main-content { margin-left:60px; }
+        }
+        @media (max-width:700px) { .grid-detail { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
-    <div class="user-area">
-        <div class="user-greeting">
-            <div class="name">{{ nombre }}</div>
-            <div class="role">{{ rol }}</div>
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
+        <div class="logo-text-wrap">
+            <div class="logo-name">STIHL <span>WS</span></div>
+            <div class="logo-sub">Workshop System</div>
         </div>
-        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
     </div>
-</div>
-
-<div class="main-container">
-
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
-        <a href="{{ url_for('ordenes') }}">Órdenes</a> › {{ orden.folio }}
-    </div>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-            <div class="mensaje {{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
-
-    <!-- Cabecera de la orden -->
-    <div class="orden-header">
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
         <div>
-            <div class="orden-folio">{{ orden.folio }}</div>
-            <div class="orden-fecha">Ingresó el {{ orden.fecha_ingreso.strftime('%d/%m/%Y %H:%M') }}</div>
-        </div>
-        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-            <span class="badge-estado {{ orden.estado }}">
-                {{ orden.estado | replace('_',' ') | title }}
-            </span>
-            <span class="badge-prioridad {{ orden.prioridad }}">
-                {{ orden.prioridad | title }}
-            </span>
+            <div class="user-name">{{ nombre }}</div>
+            <div class="user-role">{{ rol }}</div>
         </div>
     </div>
-
-    <!-- Acciones rápidas -->
-    <div class="acciones-bar">
-        <a href="{{ url_for('ordenes') }}" class="btn-accion-lg btn-volver">← Volver</a>
-        <a href="{{ url_for('editar_orden', orden_id=orden.id) }}" class="btn-accion-lg btn-editar-lg">✏️ Editar orden</a>
-        <a href="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" class="btn-accion-lg" style="background:#e8f5e9; color:#2e7d32;">
-            🔩 Refacciones usadas
+    <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <i class="fas fa-house ni"></i><span>Inicio</span>
+        </a>
+        <div class="nav-label">Módulos</div>
+        <a href="{{ url_for('ordenes') }}" class="nav-item active">
+            <i class="fas fa-clipboard-list ni"></i><span>Órdenes de servicio</span>
+        </a>
+        <a href="{{ url_for('clientes') }}" class="nav-item">
+            <i class="fas fa-address-book ni"></i><span>Clientes</span>
+        </a>
+        <a href="{{ url_for('equipos') }}" class="nav-item">
+            <i class="fas fa-toolbox ni"></i><span>Equipos</span>
+        </a>
+        <a href="{{ url_for('refacciones') }}" class="nav-item">
+            <i class="fas fa-gears ni"></i><span>Refacciones</span>
+        </a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item">
+            <i class="fas fa-file-invoice-dollar ni"></i><span>Cotizaciones</span>
+        </a>
+        <a href="{{ url_for('reportes') }}" class="nav-item">
+            <i class="fas fa-chart-column ni"></i><span>Reportes</span>
+        </a>
+        <div class="nav-label">Administración</div>
+        <a href="{{ url_for('usuarios') }}" class="nav-item">
+            <i class="fas fa-users-gear ni"></i><span>Usuarios del sistema</span>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i><span>Cerrar sesión</span>
         </a>
     </div>
+</aside>
 
-    <!-- Cambiar estado -->
-    <div class="estado-form">
-        <h4>🔄 Cambiar estado</h4>
-        <form method="POST" action="{{ url_for('cambiar_estado', orden_id=orden.id) }}">
-            <div class="estados-grid">
-                {% for est in ['recibido','diagnosticando','esperando_refacciones','en_reparacion','listo','entregado'] %}
-                <button type="submit" name="estado" value="{{ est }}"
-                        class="btn-estado {{ 'activo' if orden.estado == est }}">
-                    {{ est | replace('_',' ') | title }}
-                </button>
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
+
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{{ url_for('ordenes') }}">Órdenes</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">{{ orden.folio }}</span>
+        </div>
+        <div class="topbar-right">
+            <i class="fas fa-calendar-days"></i>
+            <span id="date-label"></span>
+        </div>
+    </div>
+
+    <div class="content-area">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="mensaje {{ category }}">
+                    {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
+                    {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
+                    {% else %}                      <i class="fas fa-circle-info"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <!-- ── Cabecera de la orden ── -->
+        <div class="orden-header">
+            <div>
+                <div class="orden-folio">{{ orden.folio }}</div>
+                <div class="orden-fecha">
+                    <i class="fas fa-calendar-days"></i>
+                    Ingresó el {{ orden.fecha_ingreso.strftime('%d/%m/%Y %H:%M') }}
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge-estado {{ orden.estado }}">
+                    {{ orden.estado | replace('_',' ') | title }}
+                </span>
+                <span class="badge-prioridad {{ orden.prioridad }}">
+                    {% if orden.prioridad == 'urgente' %}<i class="fas fa-bolt"></i>{% endif %}
+                    {{ orden.prioridad | title }}
+                </span>
+            </div>
+        </div>
+
+        <!-- ── Barra de acciones ── -->
+        <div class="acciones-bar">
+            <a href="{{ url_for('ordenes') }}" class="btn-action secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="{{ url_for('editar_orden', orden_id=orden.id) }}" class="btn-action blue">
+                <i class="fas fa-pen"></i> Editar orden
+            </a>
+            <a href="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" class="btn-action green">
+                <i class="fas fa-gears"></i> Refacciones usadas
+            </a>
+        </div>
+
+        <!-- ── Cambiar estado ── -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <div class="section-card-title">
+                    <div class="section-icon"><i class="fas fa-arrows-rotate"></i></div>
+                    <h4>Cambiar estado</h4>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('cambiar_estado', orden_id=orden.id) }}">
+                <div class="estados-grid">
+                    {% set iconos = {
+                        'recibido':              'fas fa-inbox',
+                        'diagnosticando':        'fas fa-magnifying-glass',
+                        'esperando_refacciones': 'fas fa-clock',
+                        'en_reparacion':         'fas fa-screwdriver-wrench',
+                        'listo':                 'fas fa-circle-check',
+                        'entregado':             'fas fa-box-open'
+                    } %}
+                    {% for est in ['recibido','diagnosticando','esperando_refacciones','en_reparacion','listo','entregado'] %}
+                    <button type="submit" name="estado" value="{{ est }}"
+                            class="btn-estado {{ 'activo' if orden.estado == est }}">
+                        <i class="{{ iconos[est] }}"></i>
+                        {{ est | replace('_',' ') | title }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+
+        <!-- ── Grid de detalle ── -->
+        <div class="grid-detail">
+
+            <!-- Cliente -->
+            <div class="detail-card">
+                <div class="detail-card-head">
+                    <div class="detail-card-icon"><i class="fas fa-user"></i></div>
+                    <h4>Cliente</h4>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Nombre</span>
+                    <span class="val">{{ orden.nombre_cliente }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Teléfono</span>
+                    <span class="val">{{ orden.telefono or '—' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Email</span>
+                    <span class="val">{{ orden.email or '—' }}</span>
+                </div>
+            </div>
+
+            <!-- Equipo -->
+            <div class="detail-card">
+                <div class="detail-card-head">
+                    <div class="detail-card-icon"><i class="fas fa-toolbox"></i></div>
+                    <h4>Equipo</h4>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Tipo</span>
+                    <span class="val">{{ orden.tipo_equipo }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Marca / Modelo</span>
+                    <span class="val">{{ orden.marca }} {{ orden.modelo or '' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">No. Serie</span>
+                    <span class="val">
+                        {% if orden.numero_serie %}
+                            <span class="mono">{{ orden.numero_serie }}</span>
+                        {% else %}—{% endif %}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Año</span>
+                    <span class="val">{{ orden.anio or '—' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Color</span>
+                    <span class="val">{{ orden.color or '—' }}</span>
+                </div>
+            </div>
+
+            <!-- Asignación -->
+            <div class="detail-card">
+                <div class="detail-card-head">
+                    <div class="detail-card-icon"><i class="fas fa-user-gear"></i></div>
+                    <h4>Asignación</h4>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Técnico</span>
+                    <span class="val">{{ orden.nombre_tecnico or 'Sin asignar' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Prioridad</span>
+                    <span class="val">{{ orden.prioridad | title }}</span>
+                </div>
+            </div>
+
+            <!-- Costos y fechas -->
+            <div class="detail-card">
+                <div class="detail-card-head">
+                    <div class="detail-card-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <h4>Costos y fechas</h4>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Costo estimado</span>
+                    <span class="val">
+                        {{ '$%.2f' | format(orden.costo_estimado) if orden.costo_estimado else '—' }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Costo final</span>
+                    <span class="val {% if orden.costo_final %}price{% endif %}">
+                        {{ '$%.2f' | format(orden.costo_final) if orden.costo_final else '—' }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Entrega estimada</span>
+                    <span class="val">
+                        {{ orden.fecha_estimada.strftime('%d/%m/%Y') if orden.fecha_estimada else '—' }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="key">Entrega real</span>
+                    <span class="val">
+                        {{ orden.fecha_entrega_real.strftime('%d/%m/%Y') if orden.fecha_entrega_real else '—' }}
+                    </span>
+                </div>
+            </div>
+
+        </div><!-- /grid-detail -->
+
+        <!-- ── Problema reportado ── -->
+        <div class="text-card">
+            <div class="text-card-head">
+                <div class="text-card-icon"><i class="fas fa-magnifying-glass"></i></div>
+                <h4>Problema reportado</h4>
+            </div>
+            <p>{{ orden.descripcion_problema }}</p>
+        </div>
+
+        <!-- ── Observaciones internas (condicional) ── -->
+        {% if orden.observaciones %}
+        <div class="text-card">
+            <div class="text-card-head">
+                <div class="text-card-icon"><i class="fas fa-note-sticky"></i></div>
+                <h4>Observaciones internas</h4>
+            </div>
+            <p>{{ orden.observaciones }}</p>
+        </div>
+        {% endif %}
+
+        <!-- ── Refacciones utilizadas ── -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <div class="section-card-title">
+                    <div class="section-icon"><i class="fas fa-gears"></i></div>
+                    <h4>Refacciones utilizadas</h4>
+                </div>
+                <a href="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" class="card-link">
+                    Ver / gestionar <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% if orden.costo_final and orden.costo_final > 0 %}
+                <div class="refacciones-total">
+                    <div>
+                        <div class="price-big">${{ '%.2f' % orden.costo_final }}</div>
+                        <div class="price-label">Costo en refacciones</div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="empty-mini">
+                    <i class="fas fa-inbox"></i>
+                    Aún no se han registrado refacciones para esta orden.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- ── Bitácora / últimos avances ── -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <div class="section-card-title">
+                    <div class="section-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                    <h4>Últimos avances</h4>
+                </div>
+                <a href="{{ url_for('bitacora_orden', orden_id=orden.id) }}" class="card-link">
+                    Ver bitácora completa <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            {% if ultimos_avances %}
+                {% for av in ultimos_avances %}
+                <div class="bitacora-entry {{ 'con-estado' if av.estado_nuevo }}">
+                    <div class="bitacora-meta">
+                        <i class="fas fa-user" style="font-size:0.65rem;"></i>
+                        {{ av.usuario_nombre }}
+                        <span style="color:var(--border);">·</span>
+                        <i class="fas fa-calendar-days" style="font-size:0.65rem;"></i>
+                        {{ av.fecha_hora.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                    <div class="bitacora-desc">{{ av.descripcion }}</div>
+                    {% if av.estado_nuevo %}
+                    <div class="bitacora-cambio">
+                        <i class="fas fa-arrows-rotate"></i>
+                        {{ av.estado_anterior | replace('_',' ') | title if av.estado_anterior else '—' }}
+                        <i class="fas fa-arrow-right" style="font-size:0.65rem;"></i>
+                        {{ av.estado_nuevo | replace('_',' ') | title }}
+                    </div>
+                    {% endif %}
+                </div>
                 {% endfor %}
-            </div>
-        </form>
-    </div>
+            {% else %}
+                <p class="empty-mini">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    Sin avances registrados aún.
+                </p>
+            {% endif %}
 
-    <!-- Detalle cliente y equipo -->
-    <div class="grid-detail">
-        <div class="detail-card">
-            <h4>👥 Cliente</h4>
-            <div class="detail-row"><span class="key">Nombre</span><span class="val">{{ orden.nombre_cliente }}</span></div>
-            <div class="detail-row"><span class="key">Teléfono</span><span class="val">{{ orden.telefono or '—' }}</span></div>
-            <div class="detail-row"><span class="key">Email</span><span class="val">{{ orden.email or '—' }}</span></div>
-        </div>
-        <div class="detail-card">
-            <h4>🔧 Equipo</h4>
-            <div class="detail-row"><span class="key">Tipo</span><span class="val">{{ orden.tipo_equipo }}</span></div>
-            <div class="detail-row"><span class="key">Marca / Modelo</span><span class="val">{{ orden.marca }} {{ orden.modelo or '' }}</span></div>
-            <div class="detail-row"><span class="key">No. Serie</span><span class="val">{{ orden.numero_serie or '—' }}</span></div>
-            <div class="detail-row"><span class="key">Año</span><span class="val">{{ orden.anio or '—' }}</span></div>
-            <div class="detail-row"><span class="key">Color</span><span class="val">{{ orden.color or '—' }}</span></div>
-        </div>
-        <div class="detail-card">
-            <h4>👷 Asignación</h4>
-            <div class="detail-row"><span class="key">Técnico</span><span class="val">{{ orden.nombre_tecnico or 'Sin asignar' }}</span></div>
-            <div class="detail-row"><span class="key">Prioridad</span><span class="val">{{ orden.prioridad | title }}</span></div>
-        </div>
-        <div class="detail-card">
-            <h4>💰 Costos y fechas</h4>
-            <div class="detail-row"><span class="key">Costo estimado</span>
-                <span class="val">{{ '$%.2f' | format(orden.costo_estimado) if orden.costo_estimado else '—' }}</span></div>
-            <div class="detail-row"><span class="key">Costo final</span>
-                <span class="val">{{ '$%.2f' | format(orden.costo_final) if orden.costo_final else '—' }}</span></div>
-            <div class="detail-row"><span class="key">Entrega estimada</span>
-                <span class="val">{{ orden.fecha_estimada.strftime('%d/%m/%Y') if orden.fecha_estimada else '—' }}</span></div>
-            <div class="detail-row"><span class="key">Entrega real</span>
-                <span class="val">{{ orden.fecha_entrega_real.strftime('%d/%m/%Y') if orden.fecha_entrega_real else '—' }}</span></div>
-        </div>
-    </div>
-
-    <!-- Problema y observaciones -->
-    <div class="problema-card">
-        <h4>🔍 Problema reportado</h4>
-        <p>{{ orden.descripcion_problema }}</p>
-    </div>
-
-    {% if orden.observaciones %}
-    <div class="problema-card">
-        <h4>📝 Observaciones internas</h4>
-        <p>{{ orden.observaciones }}</p>
-    </div>
-    {% endif %}
-
-    <!--Resumen refacciones-->
-    <div class="problema-card" style="margin-top:1.5rem;">
-        <h4>🔩 Refacciones utilizadas</h4>
-        {% set ns = namespace(total=0) %}
-        {% if orden.costo_final and orden.costo_final > 0 %}
-        <p style="margin-top:0.5rem; font-size:1rem; color:#2d2d2d;">
-            Costo en refacciones:
-            <strong style="color:#ff6600; font-size:1.2rem;">
-                ${{ '%.2f' % orden.costo_final }}
-            </strong>
-        </p>
-        {% else %}
-        <p style="color:#9aa9b7; margin-top:0.5rem;">
-            Aún no se han registrado refacciones para esta orden.
-        </p>
-        {% endif %}
-        <div style="margin-top:0.8rem;">
-            <a href="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" style="color:#ff6600; font-weight:600; text-decoration:none; font-size:0.9rem;">
-                Ver / gestionar refacciones →
-            </a>
-        </div>
-    </div>
-
-    <div class="problema-card" style="margin-top:1.5rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h4>📋 Últimos avances</h4>
-            <a href="{{ url_for('bitacora_orden', orden_id=orden.id) }}" style="color:#ff6600; font-weight:600; font-size:0.88rem; text-decoration:none;">
-                Ver bitácora completa →
-            </a>
-        </div>
-
-        {% if ultimos_avances %}
-            {% for av in ultimos_avances %}
-            <div style="border-left:3px solid {{ '#ff6600' if av.estado_nuevo else '#d9e0e6' }};
-                    padding:0.6rem 1rem; margin-bottom:0.8rem; border-radius:0 8px 8px 0;
-                    background:#fafbfc;">
-                <div style="font-size:0.78rem; color:#9aa9b7; margin-bottom:3px;">
-                    {{ av.usuario_nombre }} · {{ av.fecha_hora.strftime('%d/%m/%Y %H:%M') }}
+            <!-- Form rápido para agregar avance -->
+            {% if puede_agregar_bitacora %}
+            <form action="{{ url_for('agregar_bitacora', orden_id=orden.id) }}" method="POST">
+                <input type="hidden" name="origen" value="detalle">
+                <input type="hidden" name="cambiar_estado" value="0">
+                <div class="avance-form">
+                    <textarea name="descripcion" rows="2"
+                              placeholder="Registrar avance rápido…"
+                              required></textarea>
+                    <button type="submit" class="btn-avance">
+                        <i class="fas fa-plus"></i> Registrar
+                    </button>
                 </div>
-                <div style="font-size:0.9rem; color:#3e4a5e;">{{ av.descripcion }}</div>
-                {% if av.estado_nuevo %}
-                <div style="font-size:0.78rem; color:#e65100; margin-top:4px; font-weight:600;">
-                    🔄 {{ av.estado_anterior | replace('_',' ') | title if av.estado_anterior else '—' }}
-                → {{ av.estado_nuevo | replace('_',' ') | title }}
-                </div>
-                {% endif %}
-            </div>
-            {% endfor %}
-    {% else %}
-        <p style="color:#9aa9b7; font-size:0.9rem;">Sin avances registrados aún.</p>
-        {% endif %}
+            </form>
+            {% endif %}
 
-        <!-- Formulario rápido para agregar avance desde el detalle -->
-         {% if puede_agregar_bitacora %}
-         <form action="{{ url_for('agregar_bitacora', orden_id=orden.id) }}" method="POST" style="margin-top:1rem;">
-            <input type="hidden" name="origen" value="detalle">
-            <input type="hidden" name="cambiar_estado" value="0">
-            <div style="display:flex; gap:0.8rem; align-items:flex-end;">
-                <div style="flex:1;">
-                    <textarea name="descripcion" id="2" placeholder="Registrar avance rápido…"
-                          required
-                          style="width:100%; padding:0.6rem 0.9rem; border:1px solid #d9e0e6;
-                                 border-radius:10px; font-size:0.9rem; resize:none;
-                                 outline:none; background:#fafbfc; font-family:inherit;"></textarea>
-                </div>
-                <button type="submit"
-                    style="background:#ff6600; color:white; border:none;
-                           padding:0.65rem 1.2rem; border-radius:20px; font-weight:600;
-                           cursor:pointer; white-space:nowrap; font-size:0.88rem;
-                           box-shadow:0 4px 10px rgba(255,102,0,0.3);">
-                           + Registrar
-                 </button>
-            </div>
-         </form>
-         {% endif %}
-    </div>
+        </div><!-- /bitácora -->
 
-</div>
+    </div><!-- /content-area -->
 
-<div class="dashboard-footer">
-    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
-    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
-</div>
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
+        </div>
+    </footer>
+
+</div><!-- /main-content -->
+
+<script>
+    const d = new Date();
+    document.getElementById('date-label').textContent =
+        d.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+</script>
+
 </body>
 </html>
