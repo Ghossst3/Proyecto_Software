@@ -4,228 +4,545 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Equipo · STIHL Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box;
-            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
-        .navbar {
-            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        :root {
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    64px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
-        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
-        .navbar .logo span { color:#ff6600; }
-        .user-area { display:flex; align-items:center; gap:20px; }
-        .user-greeting .name { font-weight:600; }
-        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
+
+        /* ══════════ SIDEBAR COLAPSADA ══════════ */
+        .sidebar {
+            width:var(--sidebar-w); min-height:100vh; background-color:var(--dark);
+            display:flex; flex-direction:column; align-items:center;
+            position:fixed; top:0; left:0; z-index:100; overflow-y:auto; overflow-x:hidden;
+        }
+        .sidebar-logo {
+            width:100%; padding:1.25rem 0; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; justify-content:center;
+        }
+        .logo-icon-box {
+            width:36px; height:36px; background-color:var(--orange); border-radius:9px;
+            display:flex; align-items:center; justify-content:center; color:white; font-size:0.95rem;
+        }
+        .sidebar-user {
+            width:100%; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.07);
+            display:flex; justify-content:center;
+        }
+        .user-avatar {
+            width:36px; height:36px; background-color:var(--orange-mid); border:2px solid var(--orange);
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:var(--orange); font-size:0.9rem;
+        }
+        .sidebar-nav {
+            flex:1; width:100%; padding:0.9rem 0;
+            display:flex; flex-direction:column; align-items:center; gap:3px;
+        }
+        .nav-item {
+            width:42px; height:42px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            color:rgba(255,255,255,0.45); text-decoration:none;
+            font-size:0.95rem; transition:all 0.16s; position:relative;
+        }
+        .nav-item:hover  { background-color:rgba(255,255,255,0.09); color:white; }
+        .nav-item.active { background-color:var(--orange); color:white; }
+        .nav-item::after {
+            content:attr(data-tip);
+            position:absolute; left:calc(100% + 13px); top:50%; transform:translateY(-50%);
+            background-color:#111; color:white;
+            font-family:'Barlow', sans-serif; font-size:0.76rem; font-weight:600;
+            padding:0.32rem 0.7rem; border-radius:7px; white-space:nowrap;
+            pointer-events:none; opacity:0; transition:opacity 0.14s;
+            border:1px solid rgba(255,255,255,0.08);
+            box-shadow:0 4px 12px rgba(0,0,0,0.35); z-index:300;
+        }
+        .nav-item:hover::after { opacity:1; }
+        .nav-sep { width:26px; height:1px; background-color:rgba(255,255,255,0.08); margin:5px 0; }
+        .sidebar-bottom {
+            width:100%; padding:0.8rem 0; border-top:1px solid rgba(255,255,255,0.07);
+            display:flex; justify-content:center;
+        }
         .btn-logout {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+            width:42px; height:42px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            color:var(--orange); background-color:var(--orange-light);
+            border:1px solid rgba(255,102,0,0.20); text-decoration:none;
+            font-size:0.95rem; transition:all 0.16s; position:relative;
         }
-        .btn-logout:hover { background-color:#ff6600; color:white; }
+        .btn-logout:hover { background-color:var(--orange); color:white; border-color:var(--orange); }
+        .btn-logout::after {
+            content:'Cerrar sesión';
+            position:absolute; left:calc(100% + 13px); top:50%; transform:translateY(-50%);
+            background-color:#111; color:white;
+            font-family:'Barlow', sans-serif; font-size:0.76rem; font-weight:600;
+            padding:0.32rem 0.7rem; border-radius:7px; white-space:nowrap;
+            pointer-events:none; opacity:0; transition:opacity 0.14s;
+            border:1px solid rgba(255,255,255,0.08);
+            box-shadow:0 4px 12px rgba(0,0,0,0.35); z-index:300;
+        }
+        .btn-logout:hover::after { opacity:1; }
 
-        .main-container { max-width:700px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
-        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
-        .breadcrumb a { color:#ff6600; text-decoration:none; }
+        /* ══════════ MAIN ══════════ */
+        .main-content { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+        .topbar {
+            background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; z-index:50;
+        }
+        .breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--muted); }
+        .breadcrumb a { color:var(--orange); text-decoration:none; font-weight:500; }
+        .breadcrumb a:hover { text-decoration:underline; }
+        .breadcrumb .cur { color:var(--text); font-weight:600; }
+        .breadcrumb i { font-size:0.65rem; }
+        .btn-volver {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:0.45rem 1rem; border-radius:8px;
+            border:1px solid var(--border); background:var(--white);
+            color:var(--text-light); font-weight:600; font-size:0.82rem;
+            text-decoration:none; font-family:'Barlow', sans-serif; transition:all 0.16s;
+        }
+        .btn-volver:hover { border-color:var(--orange); color:var(--orange); }
 
-        .form-card { background:white; border-radius:20px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.06); overflow:hidden; }
-        .form-header { background-color:#2d2d2d; padding:1.8rem 2rem; color:white; }
-        .form-header h2 { font-size:1.5rem; font-weight:600; }
-        .form-header p { color:#a0a0a0; font-size:0.9rem; margin-top:4px; }
-        .form-body { padding:2rem; }
+        .content-area { flex:1; padding:2rem; display:flex; flex-direction:column; align-items:center; }
 
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
-        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.2rem; }
+        /* Flash */
+        .flash-wrap { width:100%; max-width:700px; margin-bottom:1rem; }
+        .mensaje {
+            padding:0.8rem 1.2rem; border-radius:10px; font-weight:500;
+            display:flex; align-items:center; gap:10px; border-left:4px solid;
+            background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom:0.5rem; font-size:0.9rem;
+        }
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
+        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
+        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
+        .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
+
+        /* ══════════ FORM CARD ══════════ */
+        .form-card {
+            width:100%; max-width:700px;
+            background:var(--white); border-radius:18px;
+            border:1px solid var(--border);
+            box-shadow:0 4px 20px rgba(0,0,0,0.06); overflow:hidden;
+        }
+
+        /* Cabecera naranja — nuevo */
+        .form-card-header {
+            background:linear-gradient(135deg, var(--dark) 0%, #2a2a2a 100%);
+            padding:1.5rem 1.8rem;
+            display:flex; align-items:center; gap:13px;
+            position:relative; overflow:hidden;
+        }
+        .form-card-header::after {
+            content:"STIHL";
+            position:absolute; right:1.4rem; bottom:-10px;
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:4.2rem; font-weight:800;
+            color:rgba(255,102,0,0.08); letter-spacing:4px; pointer-events:none;
+        }
+        .form-header-icon {
+            width:42px; height:42px; background-color:var(--orange);
+            border-radius:11px; display:flex; align-items:center;
+            justify-content:center; color:white; font-size:1.05rem; flex-shrink:0;
+        }
+        .form-card-header h2 {
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:1.45rem; font-weight:800;
+            color:white; text-transform:uppercase; letter-spacing:0.5px;
+        }
+        .form-card-header p { font-size:0.82rem; color:rgba(255,255,255,0.5); margin-top:2px; }
+
+        .form-body { padding:1.8rem; }
+
+        /* Tip informativo */
+        .tip-box {
+            display:flex; align-items:flex-start; gap:10px;
+            background:#fffbf5; border:1px solid rgba(255,102,0,0.2);
+            border-left:3px solid var(--orange);
+            border-radius:0 10px 10px 0;
+            padding:0.75rem 1rem; margin-bottom:1.3rem;
+            font-size:0.84rem; color:var(--text-light); line-height:1.55;
+        }
+        .tip-box i { color:var(--orange); font-size:0.88rem; margin-top:2px; flex-shrink:0; }
+        .tip-box a { color:var(--orange); font-weight:700; text-decoration:none; }
+        .tip-box a:hover { text-decoration:underline; }
+
+        /* Grids */
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; margin-bottom:1.2rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.1rem; margin-bottom:1.2rem; }
 
         .input-group { margin-bottom:1.2rem; }
+        .input-group:last-child { margin-bottom:0; }
+
         .input-group label {
-            display:block; font-size:0.88rem; font-weight:600; color:#2d3e50;
-            margin-bottom:6px; text-transform:uppercase; letter-spacing:0.3px;
+            display:flex; align-items:center; gap:6px;
+            font-size:0.72rem; font-weight:700; color:var(--text);
+            text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;
         }
-        .input-group input, .input-group select, .input-group textarea {
-            width:100%; padding:0.75rem 1rem; border:1px solid #d9e0e6;
-            border-radius:10px; font-size:0.95rem; background:#fafbfc;
-            transition:all 0.2s; outline:none; resize:vertical;
+        .input-group label i { color:var(--muted); font-size:0.68rem; }
+        .input-group label .req { color:var(--orange); font-size:0.85rem; line-height:1; }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width:100%; padding:0.65rem 1rem;
+            border:1px solid var(--border); border-radius:10px;
+            font-size:0.92rem; font-family:'Barlow', sans-serif;
+            color:var(--text); background-color:var(--bg);
+            outline:none; transition:border-color 0.18s, box-shadow 0.18s, background 0.18s;
+            resize:vertical;
         }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12); background:white;
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color:var(--orange);
+            box-shadow:0 0 0 3px rgba(255,102,0,0.10);
+            background-color:white;
+        }
+        .input-group input::placeholder,
+        .input-group textarea::placeholder { color:var(--muted); }
+        .input-group select { cursor:pointer; appearance:none; }
+
+        /* Wrappers con íconos */
+        .icon-wrap { position:relative; }
+        .icon-wrap .field-icon {
+            position:absolute; left:0.9rem; top:50%; transform:translateY(-50%);
+            color:var(--muted); font-size:0.78rem; pointer-events:none;
+        }
+        .icon-wrap input,
+        .icon-wrap select { padding-left:2.3rem; }
+        .icon-wrap.ta-wrap .field-icon { top:0.85rem; transform:none; }
+        .icon-wrap.ta-wrap textarea { padding-left:2.3rem; }
+        .select-arrow {
+            position:absolute; right:0.9rem; top:50%; transform:translateY(-50%);
+            color:var(--muted); font-size:0.72rem; pointer-events:none;
         }
 
-        /* Selector de cliente con búsqueda visual */
-        .cliente-selector { position:relative; }
-        .cliente-selector select { appearance:auto; cursor:pointer; }
-
-        .form-actions {
-            display:flex; gap:1rem; justify-content:flex-end;
-            padding-top:1.5rem; border-top:1px solid #eaeef2; margin-top:1.5rem;
+        /* Separador de sección */
+        .section-sep {
+            display:flex; align-items:center; gap:9px;
+            font-family:'Barlow Condensed', sans-serif;
+            font-size:0.8rem; font-weight:800; color:var(--orange);
+            text-transform:uppercase; letter-spacing:0.7px;
+            margin-bottom:1.1rem; margin-top:1.5rem;
         }
-        .btn-submit {
-            background-color:#ff6600; color:white; border:none;
-            padding:0.8rem 2rem; border-radius:40px; font-size:1rem;
-            font-weight:600; cursor:pointer; transition:all 0.2s;
-            box-shadow:0 6px 15px rgba(255,102,0,0.35);
-        }
-        .btn-submit:hover { background-color:#e65c00; transform:scale(1.02); }
-        .btn-cancel {
-            background:none; border:2px solid #d9e0e6; color:#6f7d8c;
-            padding:0.8rem 1.8rem; border-radius:40px; font-size:1rem;
-            font-weight:600; cursor:pointer; text-decoration:none; transition:all 0.2s;
-        }
-        .btn-cancel:hover { border-color:#ff6600; color:#ff6600; }
+        .section-sep:first-child { margin-top:0; }
+        .section-sep i { font-size:0.82rem; }
+        .section-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
-        .mensaje { padding:1rem 1.5rem; border-radius:12px; font-weight:500;
-            display:flex; align-items:center; gap:12px; border-left:5px solid;
-            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem; }
-        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
-        .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
-
-        .tip {
-            background-color:#fff8f4; border-left:4px solid #ff6600;
-            padding:0.8rem 1rem; border-radius:0 8px 8px 0;
-            font-size:0.85rem; color:#6f7d8c; margin-bottom:1.5rem;
+        /* Footer del form */
+        .form-footer {
+            padding:1.1rem 1.8rem; border-top:1px solid var(--border);
+            background-color:#fafbfc;
+            display:flex; justify-content:flex-end; align-items:center; gap:0.8rem;
         }
-
-        .dashboard-footer {
-            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
-            margin-top:3rem; display:flex; justify-content:space-between;
-            align-items:center; flex-wrap:wrap; gap:1rem;
+        .btn-cancelar {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:0.62rem 1.2rem; border-radius:10px;
+            border:1px solid var(--border); background:var(--white);
+            color:var(--text-light); font-weight:600; font-size:0.88rem;
+            text-decoration:none; cursor:pointer;
+            font-family:'Barlow', sans-serif; transition:all 0.16s;
         }
-        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
-        .footer-links a:hover { color:#ff6600; }
-        .footer-copy span { color:#ff6600; font-weight:600; }
+        .btn-cancelar:hover { border-color:var(--muted); color:var(--text); }
+        .btn-guardar {
+            display:inline-flex; align-items:center; gap:8px;
+            padding:0.62rem 1.4rem; border-radius:10px;
+            background-color:var(--orange); color:white;
+            font-weight:700; font-size:0.88rem; border:none; cursor:pointer;
+            font-family:'Barlow', sans-serif;
+            box-shadow:0 4px 14px rgba(255,102,0,0.35);
+            transition:background 0.18s, transform 0.15s;
+        }
+        .btn-guardar:hover { background-color:#e65c00; transform:translateY(-1px); }
 
-        @media(max-width:600px) { .grid-2, .grid-3 { grid-template-columns:1fr; } }
+        /* Footer página */
+        .main-footer {
+            background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem;
+            display:flex; justify-content:space-between; align-items:center;
+            font-size:0.78rem; color:var(--muted);
+        }
+        .main-footer a {
+            color:var(--muted); text-decoration:none; display:inline-flex; align-items:center;
+            gap:5px; margin-right:1.2rem; transition:color 0.14s;
+        }
+        .main-footer a:hover { color:var(--orange); }
+        .main-footer .brand { color:var(--orange); font-weight:700; }
+
+        @media (max-width:600px) {
+            .grid-2, .grid-3 { grid-template-columns:1fr; }
+            .content-area { padding:1rem; }
+            .form-body { padding:1.3rem; }
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
-    <div class="user-area">
-        <div class="user-greeting">
-            <div class="name">{{ nombre }}</div>
-            <div class="role">{{ rol }}</div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+<!-- ══════════ SIDEBAR COLAPSADA ══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
     </div>
-</div>
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-item" data-tip="Inicio">
+            <i class="fas fa-house"></i>
+        </a>
+        <div class="nav-sep"></div>
+        <a href="{{ url_for('ordenes') }}" class="nav-item" data-tip="Órdenes de servicio">
+            <i class="fas fa-clipboard-list"></i>
+        </a>
+        <a href="{{ url_for('clientes') }}" class="nav-item" data-tip="Clientes">
+            <i class="fas fa-address-book"></i>
+        </a>
+        <!-- Equipos activo -->
+        <a href="{{ url_for('equipos') }}" class="nav-item active" data-tip="Equipos">
+            <i class="fas fa-toolbox"></i>
+        </a>
+        <a href="{{ url_for('refacciones') }}" class="nav-item" data-tip="Refacciones">
+            <i class="fas fa-gears"></i>
+        </a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item" data-tip="Cotizaciones">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </a>
+        <a href="{{ url_for('reportes') }}" class="nav-item" data-tip="Reportes">
+            <i class="fas fa-chart-column"></i>
+        </a>
+        <div class="nav-sep"></div>
+        <a href="{{ url_for('usuarios') }}" class="nav-item" data-tip="Usuarios del sistema">
+            <i class="fas fa-users-gear"></i>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i>
+        </a>
+    </div>
+</aside>
 
-<div class="main-container">
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
 
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
-        <a href="{{ url_for('equipos') }}">Equipos</a> › Registrar nuevo
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{{ url_for('equipos') }}">Equipos</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">Registrar nuevo</span>
+        </div>
+        <a href="{{ url_for('equipos') }}" class="btn-volver">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
     </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-            <div class="mensaje {{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
+    <div class="content-area">
 
-    <div class="form-card">
-        <div class="form-header">
-            <h2>🔧 Registrar nuevo equipo</h2>
-            <p>Asocia el equipo a un cliente existente. Cliente y tipo de equipo son obligatorios.</p>
+        <!-- Flash messages -->
+        <div class="flash-wrap">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}{% for category, message in messages %}
+                    <div class="mensaje {{ category }}">
+                        {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
+                        {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
+                        {% else %}                      <i class="fas fa-circle-info"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}{% endif %}
+            {% endwith %}
         </div>
-        <div class="form-body">
 
-            <div class="tip">
-                💡 Si el cliente aún no está registrado,
-                <a href="{{ url_for('nuevo_cliente') }}" style="color:#ff6600; font-weight:600;">regístralo primero aquí</a>
-                y luego vuelve a esta pantalla.
+        <!-- Form card -->
+        <div class="form-card">
+
+            <!-- Cabecera -->
+            <div class="form-card-header">
+                <div class="form-header-icon"><i class="fas fa-toolbox"></i></div>
+                <div>
+                    <h2>Registrar nuevo equipo</h2>
+                    <p>Asocia el equipo a un cliente. Cliente y tipo son obligatorios.</p>
+                </div>
             </div>
 
             <form action="{{ url_for('nuevo_equipo') }}" method="POST">
+                <div class="form-body">
 
-                <!-- Cliente -->
-                <div class="input-group cliente-selector">
-                    <label for="cliente_id">Cliente propietario *</label>
-                    <select id="cliente_id" name="cliente_id" required>
-                        <option value="">— Selecciona un cliente —</option>
-                        {% for c in clientes %}
-                            <option value="{{ c.id }}">{{ c.nombre_completo }}</option>
-                        {% endfor %}
-                    </select>
+                    <!-- Tip -->
+                    <div class="tip-box">
+                        <i class="fas fa-circle-info"></i>
+                        Si el cliente aún no está registrado,
+                        <a href="{{ url_for('nuevo_cliente') }}">regístralo primero aquí</a>
+                        y luego vuelve a esta pantalla.
+                    </div>
+
+                    <!-- ── Cliente ── -->
+                    <div class="section-sep">
+                        <i class="fas fa-user"></i> Cliente propietario
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-user"></i> Cliente
+                            <span class="req">*</span>
+                        </label>
+                        <div class="icon-wrap">
+                            <i class="fas fa-user field-icon"></i>
+                            <select name="cliente_id" required>
+                                <option value="">— Selecciona un cliente —</option>
+                                {% for c in clientes %}
+                                    <option value="{{ c.id }}">{{ c.nombre_completo }}</option>
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                    </div>
+
+                    <!-- ── Datos del equipo ── -->
+                    <div class="section-sep">
+                        <i class="fas fa-toolbox"></i> Datos del equipo
+                    </div>
+
+                    <!-- Tipo y marca -->
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>
+                                <i class="fas fa-tag"></i> Tipo de equipo
+                                <span class="req">*</span>
+                            </label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-tag field-icon"></i>
+                                <select name="tipo_equipo" required>
+                                    <option value="">— Selecciona —</option>
+                                    <option>Motosierra</option>
+                                    <option>Desbrozadora</option>
+                                    <option>Motobomba</option>
+                                    <option>Cortasetos</option>
+                                    <option>Sopladora</option>
+                                    <option>Podadora</option>
+                                    <option>Aspiradora de mochila</option>
+                                    <option>Cortadora de concreto</option>
+                                    <option>Otro</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-industry"></i> Marca</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-industry field-icon"></i>
+                                <input type="text" name="marca" value="STIHL" placeholder="STIHL">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modelo y número de serie -->
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label><i class="fas fa-barcode"></i> Modelo</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-barcode field-icon"></i>
+                                <input type="text" name="modelo" placeholder="Ej. MS 250, FS 94 R">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-hashtag"></i> Número de serie</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-hashtag field-icon"></i>
+                                <input type="text" name="numero_serie" placeholder="Ej. SN-2024-00123">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Características adicionales ── -->
+                    <div class="section-sep">
+                        <i class="fas fa-list-check"></i> Características adicionales
+                    </div>
+
+                    <!-- Año y color -->
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label><i class="fas fa-calendar"></i> Año</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-calendar field-icon"></i>
+                                <input type="number" name="anio"
+                                       min="1990" max="2030"
+                                       placeholder="Ej. 2022"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,4)">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-palette"></i> Color</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-palette field-icon"></i>
+                                <input type="text" name="color"
+                                       placeholder="Ej. Naranja/Gris"
+                                       maxlength="20"
+                                       oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]/g,'')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descripcion -->
+                    <div class="input-group">
+                        <label><i class="fas fa-note-sticky"></i> Descripción / Accesorios</label>
+                        <div class="icon-wrap ta-wrap">
+                            <i class="fas fa-note-sticky field-icon"></i>
+                            <textarea name="descripcion" rows="3"
+                                      placeholder="Detalles adicionales, accesorios incluidos, estado general…"></textarea>
+                        </div>
+                    </div>
+
+                </div><!-- /form-body -->
+
+                <!-- Acciones -->
+                <div class="form-footer">
+                    <a href="{{ url_for('equipos') }}" class="btn-cancelar">
+                        <i class="fas fa-xmark"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-floppy-disk"></i> Guardar equipo
+                    </button>
                 </div>
 
-                <!-- Tipo y marca -->
-                <div class="grid-2">
-                    <div class="input-group">
-                        <label for="tipo_equipo">Tipo de equipo *</label>
-                        <select id="tipo_equipo" name="tipo_equipo" required>
-                            <option value="">— Selecciona —</option>
-                            <option>Motosierra</option>
-                            <option>Desbrozadora</option>
-                            <option>Motobomba</option>
-                            <option>Cortasetos</option>
-                            <option>Sopladora</option>
-                            <option>Podadora</option>
-                            <option>Aspiradora de mochila</option>
-                            <option>Cortadora de concreto</option>
-                            <option>Otro</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="marca">Marca</label>
-                        <input type="text" id="marca" name="marca" value="STIHL" placeholder="STIHL">
-                    </div>
-                </div>
-
-                <!-- Modelo y serie -->
-                <div class="grid-2">
-                    <div class="input-group">
-                        <label for="modelo">Modelo</label>
-                        <input type="text" id="modelo" name="modelo" placeholder="Ej. MS 250, FS 94 R">
-                    </div>
-                    <div class="input-group">
-                        <label for="numero_serie">Número de serie</label>
-                        <input type="text" id="numero_serie" name="numero_serie" placeholder="Ej. SN-2024-00123">
-                    </div>
-                </div>
-
-                <!-- Año y color -->
-                <div class="grid-2">
-                    <div class="input-group">
-                        <label for="anio">Año</label>
-                        <input type="number" id="anio" name="anio" 
-                               min="1990" max="2030"
-                               placeholder="Ej. 2022"
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4)">
-                    </div>
-                    <div class="input-group">
-                        <label for="color">Color</label>
-                        <input type="text" id="color" name="color" 
-                               placeholder="Ej. Naranja/Gris"
-                               maxlength="20"
-                               oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]/g, '')">
-                    </div>
-                </div>
-
-                <!-- Descripción -->
-                <div class="input-group">
-                    <label for="descripcion">Descripción / Accesorios</label>
-                    <textarea id="descripcion" name="descripcion" rows="3"
-                              placeholder="Detalles adicionales, accesorios incluidos, estado general…"></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <a href="{{ url_for('equipos') }}" class="btn-cancel">Cancelar</a>
-                    <button type="submit" class="btn-submit">Guardar equipo →</button>
-                </div>
             </form>
-        </div>
-    </div>
-</div>
+        </div><!-- /form-card -->
 
-<div class="dashboard-footer">
-    <div class="footer-links">
-        <a href="#">SOPORTE TÉCNICO</a>
-        <a href="#">CONTACTO</a>
-    </div>
-    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
-</div>
+    </div><!-- /content-area -->
+
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
+        </div>
+    </footer>
+
+</div><!-- /main-content -->
+
 </body>
 </html>
