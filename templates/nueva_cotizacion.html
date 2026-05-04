@@ -29,360 +29,148 @@
         body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
 
         /* ══════════ SIDEBAR COLAPSADA ══════════ */
-        .sidebar {
-            width:var(--sidebar-w); min-height:100vh; background-color:var(--dark);
-            display:flex; flex-direction:column; align-items:center;
-            position:fixed; top:0; left:0; z-index:100; overflow-y:auto; overflow-x:hidden;
-        }
-        .sidebar-logo {
-            width:100%; padding:1.25rem 0; border-bottom:1px solid rgba(255,255,255,0.07);
-            display:flex; justify-content:center;
-        }
-        .logo-icon-box {
-            width:36px; height:36px; background-color:var(--orange); border-radius:9px;
-            display:flex; align-items:center; justify-content:center; color:white; font-size:0.95rem;
-        }
-        .sidebar-user {
-            width:100%; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.07);
-            display:flex; justify-content:center;
-        }
-        .user-avatar {
-            width:36px; height:36px; background-color:var(--orange-mid); border:2px solid var(--orange);
-            border-radius:50%; display:flex; align-items:center; justify-content:center;
-            color:var(--orange); font-size:0.9rem;
-        }
-        .sidebar-nav {
-            flex:1; width:100%; padding:0.9rem 0;
-            display:flex; flex-direction:column; align-items:center; gap:3px;
-        }
-        .nav-item {
-            width:42px; height:42px; border-radius:10px;
-            display:flex; align-items:center; justify-content:center;
-            color:rgba(255,255,255,0.45); text-decoration:none;
-            font-size:0.95rem; transition:all 0.16s; position:relative;
-        }
+        .sidebar { width:var(--sidebar-w); min-height:100vh; background-color:var(--dark); display:flex; flex-direction:column; align-items:center; position:fixed; top:0; left:0; z-index:100; overflow-y:auto; overflow-x:hidden; }
+        .sidebar-logo { width:100%; padding:1.25rem 0; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; justify-content:center; }
+        .logo-icon-box { width:36px; height:36px; background-color:var(--orange); border-radius:9px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.95rem; }
+        .sidebar-user { width:100%; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; justify-content:center; }
+        .user-avatar { width:36px; height:36px; background-color:var(--orange-mid); border:2px solid var(--orange); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--orange); font-size:0.9rem; }
+        .sidebar-nav { flex:1; width:100%; padding:0.9rem 0; display:flex; flex-direction:column; align-items:center; gap:3px; }
+        .nav-item { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.45); text-decoration:none; font-size:0.95rem; transition:all 0.16s; position:relative; }
         .nav-item:hover  { background-color:rgba(255,255,255,0.09); color:white; }
         .nav-item.active { background-color:var(--orange); color:white; }
-        .nav-item::after {
-            content:attr(data-tip);
-            position:absolute; left:calc(100% + 13px); top:50%; transform:translateY(-50%);
-            background-color:#111; color:white;
-            font-family:'Barlow', sans-serif; font-size:0.76rem; font-weight:600;
-            padding:0.32rem 0.7rem; border-radius:7px; white-space:nowrap;
-            pointer-events:none; opacity:0; transition:opacity 0.14s;
-            border:1px solid rgba(255,255,255,0.08);
-            box-shadow:0 4px 12px rgba(0,0,0,0.35); z-index:300;
-        }
+        .nav-item::after { content:attr(data-tip); position:absolute; left:calc(100% + 13px); top:50%; transform:translateY(-50%); background-color:#111; color:white; font-family:'Barlow', sans-serif; font-size:0.76rem; font-weight:600; padding:0.32rem 0.7rem; border-radius:7px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.14s; border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 12px rgba(0,0,0,0.35); z-index:300; }
         .nav-item:hover::after { opacity:1; }
         .nav-sep { width:26px; height:1px; background-color:rgba(255,255,255,0.08); margin:5px 0; }
-        .sidebar-bottom {
-            width:100%; padding:0.8rem 0; border-top:1px solid rgba(255,255,255,0.07);
-            display:flex; justify-content:center;
-        }
-        .btn-logout {
-            width:42px; height:42px; border-radius:10px;
-            display:flex; align-items:center; justify-content:center;
-            color:var(--orange); background-color:var(--orange-light);
-            border:1px solid rgba(255,102,0,0.20); text-decoration:none;
-            font-size:0.95rem; transition:all 0.16s; position:relative;
-        }
+        .sidebar-bottom { width:100%; padding:0.8rem 0; border-top:1px solid rgba(255,255,255,0.07); display:flex; justify-content:center; }
+        .btn-logout { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--orange); background-color:var(--orange-light); border:1px solid rgba(255,102,0,0.20); text-decoration:none; font-size:0.95rem; transition:all 0.16s; position:relative; }
         .btn-logout:hover { background-color:var(--orange); color:white; border-color:var(--orange); }
-        .btn-logout::after {
-            content:'Cerrar sesión';
-            position:absolute; left:calc(100% + 13px); top:50%; transform:translateY(-50%);
-            background-color:#111; color:white;
-            font-family:'Barlow', sans-serif; font-size:0.76rem; font-weight:600;
-            padding:0.32rem 0.7rem; border-radius:7px; white-space:nowrap;
-            pointer-events:none; opacity:0; transition:opacity 0.14s;
-            border:1px solid rgba(255,255,255,0.08);
-            box-shadow:0 4px 12px rgba(0,0,0,0.35); z-index:300;
-        }
+        .btn-logout::after { content:'Cerrar sesión'; position:absolute; left:calc(100% + 13px); top:50%; transform:translateY(-50%); background-color:#111; color:white; font-family:'Barlow', sans-serif; font-size:0.76rem; font-weight:600; padding:0.32rem 0.7rem; border-radius:7px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.14s; border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 12px rgba(0,0,0,0.35); z-index:300; }
         .btn-logout:hover::after { opacity:1; }
 
         /* ══════════ MAIN ══════════ */
         .main-content { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
-        .topbar {
-            background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            position:sticky; top:0; z-index:50;
-        }
+        .topbar { background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50; }
         .breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--muted); }
         .breadcrumb a { color:var(--orange); text-decoration:none; font-weight:500; }
         .breadcrumb a:hover { text-decoration:underline; }
         .breadcrumb .cur { color:var(--text); font-weight:600; }
         .breadcrumb i { font-size:0.65rem; }
-        .btn-volver {
-            display:inline-flex; align-items:center; gap:7px;
-            padding:0.45rem 1rem; border-radius:8px;
-            border:1px solid var(--border); background:var(--white);
-            color:var(--text-light); font-weight:600; font-size:0.82rem;
-            text-decoration:none; font-family:'Barlow', sans-serif; transition:all 0.16s;
-        }
+        .btn-volver { display:inline-flex; align-items:center; gap:7px; padding:0.45rem 1rem; border-radius:8px; border:1px solid var(--border); background:var(--white); color:var(--text-light); font-weight:600; font-size:0.82rem; text-decoration:none; font-family:'Barlow', sans-serif; transition:all 0.16s; }
         .btn-volver:hover { border-color:var(--orange); color:var(--orange); }
-
         .content-area { flex:1; padding:2rem; display:flex; flex-direction:column; align-items:center; }
 
         /* Flash */
-        .flash-wrap { width:100%; max-width:800px; margin-bottom:1rem; }
-        .mensaje {
-            padding:0.8rem 1.2rem; border-radius:10px; font-weight:500;
-            display:flex; align-items:center; gap:10px; border-left:4px solid;
-            background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom:0.5rem; font-size:0.9rem;
-        }
+        .flash-wrap { width:100%; max-width:860px; margin-bottom:1rem; }
+        .mensaje { padding:0.8rem 1.2rem; border-radius:10px; font-weight:500; display:flex; align-items:center; gap:10px; border-left:4px solid; background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:0.5rem; font-size:0.9rem; }
         .mensaje.error   { border-left-color:#e53935; color:#e53935; }
         .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
-        .mensaje.warning { border-left-color:#e65100; color:#e65100; }
-        .mensaje.info    { border-left-color:#1565c0; color:#1565c0; }
 
         /* ══════════ FORM CARD ══════════ */
-        .form-card {
-            width:100%; max-width:800px; /* Un poco más ancho para la tabla */
-            background:var(--white); border-radius:18px;
-            border:1px solid var(--border);
-            box-shadow:0 4px 20px rgba(0,0,0,0.06); overflow:hidden;
-        }
+        .form-card { width:100%; max-width:860px; background:var(--white); border-radius:18px; border:1px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,0.06); overflow:hidden; }
 
-        .form-card-header {
-            background:linear-gradient(135deg, var(--dark) 0%, #2a2a2a 100%);
-            padding:1.5rem 1.8rem;
-            display:flex; align-items:center; gap:13px;
-            position:relative; overflow:hidden;
-        }
-        .form-card-header::after {
-            content:"STIHL";
-            position:absolute; right:1.4rem; bottom:-10px;
-            font-family:'Barlow Condensed', sans-serif;
-            font-size:4.2rem; font-weight:800;
-            color:rgba(255,102,0,0.08); letter-spacing:4px; pointer-events:none;
-        }
-        .form-header-icon {
-            width:42px; height:42px; background-color:var(--orange);
-            border-radius:11px; display:flex; align-items:center;
-            justify-content:center; color:white; font-size:1.05rem; flex-shrink:0;
-        }
-        .form-card-header h2 {
-            font-family:'Barlow Condensed', sans-serif;
-            font-size:1.45rem; font-weight:800;
-            color:white; text-transform:uppercase; letter-spacing:0.5px;
-        }
+        .form-card-header { background:linear-gradient(135deg, var(--dark) 0%, #2a2a2a 100%); padding:1.5rem 1.8rem; display:flex; align-items:center; gap:13px; position:relative; overflow:hidden; }
+        .form-card-header::after { content:"STIHL"; position:absolute; right:1.4rem; bottom:-10px; font-family:'Barlow Condensed', sans-serif; font-size:4.2rem; font-weight:800; color:rgba(255,102,0,0.08); letter-spacing:4px; pointer-events:none; }
+        .form-header-icon { width:42px; height:42px; background-color:var(--orange); border-radius:11px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.05rem; flex-shrink:0; }
+        .form-card-header h2 { font-family:'Barlow Condensed', sans-serif; font-size:1.45rem; font-weight:800; color:white; text-transform:uppercase; letter-spacing:0.5px; }
         .form-card-header p { font-size:0.82rem; color:rgba(255,255,255,0.5); margin-top:2px; }
 
         .form-body { padding:1.8rem; }
 
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; margin-bottom:1.2rem; }
-        
-        .input-group { margin-bottom:1.2rem; }
-        .input-group:last-child { margin-bottom:0; }
-
-        .input-group label {
-            display:flex; align-items:center; gap:6px;
-            font-size:0.72rem; font-weight:700; color:var(--text);
-            text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;
-        }
-        .input-group label i { color:var(--muted); font-size:0.68rem; }
-        .input-group label .req { color:var(--orange); font-size:0.85rem; line-height:1; }
-
-        .input-group input,
-        .input-group select,
-        .input-group textarea {
-            width:100%; padding:0.65rem 1rem;
-            border:1px solid var(--border); border-radius:10px;
-            font-size:0.92rem; font-family:'Barlow', sans-serif;
-            color:var(--text); background-color:var(--bg);
-            outline:none; transition:border-color 0.18s, box-shadow 0.18s, background 0.18s;
-            resize:vertical;
-        }
-        .input-group input:focus,
-        .input-group select:focus,
-        .input-group textarea:focus {
-            border-color:var(--orange);
-            box-shadow:0 0 0 3px rgba(255,102,0,0.10);
-            background-color:white;
-        }
-        .input-group input::placeholder,
-        .input-group textarea::placeholder { color:var(--muted); }
-        .input-group select { cursor:pointer; appearance:none; }
-
-        .icon-wrap { position:relative; }
-        .icon-wrap .field-icon {
-            position:absolute; left:0.9rem; top:50%; transform:translateY(-50%);
-            color:var(--muted); font-size:0.78rem; pointer-events:none;
-        }
-        .icon-wrap input,
-        .icon-wrap select { padding-left:2.3rem; }
-        .icon-wrap.ta-wrap .field-icon { top:0.85rem; transform:none; }
-        .icon-wrap.ta-wrap textarea { padding-left:2.3rem; }
-        .select-arrow {
-            position:absolute; right:0.9rem; top:50%; transform:translateY(-50%);
-            color:var(--muted); font-size:0.72rem; pointer-events:none;
-        }
-
-        .section-sep {
-            display:flex; align-items:center; gap:9px;
-            font-family:'Barlow Condensed', sans-serif;
-            font-size:0.8rem; font-weight:800; color:var(--orange);
-            text-transform:uppercase; letter-spacing:0.7px;
-            margin-bottom:1.1rem; margin-top:1.5rem;
-        }
+        .section-sep { display:flex; align-items:center; gap:9px; font-family:'Barlow Condensed', sans-serif; font-size:0.8rem; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:1.1rem; margin-top:1.6rem; }
         .section-sep:first-child { margin-top:0; }
         .section-sep i { font-size:0.82rem; }
         .section-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
-        /* ══════════ ESTILOS DE LA TABLA DINÁMICA ══════════ */
-        .items-table-wrap {
-            width:100%; overflow-x:auto; margin-bottom:1rem;
-            border:1px solid var(--border); border-radius:10px;
-        }
-        .items-table {
-            width:100%; border-collapse:collapse; text-align:left;
-        }
-        .items-table th {
-            background-color:var(--bg); padding:0.8rem 1rem;
-            font-size:0.72rem; text-transform:uppercase; color:var(--text-light);
-            border-bottom:1px solid var(--border); font-weight:700; letter-spacing:0.5px;
-        }
-        .items-table td {
-            padding:0.8rem 1rem; border-bottom:1px solid var(--border); vertical-align:middle;
-        }
-        .items-table tr:last-child td { border-bottom:none; }
-        
-        .items-table input {
-            width:100%; padding:0.5rem 0.8rem;
-            border:1px solid var(--border); border-radius:6px;
-            font-size:0.9rem; font-family:'Barlow', sans-serif;
-            color:var(--text); outline:none; transition:all 0.18s;
-            background-color:var(--white);
-        }
-        .items-table input:focus {
-            border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10);
-        }
-        .subtotal-cell { font-weight:700; color:var(--text); font-size:0.95rem; }
-        
-        .btn-remove-row {
-            background:rgba(229, 57, 53, 0.1); color:#e53935;
-            border:none; width:32px; height:32px; border-radius:6px;
-            cursor:pointer; transition:all 0.15s; display:flex;
-            align-items:center; justify-content:center;
-        }
-        .btn-remove-row:hover { background:#e53935; color:white; }
-        
-        .btn-add-row {
-            display:inline-flex; align-items:center; gap:7px;
-            padding:0.5rem 1rem; border-radius:8px;
-            background:var(--orange-light); color:var(--orange);
-            font-weight:600; font-size:0.85rem; border:1px solid var(--orange-mid);
-            cursor:pointer; transition:all 0.18s; margin-bottom:1.5rem;
-            font-family:'Barlow', sans-serif;
-        }
-        .btn-add-row:hover { background:var(--orange); color:white; border-color:var(--orange); }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; margin-bottom:1.2rem; }
 
-        /* ══════════ CAJA DE TOTALES ══════════ */
-        .totales-box {
-            background:var(--bg); border-radius:12px; padding:1.5rem;
-            border:1px solid var(--border); margin-bottom:1.5rem;
-            width:100%; max-width:350px; margin-left:auto;
+        .input-group { margin-bottom:1.2rem; }
+        .input-group:last-child { margin-bottom:0; }
+        .input-group label { display:flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .input-group label i { color:var(--muted); font-size:0.68rem; }
+        .input-group label .req { color:var(--orange); font-size:0.85rem; line-height:1; }
+        .input-group input, .input-group select, .input-group textarea { width:100%; padding:0.65rem 1rem; border:1px solid var(--border); border-radius:10px; font-size:0.92rem; font-family:'Barlow', sans-serif; color:var(--text); background-color:var(--bg); outline:none; transition:border-color 0.18s, box-shadow 0.18s, background 0.18s; resize:vertical; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10); background-color:white; }
+        .input-group input::placeholder, .input-group textarea::placeholder { color:var(--muted); }
+        .input-group select { cursor:pointer; appearance:none; }
+        .icon-wrap { position:relative; }
+        .icon-wrap .field-icon { position:absolute; left:0.9rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:0.78rem; pointer-events:none; }
+        .icon-wrap input, .icon-wrap select { padding-left:2.3rem; }
+        .icon-wrap.ta-wrap .field-icon { top:0.85rem; transform:none; }
+        .icon-wrap.ta-wrap textarea { padding-left:2.3rem; }
+        .select-arrow { position:absolute; right:0.9rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:0.72rem; pointer-events:none; }
+
+        /* ══════════ TABLA DE CONCEPTOS ══════════ */
+        .items-section { background:var(--bg); border-radius:12px; padding:1.2rem; border:1px solid var(--border); margin-bottom:1.2rem; }
+
+        .items-table { width:100%; border-collapse:collapse; margin-bottom:1rem; }
+        .items-table th { padding:0.6rem 0.7rem; text-align:left; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted); border-bottom:2px solid var(--orange); }
+        .items-table th:not(:first-child) { text-align:right; }
+        .items-table td { padding:0.45rem 0.4rem; vertical-align:middle; }
+
+        .items-table input {
+            width:100%; padding:0.52rem 0.75rem;
+            border:1px solid var(--border); border-radius:8px;
+            font-size:0.9rem; font-family:'Barlow', sans-serif;
+            background:white; color:var(--text); outline:none;
+            transition:border-color 0.16s, box-shadow 0.16s;
         }
-        .totales-row {
-            display:flex; justify-content:space-between;
-            padding:0.4rem 0; font-size:0.95rem; color:var(--text-light); font-weight:500;
-        }
-        .totales-row.total-final {
-            border-top:2px solid var(--border); margin-top:0.8rem; padding-top:1rem;
-            font-size:1.3rem; font-weight:800; color:var(--text);
-        }
-        .totales-row.total-final span:last-child { color:var(--orange); }
+        .items-table input:focus { border-color:var(--orange); box-shadow:0 0 0 2px rgba(255,102,0,0.10); }
+        .items-table input::placeholder { color:var(--muted); }
+
+        .subtotal-cell { text-align:right; padding:0.5rem 0.7rem !important; font-weight:700; color:var(--dark); font-family:'Barlow Condensed', sans-serif; font-size:1rem; }
+
+        .btn-remove-row { width:30px; height:30px; background:#ffebee; color:#c62828; border:none; border-radius:7px; cursor:pointer; font-size:0.82rem; display:flex; align-items:center; justify-content:center; margin:auto; transition:all 0.16s; }
+        .btn-remove-row:hover { background:#c62828; color:white; }
+
+        .btn-add-row { display:inline-flex; align-items:center; gap:7px; background:#e8f5e9; color:#2e7d32; border:none; padding:0.55rem 1.1rem; border-radius:9px; cursor:pointer; font-weight:700; font-size:0.85rem; font-family:'Barlow', sans-serif; transition:all 0.16s; }
+        .btn-add-row:hover { background:#2e7d32; color:white; }
+
+        /* ══════════ TOTALES ══════════ */
+        .totales-box { background:var(--white); border-radius:10px; padding:1rem 1.3rem; border:1px solid var(--border); margin-top:0.5rem; }
+        .totales-row { display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0; font-size:0.9rem; color:var(--text); }
+        .totales-row .lbl { color:var(--muted); font-size:0.85rem; }
+        .totales-row .val { font-weight:600; }
+        .totales-row.total-final { border-top:2px solid var(--orange); margin-top:0.5rem; padding-top:0.7rem; }
+        .totales-row.total-final .lbl { font-family:'Barlow Condensed', sans-serif; font-size:1rem; font-weight:800; color:var(--dark); text-transform:uppercase; }
+        .totales-row.total-final .val { font-family:'Barlow Condensed', sans-serif; font-size:1.5rem; font-weight:800; color:var(--orange); }
 
         /* Footer del form */
-        .form-footer {
-            padding:1.1rem 1.8rem; border-top:1px solid var(--border);
-            background-color:#fafbfc;
-            display:flex; justify-content:flex-end; align-items:center; gap:0.8rem;
-        }
-        .btn-cancelar {
-            display:inline-flex; align-items:center; gap:7px;
-            padding:0.62rem 1.2rem; border-radius:10px;
-            border:1px solid var(--border); background:var(--white);
-            color:var(--text-light); font-weight:600; font-size:0.88rem;
-            text-decoration:none; cursor:pointer;
-            font-family:'Barlow', sans-serif; transition:all 0.16s;
-        }
+        .form-footer { padding:1.1rem 1.8rem; border-top:1px solid var(--border); background-color:#fafbfc; display:flex; justify-content:flex-end; align-items:center; gap:0.8rem; }
+        .btn-cancelar { display:inline-flex; align-items:center; gap:7px; padding:0.62rem 1.2rem; border-radius:10px; border:1px solid var(--border); background:var(--white); color:var(--text-light); font-weight:600; font-size:0.88rem; text-decoration:none; cursor:pointer; font-family:'Barlow', sans-serif; transition:all 0.16s; }
         .btn-cancelar:hover { border-color:var(--muted); color:var(--text); }
-        .btn-guardar {
-            display:inline-flex; align-items:center; gap:8px;
-            padding:0.62rem 1.4rem; border-radius:10px;
-            background-color:var(--orange); color:white;
-            font-weight:700; font-size:0.88rem; border:none; cursor:pointer;
-            font-family:'Barlow', sans-serif;
-            box-shadow:0 4px 14px rgba(255,102,0,0.35);
-            transition:background 0.18s, transform 0.15s;
-        }
+        .btn-guardar { display:inline-flex; align-items:center; gap:8px; padding:0.62rem 1.4rem; border-radius:10px; background-color:var(--orange); color:white; font-weight:700; font-size:0.88rem; border:none; cursor:pointer; font-family:'Barlow', sans-serif; box-shadow:0 4px 14px rgba(255,102,0,0.35); transition:background 0.18s, transform 0.15s; }
         .btn-guardar:hover { background-color:#e65c00; transform:translateY(-1px); }
 
-        /* Footer página */
-        .main-footer {
-            background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            font-size:0.78rem; color:var(--muted);
-        }
-        .main-footer a {
-            color:var(--muted); text-decoration:none; display:inline-flex; align-items:center;
-            gap:5px; margin-right:1.2rem; transition:color 0.14s;
-        }
+        .main-footer { background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--muted); }
+        .main-footer a { color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:5px; margin-right:1.2rem; transition:color 0.14s; }
         .main-footer a:hover { color:var(--orange); }
         .main-footer .brand { color:var(--orange); font-weight:700; }
 
-        @media (max-width:600px) {
-            .grid-2 { grid-template-columns:1fr; }
-            .content-area { padding:1rem; }
-            .form-body { padding:1.3rem; }
-        }
+        @media (max-width:600px) { .grid-2 { grid-template-columns:1fr; } .content-area { padding:1rem; } .form-body { padding:1.3rem; } }
     </style>
 </head>
 <body>
 
+<!-- ══════════ SIDEBAR ══════════ -->
 <aside class="sidebar">
-    <div class="sidebar-logo">
-        <div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div>
-    </div>
-    <div class="sidebar-user">
-        <div class="user-avatar"><i class="fas fa-user"></i></div>
-    </div>
+    <div class="sidebar-logo"><div class="logo-icon-box"><i class="fas fa-screwdriver-wrench"></i></div></div>
+    <div class="sidebar-user"><div class="user-avatar"><i class="fas fa-user"></i></div></div>
     <nav class="sidebar-nav">
-        <a href="{{ url_for('dashboard') }}" class="nav-item" data-tip="Inicio">
-            <i class="fas fa-house"></i>
-        </a>
+        <a href="{{ url_for('dashboard') }}"    class="nav-item" data-tip="Inicio"><i class="fas fa-house"></i></a>
         <div class="nav-sep"></div>
-        <a href="{{ url_for('ordenes') }}" class="nav-item" data-tip="Órdenes de servicio">
-            <i class="fas fa-clipboard-list"></i>
-        </a>
-        <a href="{{ url_for('clientes') }}" class="nav-item" data-tip="Clientes">
-            <i class="fas fa-address-book"></i>
-        </a>
-        <a href="{{ url_for('equipos') }}" class="nav-item" data-tip="Equipos">
-            <i class="fas fa-toolbox"></i>
-        </a>
-        <a href="{{ url_for('refacciones') }}" class="nav-item" data-tip="Refacciones">
-            <i class="fas fa-gears"></i>
-        </a>
-        <a href="{{ url_for('cotizaciones') }}" class="nav-item active" data-tip="Cotizaciones">
-            <i class="fas fa-file-invoice-dollar"></i>
-        </a>
-        <a href="{{ url_for('reportes') }}" class="nav-item" data-tip="Reportes">
-            <i class="fas fa-chart-column"></i>
-        </a>
+        <a href="{{ url_for('ordenes') }}"      class="nav-item" data-tip="Órdenes de servicio"><i class="fas fa-clipboard-list"></i></a>
+        <a href="{{ url_for('clientes') }}"     class="nav-item" data-tip="Clientes"><i class="fas fa-address-book"></i></a>
+        <a href="{{ url_for('equipos') }}"      class="nav-item" data-tip="Equipos"><i class="fas fa-toolbox"></i></a>
+        <a href="{{ url_for('refacciones') }}"  class="nav-item" data-tip="Refacciones"><i class="fas fa-gears"></i></a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item active" data-tip="Cotizaciones"><i class="fas fa-file-invoice-dollar"></i></a>
+        <a href="{{ url_for('reportes') }}"     class="nav-item" data-tip="Reportes"><i class="fas fa-chart-column"></i></a>
         <div class="nav-sep"></div>
-        <a href="{{ url_for('usuarios') }}" class="nav-item" data-tip="Usuarios del sistema">
-            <i class="fas fa-users-gear"></i>
-        </a>
+        <a href="{{ url_for('usuarios') }}"     class="nav-item" data-tip="Usuarios del sistema"><i class="fas fa-users-gear"></i></a>
     </nav>
-    <div class="sidebar-bottom">
-        <a href="{{ url_for('logout') }}" class="btn-logout">
-            <i class="fas fa-right-from-bracket"></i>
-        </a>
-    </div>
+    <div class="sidebar-bottom"><a href="{{ url_for('logout') }}" class="btn-logout"><i class="fas fa-right-from-bracket"></i></a></div>
 </aside>
 
+<!-- ══════════ MAIN ══════════ -->
 <div class="main-content">
 
     <div class="topbar">
@@ -392,7 +180,7 @@
             <i class="fas fa-chevron-right"></i>
             <a href="{{ url_for('cotizaciones') }}">Cotizaciones</a>
             <i class="fas fa-chevron-right"></i>
-            <span class="cur">Registrar nueva</span>
+            <span class="cur">Nueva</span>
         </div>
         <a href="{{ url_for('cotizaciones') }}" class="btn-volver">
             <i class="fas fa-arrow-left"></i> Volver
@@ -405,11 +193,8 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}{% for category, message in messages %}
                     <div class="mensaje {{ category }}">
-                        {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
-                        {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
-                        {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
-                        {% else %}                      <i class="fas fa-circle-info"></i>
-                        {% endif %}
+                        {% if category == 'error' %}<i class="fas fa-circle-xmark"></i>
+                        {% else %}<i class="fas fa-circle-check"></i>{% endif %}
                         {{ message }}
                     </div>
                 {% endfor %}{% endif %}
@@ -429,20 +214,16 @@
             <form action="{{ url_for('nueva_cotizacion') }}" method="POST" id="formCot">
                 <div class="form-body">
 
-                    <div class="section-sep">
-                        <i class="fas fa-user-tag"></i> Cliente y orden vinculada
-                    </div>
+                    <!-- ── Cliente y orden ── -->
+                    <div class="section-sep"><i class="fas fa-user"></i> Cliente y orden</div>
 
                     <div class="grid-2">
                         <div class="input-group">
-                            <label>
-                                <i class="fas fa-user"></i> Cliente
-                                <span class="req">*</span>
-                            </label>
+                            <label><i class="fas fa-user"></i> Cliente <span class="req">*</span></label>
                             <div class="icon-wrap">
                                 <i class="fas fa-user field-icon"></i>
-                                <select name="cliente_id" required>
-                                    <option value="">— Selecciona un cliente —</option>
+                                <select name="cliente_id" id="cliente_id" required>
+                                    <option value="">— Selecciona —</option>
                                     {% for c in clientes %}
                                         <option value="{{ c.id }}">{{ c.nombre_completo }}</option>
                                     {% endfor %}
@@ -450,12 +231,11 @@
                                 <i class="fas fa-chevron-down select-arrow"></i>
                             </div>
                         </div>
-
                         <div class="input-group">
                             <label><i class="fas fa-clipboard-list"></i> Orden vinculada (opcional)</label>
                             <div class="icon-wrap">
                                 <i class="fas fa-clipboard-list field-icon"></i>
-                                <select name="orden_id">
+                                <select name="orden_id" id="orden_id">
                                     <option value="">— Sin vincular —</option>
                                     {% for o in ordenes %}
                                         <option value="{{ o.id }}">{{ o.folio }} · {{ o.nombre_cliente }}</option>
@@ -466,97 +246,97 @@
                         </div>
                     </div>
 
+                    <!-- ── Vigencia y descuento ── -->
+                    <div class="section-sep"><i class="fas fa-calendar-days"></i> Vigencia y descuento</div>
+
                     <div class="grid-2">
                         <div class="input-group">
-                            <label><i class="fas fa-calendar-days"></i> Válida hasta</label>
+                            <label><i class="fas fa-calendar-check"></i> Válida hasta</label>
                             <div class="icon-wrap">
-                                <i class="fas fa-calendar-days field-icon"></i>
-                                <input type="date" name="fecha_vencimiento">
+                                <i class="fas fa-calendar-check field-icon"></i>
+                                <input type="date" name="fecha_vencimiento" id="fecha_vencimiento">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label><i class="fas fa-percent"></i> Descuento ($)</label>
+                            <label><i class="fas fa-tag"></i> Descuento ($)</label>
                             <div class="icon-wrap">
-                                <i class="fas fa-dollar-sign field-icon"></i>
-                                <input type="number" id="descuento" name="descuento"
-                                       min="0" step="0.01" value="0" oninput="recalcularTotal()">
+                                <i class="fas fa-tag field-icon"></i>
+                                <input type="number" name="descuento" id="descuento"
+                                       min="0" step="0.01" value="0"
+                                       oninput="recalcularTotal()">
                             </div>
                         </div>
                     </div>
 
-                    <div class="section-sep">
-                        <i class="fas fa-list-check"></i> Conceptos / Servicios
-                    </div>
+                    <!-- ── Conceptos ── -->
+                    <div class="section-sep"><i class="fas fa-list-check"></i> Conceptos / Servicios</div>
 
-                    <div class="items-table-wrap">
+                    <div class="items-section">
                         <table class="items-table" id="itemsTable">
                             <thead>
                                 <tr>
-                                    <th style="width:45%">Descripción</th>
-                                    <th style="width:12%">Cant.</th>
-                                    <th style="width:18%">Precio unit.</th>
-                                    <th style="width:15%">Subtotal</th>
-                                    <th style="width:10%; text-align:center;">Acción</th>
+                                    <th style="width:44%; text-align:left;">Descripción</th>
+                                    <th style="width:13%">Cant.</th>
+                                    <th style="width:19%">Precio unit.</th>
+                                    <th style="width:16%">Subtotal</th>
+                                    <th style="width:8%"></th>
                                 </tr>
                             </thead>
                             <tbody id="itemsBody">
                                 <tr>
-                                    <td><input type="text" name="descripcion[]" placeholder="Ej. Mano de obra diagnóstico" required></td>
-                                    <td><input type="number" name="cantidad[]" value="1" min="0.01" step="0.01" oninput="recalcularFila(this)"></td>
-                                    <td><input type="number" name="precio_unitario[]" value="0" min="0" step="0.01" oninput="recalcularFila(this)"></td>
+                                    <td><input type="text"   name="descripcion[]"     placeholder="Ej. Mano de obra diagnóstico" required></td>
+                                    <td><input type="number" name="cantidad[]"         value="1"   min="0.01" step="0.01" oninput="recalcularFila(this)" style="text-align:right;"></td>
+                                    <td><input type="number" name="precio_unitario[]"  value="0"   min="0"    step="0.01" oninput="recalcularFila(this)" style="text-align:right;"></td>
                                     <td class="subtotal-cell">$0.00</td>
-                                    <td style="display:flex; justify-content:center;">
-                                        <button type="button" class="btn-remove-row" onclick="eliminarFila(this)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
+                                    <td><button type="button" class="btn-remove-row" onclick="eliminarFila(this)"><i class="fas fa-xmark"></i></button></td>
                                 </tr>
                             </tbody>
                         </table>
+
+                        <button type="button" class="btn-add-row" onclick="agregarFila()">
+                            <i class="fas fa-plus"></i> Agregar concepto
+                        </button>
+
+                        <!-- Totales -->
+                        <div class="totales-box">
+                            <div class="totales-row">
+                                <span class="lbl">Subtotal</span>
+                                <span class="val" id="resSubtotal">$0.00</span>
+                            </div>
+                            <div class="totales-row">
+                                <span class="lbl">Descuento</span>
+                                <span class="val" style="color:#c62828;" id="resDescuento">-$0.00</span>
+                            </div>
+                            <div class="totales-row total-final">
+                                <span class="lbl">Total</span>
+                                <span class="val" id="resTotal">$0.00</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <button type="button" class="btn-add-row" onclick="agregarFila()">
-                        <i class="fas fa-plus"></i> Agregar concepto
-                    </button>
-
-                    <div class="totales-box" id="totalesBox">
-                        <div class="totales-row">
-                            <span>Subtotal</span>
-                            <span id="resSubtotal">$0.00</span>
-                        </div>
-                        <div class="totales-row">
-                            <span>Descuento</span>
-                            <span id="resDescuento">-$0.00</span>
-                        </div>
-                        <div class="totales-row total-final">
-                            <span>Total</span>
-                            <span id="resTotal">$0.00</span>
-                        </div>
-                    </div>
-
-                    <div class="section-sep">
-                        <i class="fas fa-note-sticky"></i> Notas
-                    </div>
+                    <!-- ── Notas ── -->
+                    <div class="section-sep"><i class="fas fa-note-sticky"></i> Notas</div>
 
                     <div class="input-group">
-                        <label><i class="fas fa-comment-dots"></i> Notas para el cliente</label>
+                        <label><i class="fas fa-note-sticky"></i> Notas para el cliente</label>
                         <div class="icon-wrap ta-wrap">
-                            <i class="fas fa-comment-dots field-icon"></i>
-                            <textarea name="notas" rows="3"
+                            <i class="fas fa-note-sticky field-icon"></i>
+                            <textarea name="notas" id="notas" rows="3"
                                       placeholder="Condiciones, garantía, tiempo de entrega estimado…"></textarea>
                         </div>
                     </div>
-
                     <div class="input-group">
-                        <label><i class="fas fa-eye-slash"></i> Notas internas</label>
+                        <label><i class="fas fa-lock"></i> Notas internas</label>
                         <div class="icon-wrap ta-wrap">
-                            <i class="fas fa-eye-slash field-icon"></i>
-                            <textarea name="notas_internas" rows="2"
-                                      placeholder="Solo visibles para el personal del taller…"></textarea>
+                            <i class="fas fa-lock field-icon"></i>
+                            <textarea name="notas_internas" id="notas_internas" rows="2"
+                                      placeholder="Solo visibles para el taller…"></textarea>
                         </div>
                     </div>
 
-                </div><div class="form-footer">
+                </div><!-- /form-body -->
+
+                <div class="form-footer">
                     <a href="{{ url_for('cotizaciones') }}" class="btn-cancelar">
                         <i class="fas fa-xmark"></i> Cancelar
                     </a>
@@ -564,9 +344,12 @@
                         <i class="fas fa-floppy-disk"></i> Guardar cotización
                     </button>
                 </div>
-
             </form>
-        </div></div><footer class="main-footer">
+        </div>
+
+    </div><!-- /content-area -->
+
+    <footer class="main-footer">
         <div>
             <a href="#"><i class="fas fa-headset"></i> Soporte</a>
             <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
@@ -577,7 +360,10 @@
         </div>
     </footer>
 
-</div><script>
+</div>
+
+<script>
+// ── Toda la lógica original preservada ──────────────────────────────────────
 function recalcularFila(input) {
     const row  = input.closest('tr');
     const cant = parseFloat(row.querySelector('[name="cantidad[]"]').value)        || 0;
@@ -589,11 +375,10 @@ function recalcularFila(input) {
 function recalcularTotal() {
     let subtotal = 0;
     document.querySelectorAll('.subtotal-cell').forEach(c => {
-        subtotal += parseFloat(c.textContent.replace('$','')) || 0;
+        subtotal += parseFloat(c.textContent.replace('$', '')) || 0;
     });
     const descuento = parseFloat(document.getElementById('descuento').value) || 0;
     const total     = Math.max(subtotal - descuento, 0);
-    
     document.getElementById('resSubtotal').textContent  = '$' + subtotal.toFixed(2);
     document.getElementById('resDescuento').textContent = '-$' + descuento.toFixed(2);
     document.getElementById('resTotal').textContent     = '$' + total.toFixed(2);
@@ -603,30 +388,25 @@ function agregarFila() {
     const tbody = document.getElementById('itemsBody');
     const tr    = document.createElement('tr');
     tr.innerHTML = `
-        <td><input type="text" name="descripcion[]" placeholder="Concepto" required></td>
-        <td><input type="number" name="cantidad[]" value="1" min="0.01" step="0.01" oninput="recalcularFila(this)"></td>
-        <td><input type="number" name="precio_unitario[]" value="0" min="0" step="0.01" oninput="recalcularFila(this)"></td>
+        <td><input type="text"   name="descripcion[]"    placeholder="Concepto" required></td>
+        <td><input type="number" name="cantidad[]"        value="1" min="0.01" step="0.01" oninput="recalcularFila(this)" style="text-align:right;"></td>
+        <td><input type="number" name="precio_unitario[]" value="0" min="0"    step="0.01" oninput="recalcularFila(this)" style="text-align:right;"></td>
         <td class="subtotal-cell">$0.00</td>
-        <td style="display:flex; justify-content:center;">
-            <button type="button" class="btn-remove-row" onclick="eliminarFila(this)">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
+        <td><button type="button" class="btn-remove-row" onclick="eliminarFila(this)"><i class="fas fa-xmark"></i></button></td>
     `;
     tbody.appendChild(tr);
 }
 
 function eliminarFila(btn) {
     const tbody = document.getElementById('itemsBody');
-    if (tbody.rows.length <= 1) { 
-        alert('La cotización debe tener al menos un concepto.'); 
-        return; 
+    if (tbody.rows.length <= 1) {
+        alert('La cotización debe tener al menos un concepto.');
+        return;
     }
     btn.closest('tr').remove();
     recalcularTotal();
 }
 
-// Calcular al cargar
 recalcularTotal();
 </script>
 
