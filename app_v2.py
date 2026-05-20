@@ -209,6 +209,11 @@ def nuevo_cliente():
         if rfc and not re.match(r'^[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}$', rfc):
             flash('El RFC no tiene un formato válido (Ej. PERZ850101ABC)', 'error')
             return redirect(url_for('nuevo_cliente'))
+
+        #validar email (debe contener @ y un dominio válido)
+        if email and not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
+            flash('El correo electrónico no tiene un formato válido (Ej. nombre@correo.com)', 'error')
+            return redirect(url_for('nuevo_cliente'))
         
         conn = get_connection()
         cursor = conn.cursor()
@@ -260,6 +265,11 @@ def editar_cliente(cliente_id):
         if rfc and not re.match(r'^[A-Z]{3,4}[0-9]{6}[A-Z0-9]{3}$', rfc):
             flash('El RFC no tiene un formato válido (Ej. PERZ850101ABC)', 'error')
             return redirect(url_for('editar_cliente', cliente_id=cliente_id))
+
+        #validar email (debe contener @ y un dominio válido)
+        if email and not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
+            flash('El correo electrónico no tiene un formato válido (Ej. nombre@correo.com)', 'error')
+            return redirect(url_for('editar_cliente', cliente_id=cliente_id)) 
 
         cursor.execute("""
             UPDATE clientes SET
