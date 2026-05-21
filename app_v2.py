@@ -391,6 +391,11 @@ def nuevo_equipo():
             flash('El color solo debe contener letras', 'error')
             return redirect(url_for('nuevo_equipo'))
 
+        #validar que solo sean numeros y que sean maximo 10 digitos en el numero de serie
+        if numero_serie and not re.match(r'^\d{9,10}$', numero_serie):
+            flash('El número de serie debe contener entre 9 y 10 dígitos numéricos', 'error')
+            return redirect(url_for('nuevo_equipo'))
+
         cursor.execute("""
             INSERT INTO equipos
                 (cliente_id, tipo_equipo, marca, modelo, numero_serie, anio, color, descripcion)
@@ -446,6 +451,11 @@ def editar_equipo(equipo_id):
         # Validar color (solo letras, espacios, / y -)
         if color and not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\/\-]+$', color):
             flash('El color solo debe contener letras', 'error')
+            return redirect(url_for('editar_equipo', equipo_id=equipo_id))
+
+        #validar que solo sean numeros y que sean maximo 10 digitos en el numero de serie
+        if numero_serie and not re.match(r'^\d{9,10}$', numero_serie):
+            flash('El número de serie debe contener entre 9 y 10 dígitos numéricos', 'error')
             return redirect(url_for('editar_equipo', equipo_id=equipo_id))
 
         cursor.execute("""
