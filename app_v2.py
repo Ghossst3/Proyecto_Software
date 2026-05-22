@@ -1668,6 +1668,11 @@ def nuevo_usuario():
         if len(password) < 6:
             flash('La contraseña debe tener al menos 6 caracteres', 'error')
             return redirect(url_for('nuevo_usuario'))
+
+        #validar email (debe contener @ y un dominio válido)
+        if email and not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
+            flash('El correo electrónico no tiene un formato válido (Ej. nombre@correo.com)', 'error')
+            return redirect(url_for('nuevo_usuario'))
  
         # Verificar que el nombre de usuario no exista
         cursor.execute("SELECT id FROM usuarios WHERE nombre_usuario = %s", (nombre_usuario,))
@@ -1729,6 +1734,11 @@ def editar_usuario(user_id):
         """, (nombre_usuario, user_id))
         if cursor.fetchone():
             flash(f'El nombre de usuario "{nombre_usuario}" ya está en uso', 'error')
+            return redirect(url_for('editar_usuario', user_id=user_id))
+
+        #validar email (debe contener @ y un dominio válido)
+        if email and not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
+            flash('El correo electrónico no tiene un formato válido (Ej. nombre@correo.com)', 'error')
             return redirect(url_for('editar_usuario', user_id=user_id))
  
         cursor.execute("""
