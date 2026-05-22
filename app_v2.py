@@ -1223,10 +1223,12 @@ def cotizaciones():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
         SELECT c.*, cl.nombre_completo AS nombre_cliente,
-               u.nombre_completo AS creado_por_nombre
+               u.nombre_completo AS creado_por_nombre,
+               os.folio AS orden_folio
         FROM cotizaciones c
         JOIN clientes  cl ON c.cliente_id  = cl.id
         JOIN usuarios  u  ON c.creado_por  = u.id
+        LEFT JOIN ordenes_servicio os ON c.orden_id = os.id
         ORDER BY c.fecha_emision DESC
     """)
     lista = cursor.fetchall()
