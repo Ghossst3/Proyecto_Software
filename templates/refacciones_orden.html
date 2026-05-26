@@ -4,356 +4,522 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refacciones · {{ orden.folio }} · STIHL Workshop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box;
-            font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background-color:#f0f3f7; min-height:100vh; display:flex; flex-direction:column; }
-
-        .navbar {
-            background-color:#2d2d2d; color:white; padding:0.8rem 2rem;
-            display:flex; justify-content:space-between; align-items:center;
-            box-shadow:0 4px 10px rgba(0,0,0,0.2);
+        :root {
+            --orange:       #ff6600;
+            --orange-light: rgba(255,102,0,0.10);
+            --orange-mid:   rgba(255,102,0,0.18);
+            --dark:         #1e1e1e;
+            --sidebar-w:    268px;
+            --bg:           #f2f4f8;
+            --white:        #ffffff;
+            --border:       #e4e8ef;
+            --muted:        #8e9bb0;
+            --text:         #3a4557;
+            --text-light:   #6b7a92;
         }
-        .navbar .logo h1 { font-size:1.8rem; font-weight:600; }
-        .navbar .logo span { color:#ff6600; }
-        .user-area { display:flex; align-items:center; gap:20px; }
-        .user-greeting .name { font-weight:600; }
-        .user-greeting .role { font-size:0.8rem; color:#ccc; text-transform:uppercase; }
-        .btn-logout {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Barlow', sans-serif; background-color:var(--bg); min-height:100vh; display:flex; }
+
+        /* ══════════ SIDEBAR COMPLETA ══════════ */
+        .sidebar {
+            width:var(--sidebar-w); min-height:100vh; background-color:var(--dark);
+            display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100; overflow-y:auto;
         }
-        .btn-logout:hover { background-color:#ff6600; color:white; }
+        .sidebar-logo { padding:1.5rem 1.4rem 1.3rem; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:10px; }
+        .logo-icon-box { width:38px; height:38px; background-color:var(--orange); border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; flex-shrink:0; }
+        .logo-text-wrap .logo-name { font-family:'Barlow Condensed', sans-serif; font-size:1.3rem; font-weight:800; color:white; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1; }
+        .logo-text-wrap .logo-name span { color:var(--orange); }
+        .logo-text-wrap .logo-sub { font-size:0.62rem; color:rgba(255,255,255,0.35); font-weight:600; letter-spacing:1.1px; text-transform:uppercase; }
+        .sidebar-user { padding:1.3rem 1.4rem; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:11px; }
+        .user-avatar { width:42px; height:42px; background-color:var(--orange-mid); border:2px solid var(--orange); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--orange); font-size:1.05rem; flex-shrink:0; }
+        .user-name { font-weight:700; font-size:0.93rem; color:white; line-height:1.2; }
+        .user-role { font-size:0.7rem; color:var(--orange); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; }
+        .sidebar-nav { flex:1; padding:1.1rem 0.7rem; }
+        .nav-label { font-size:0.62rem; font-weight:700; color:rgba(255,255,255,0.28); text-transform:uppercase; letter-spacing:1.2px; padding:0.9rem 0.7rem 0.35rem; }
+        .nav-item { display:flex; align-items:center; gap:10px; padding:0.68rem 0.85rem; border-radius:9px; color:rgba(255,255,255,0.55); text-decoration:none; font-weight:500; font-size:0.9rem; transition:all 0.16s; margin-bottom:2px; }
+        .nav-item:hover  { background-color:rgba(255,255,255,0.07); color:white; }
+        .nav-item.active { background-color:var(--orange); color:white; font-weight:600; }
+        .nav-item .ni { width:18px; text-align:center; font-size:0.88rem; flex-shrink:0; }
+        .sidebar-bottom { padding:0.9rem 0.7rem 1.3rem; border-top:1px solid rgba(255,255,255,0.07); }
+        .btn-logout { display:flex; align-items:center; gap:9px; width:100%; padding:0.68rem 0.85rem; border-radius:9px; background-color:rgba(255,102,0,0.10); color:var(--orange); font-weight:600; font-size:0.88rem; text-decoration:none; border:1px solid rgba(255,102,0,0.20); transition:all 0.16s; cursor:pointer; }
+        .btn-logout:hover { background-color:var(--orange); color:white; border-color:var(--orange); }
 
-        .main-container { max-width:1100px; margin:2rem auto; padding:0 2rem; width:100%; flex:1; }
-
-        .breadcrumb { font-size:0.9rem; color:#6f7d8c; margin-bottom:1.5rem; }
-        .breadcrumb a { color:#ff6600; text-decoration:none; }
+        /* ══════════ MAIN ══════════ */
+        .main-content { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+        .topbar { background-color:var(--white); border-bottom:1px solid var(--border); padding:0.8rem 2rem; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:50; }
+        .breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.82rem; color:var(--muted); }
+        .breadcrumb a { color:var(--orange); text-decoration:none; font-weight:500; }
         .breadcrumb a:hover { text-decoration:underline; }
+        .breadcrumb .cur { color:var(--text); font-weight:600; }
+        .breadcrumb i { font-size:0.65rem; }
+        .topbar-right { font-size:0.8rem; color:var(--muted); display:flex; align-items:center; gap:6px; }
+        .content-area { padding:1.8rem 2rem; flex:1; }
 
-        /* Cabecera orden */
-        .orden-banner {
-            background:linear-gradient(135deg, #2d2d2d, #1a1a1a);
-            color:white; border-radius:20px; padding:1.5rem 2rem;
-            margin-bottom:1.5rem; display:flex;
-            justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
-        }
-        .orden-banner .folio { font-size:1.8rem; font-weight:800; color:#ff6600; }
-        .orden-banner .info  { font-size:0.9rem; color:#a0a0a0; margin-top:4px; }
-        .orden-banner .btn-volver {
-            background:transparent; border:2px solid #ff6600; color:#ff6600;
-            padding:0.5rem 1.2rem; border-radius:40px; font-weight:600;
-            font-size:0.9rem; text-decoration:none; transition:all 0.2s;
-        }
-        .orden-banner .btn-volver:hover { background:#ff6600; color:white; }
-
-        .layout { display:grid; grid-template-columns:1fr 1.6fr; gap:1.5rem; align-items:start; }
-
-        /* Formulario agregar */
-        .form-card {
-            background:white; border-radius:20px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.05); overflow:hidden;
-            position:sticky; top:1.5rem;
-        }
-        .form-header { background:#2d2d2d; padding:1.2rem 1.5rem; color:white; }
-        .form-header h3 { font-size:1.1rem; font-weight:600; }
-        .form-header p  { font-size:0.82rem; color:#a0a0a0; margin-top:3px; }
-        .form-body { padding:1.5rem; }
-
-        .input-group { margin-bottom:1rem; }
-        .input-group label {
-            display:block; font-size:0.82rem; font-weight:600; color:#2d3e50;
-            margin-bottom:5px; text-transform:uppercase; letter-spacing:0.3px;
-        }
-        .input-group input, .input-group select, .input-group textarea {
-            width:100%; padding:0.65rem 0.9rem; border:1px solid #d9e0e6;
-            border-radius:10px; font-size:0.92rem; background:#fafbfc;
-            transition:all 0.2s; outline:none;
-        }
-        .input-group input:focus, .input-group select:focus {
-            border-color:#ff6600; box-shadow:0 0 0 3px rgba(255,102,0,0.12); background:white;
-        }
-        .precio-preview {
-            background:#fff8f4; border:1px solid #ffd5b0; border-radius:10px;
-            padding:0.6rem 1rem; font-size:0.88rem; color:#e65100;
-            margin-top:0.5rem; display:none;
-        }
-        .btn-agregar {
-            width:100%; background:#ff6600; color:white; border:none;
-            padding:0.8rem; border-radius:40px; font-size:1rem; font-weight:600;
-            cursor:pointer; transition:all 0.2s; margin-top:0.5rem;
-            box-shadow:0 6px 15px rgba(255,102,0,0.35);
-        }
-        .btn-agregar:hover { background:#e65c00; transform:scale(1.02); }
-
-        /* Lista de refacciones usadas */
-        .lista-card {
-            background:white; border-radius:20px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.05); overflow:hidden;
-        }
-        .lista-header {
-            padding:1.2rem 1.5rem; border-bottom:2px solid #ff6600;
-            display:flex; justify-content:space-between; align-items:center;
-        }
-        .lista-header h3 { font-size:1.1rem; font-weight:600; color:#2d2d2d; }
-        .total-badge {
-            background:#ff6600; color:white; font-weight:700;
-            padding:0.3rem 1rem; border-radius:20px; font-size:0.9rem;
-        }
-
-        table { width:100%; border-collapse:collapse; }
-        thead th {
-            padding:0.8rem 1rem; text-align:left; font-size:0.78rem;
-            text-transform:uppercase; letter-spacing:0.4px; color:#6f7d8c;
-            border-bottom:1px solid #eaeef2; font-weight:600;
-        }
-        tbody tr { border-bottom:1px solid #eaeef2; transition:background 0.15s; }
-        tbody tr:hover { background:#fff8f4; }
-        tbody tr:last-child { border-bottom:none; }
-        td { padding:0.85rem 1rem; font-size:0.9rem; color:#3e4a5e; }
-
-        .ref-nombre { font-weight:600; color:#2d2d2d; display:block; }
-        .ref-codigo { font-size:0.78rem; color:#9aa9b7; }
-
-        .btn-eliminar-item {
-            background:#ffebee; color:#c62828; border:none;
-            padding:0.3rem 0.8rem; border-radius:20px; font-size:0.8rem;
-            font-weight:600; cursor:pointer; transition:all 0.2s;
-        }
-        .btn-eliminar-item:hover { background:#c62828; color:white; }
-
-        .empty-ref {
-            text-align:center; padding:2.5rem; color:#9aa9b7;
-        }
-        .empty-ref .icon { font-size:2.5rem; margin-bottom:0.5rem; }
-
-        /* Total final */
-        .total-row {
-            background:#f0f3f7; padding:1rem 1.5rem;
-            display:flex; justify-content:flex-end; align-items:center; gap:1rem;
-            border-top:2px solid #eaeef2;
-        }
-        .total-label { font-size:1rem; color:#6f7d8c; font-weight:500; }
-        .total-valor { font-size:1.4rem; font-weight:800; color:#ff6600; }
-
-        .mensaje {
-            padding:1rem 1.5rem; border-radius:12px; font-weight:500;
-            display:flex; align-items:center; gap:12px; border-left:5px solid;
-            background-color:white; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:1.5rem;
-        }
-        .mensaje.error   { border-left-color:#c62828; color:#c62828; }
+        /* Flash */
+        .mensaje { padding:0.8rem 1.2rem; border-radius:10px; font-weight:500; display:flex; align-items:center; gap:10px; border-left:4px solid; background-color:white; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:0.9rem; font-size:0.9rem; }
+        .mensaje.error   { border-left-color:#e53935; color:#e53935; }
         .mensaje.success { border-left-color:#2e7d32; color:#2e7d32; }
         .mensaje.warning { border-left-color:#e65100; color:#e65100; }
 
-        .dashboard-footer {
-            background-color:#2d2d2d; color:#a0a0a0; padding:1.5rem 2rem;
-            margin-top:3rem; display:flex; justify-content:space-between;
-            align-items:center; flex-wrap:wrap; gap:1rem;
+        /* ── Banner de la orden ── */
+        .orden-banner {
+            background:linear-gradient(135deg, var(--dark) 0%, #1a1a1a 100%);
+            color:white; border-radius:16px; padding:1.4rem 1.8rem;
+            margin-bottom:1.5rem;
+            display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:1rem; position:relative; overflow:hidden;
         }
-        .footer-links a { color:#ccc; text-decoration:none; margin-right:2rem; font-size:0.9rem; }
-        .footer-links a:hover { color:#ff6600; }
-        .footer-copy span { color:#ff6600; font-weight:600; }
+        .orden-banner::after { content:"STIHL"; position:absolute; right:1.4rem; bottom:-10px; font-family:'Barlow Condensed', sans-serif; font-size:4rem; font-weight:800; color:rgba(255,102,0,0.07); letter-spacing:4px; pointer-events:none; }
+        .banner-folio { font-family:'Barlow Condensed', sans-serif; font-size:2rem; font-weight:800; color:var(--orange); line-height:1; }
+        .banner-info { font-size:0.84rem; color:rgba(255,255,255,0.55); margin-top:5px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+        .banner-info i { font-size:0.72rem; color:rgba(255,255,255,0.3); }
+        .btn-volver-orden { display:inline-flex; align-items:center; gap:7px; padding:0.5rem 1.1rem; border-radius:9px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.8); font-weight:600; font-size:0.85rem; text-decoration:none; transition:all 0.16s; font-family:'Barlow', sans-serif; }
+        .btn-volver-orden:hover { background:rgba(255,102,0,0.2); border-color:var(--orange); color:white; }
 
-        @media(max-width:800px) { .layout { grid-template-columns:1fr; } }
+        /* ── Layout 2 columnas ── */
+        .layout { display:grid; grid-template-columns:300px 1fr; gap:1.4rem; align-items:start; }
+
+        /* ══════════ FORM CARD (sticky) ══════════ */
+        .form-card {
+            background:var(--white); border-radius:16px;
+            border:1px solid var(--border); box-shadow:0 2px 10px rgba(0,0,0,0.05);
+            overflow:hidden; position:sticky; top:72px;
+        }
+        .form-card-header { background:linear-gradient(135deg, var(--dark) 0%, #2a2a2a 100%); padding:1.1rem 1.4rem; display:flex; align-items:center; gap:10px; }
+        .form-header-icon { width:34px; height:34px; background-color:var(--orange); border-radius:9px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.88rem; flex-shrink:0; }
+        .form-card-header h3 { font-family:'Barlow Condensed', sans-serif; font-size:1.1rem; font-weight:800; color:white; text-transform:uppercase; letter-spacing:0.4px; }
+        .form-card-header p { font-size:0.76rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+        .form-body { padding:1.3rem; }
+
+        .input-group { margin-bottom:1rem; }
+        .input-group label { display:flex; align-items:center; gap:5px; font-size:0.7rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .input-group label i { color:var(--muted); font-size:0.65rem; }
+        .input-group label .req { color:var(--orange); font-size:0.82rem; }
+
+        .input-group input, .input-group select { width:100%; padding:0.6rem 0.9rem; border:1px solid var(--border); border-radius:9px; font-size:0.9rem; font-family:'Barlow', sans-serif; color:var(--text); background-color:var(--bg); outline:none; transition:border-color 0.18s, box-shadow 0.18s, background 0.18s; }
+        .input-group input:focus, .input-group select:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,102,0,0.10); background-color:white; }
+        .input-group input::placeholder { color:var(--muted); }
+        .input-group select { cursor:pointer; appearance:none; }
+
+        .icon-wrap { position:relative; }
+        .icon-wrap .field-icon { position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:0.76rem; pointer-events:none; }
+        .icon-wrap input, .icon-wrap select { padding-left:2.2rem; }
+        .select-arrow { position:absolute; right:0.85rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:0.7rem; pointer-events:none; }
+
+        /* Preview precio/stock */
+        .precio-preview {
+            background:#fffbf5; border:1px solid rgba(255,102,0,0.2);
+            border-radius:9px; padding:0.55rem 0.85rem;
+            font-size:0.82rem; color:#e65100; margin-top:0.4rem;
+            display:none; align-items:center; gap:6px;
+        }
+        .precio-preview i { font-size:0.75rem; flex-shrink:0; }
+
+        /* Subtotal preview */
+        .subtotal-preview {
+            background:#e8f5e9; border:1px solid #a5d6a7;
+            border-radius:9px; padding:0.55rem 0.85rem;
+            font-size:0.85rem; color:#2e7d32; margin-bottom:0.8rem;
+            display:flex; align-items:center; gap:6px;
+        }
+        .subtotal-preview i { font-size:0.75rem; flex-shrink:0; }
+
+        .btn-agregar { width:100%; background:var(--orange); color:white; border:none; padding:0.72rem; border-radius:10px; font-size:0.92rem; font-weight:700; cursor:pointer; font-family:'Barlow', sans-serif; box-shadow:0 4px 14px rgba(255,102,0,0.35); transition:background 0.18s, transform 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-agregar:hover { background:#e65c00; transform:translateY(-1px); }
+
+        /* ══════════ LISTA DE REFACCIONES ══════════ */
+        .lista-card { background:var(--white); border-radius:16px; border:1px solid var(--border); box-shadow:0 2px 10px rgba(0,0,0,0.04); overflow:hidden; }
+        .lista-header { padding:1.1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:#fafbfc; }
+        .lista-header-left { display:flex; align-items:center; gap:9px; }
+        .lista-icon { width:30px; height:30px; background-color:var(--orange-light); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--orange); font-size:0.82rem; }
+        .lista-header h3 { font-family:'Barlow Condensed', sans-serif; font-size:1rem; font-weight:800; color:var(--dark); text-transform:uppercase; letter-spacing:0.3px; }
+        .count-badge { background-color:var(--orange-light); color:var(--orange); font-weight:700; font-size:0.78rem; padding:0.18rem 0.6rem; border-radius:20px; font-family:'Barlow Condensed', sans-serif; }
+
+        table { width:100%; border-collapse:collapse; }
+        thead th { padding:0.75rem 1.1rem; text-align:left; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; background-color:#fafbfc; border-bottom:1px solid var(--border); white-space:nowrap; }
+        tbody tr { border-bottom:1px solid var(--border); transition:background 0.12s; }
+        tbody tr:last-child { border-bottom:none; }
+        tbody tr:hover { background-color:#fafbfc; }
+        td { padding:0.85rem 1.1rem; font-size:0.88rem; color:var(--text); vertical-align:middle; }
+
+        .ref-nombre { font-weight:700; color:var(--dark); font-size:0.9rem; display:block; }
+        .ref-codigo { font-family:'Courier New', monospace; font-size:0.76rem; color:var(--muted); background:var(--bg); padding:0.1rem 0.45rem; border-radius:5px; border:1px solid var(--border); display:inline-block; margin-top:2px; }
+        .ref-notas  { font-size:0.78rem; color:var(--text-light); display:flex; align-items:center; gap:4px; margin-top:3px; }
+
+        .cant-cell  { font-weight:600; color:var(--dark); white-space:nowrap; }
+        .price-cell { color:var(--text-light); font-size:0.86rem; }
+        .total-cell { font-family:'Barlow Condensed', sans-serif; font-size:1rem; font-weight:800; color:var(--dark); }
+
+        .btn-quitar { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; background:#ffebee; color:#c62828; border:none; cursor:pointer; transition:all 0.16s; }
+        .btn-quitar:hover { background:#c62828; color:white; }
+
+        /* Total final */
+        .total-row { background:#fafbfc; padding:1rem 1.5rem; display:flex; justify-content:flex-end; align-items:center; gap:1rem; border-top:2px solid var(--orange); }
+        .total-label { font-size:0.85rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.4px; }
+        .total-valor { font-family:'Barlow Condensed', sans-serif; font-size:1.6rem; font-weight:800; color:var(--orange); }
+
+        /* Empty state */
+        .empty-ref { text-align:center; padding:3rem 1.5rem; color:var(--muted); }
+        .empty-ref i { font-size:2rem; display:block; margin-bottom:0.6rem; opacity:0.35; }
+        .empty-ref p { font-size:0.9rem; }
+
+        /* Footer */
+        .main-footer { background-color:var(--white); border-top:1px solid var(--border); padding:0.9rem 2rem; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--muted); }
+        .main-footer a { color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:5px; margin-right:1.2rem; transition:color 0.14s; }
+        .main-footer a:hover { color:var(--orange); }
+        .main-footer .brand { color:var(--orange); font-weight:700; }
+
+        @media (max-width: 1400px) {
+            :root { --sidebar-w: 220px; }
+
+            .logo-text-wrap .logo-name { font-size: 1.1rem; }
+            .nav-item { font-size: 0.83rem; padding: 0.6rem 0.75rem; }
+            .user-name { font-size: 0.85rem; }
+            .content-area { padding: 1.4rem 1.5rem; }
+            .topbar { padding: 0.7rem 1.5rem; }
+            .sidebar-logo { padding: 1rem 1.2rem; }
+            .sidebar-user { padding: 0.9rem 1.2rem; }
+            .sidebar-nav  { padding: 0.7rem 0.5rem; }
+            .nav-label    { padding: 0.6rem 0.7rem 0.25rem; }
+            .sidebar-bottom { padding: 0.6rem 0.5rem 0.9rem; }
+        }
+
+        /* Responsive */
+        @media (max-width:860px) {
+            .sidebar { width:60px; }
+            .logo-text-wrap, .user-name, .user-role, .nav-item span, .nav-label, .btn-logout span { display:none; }
+            .sidebar-user { justify-content:center; }
+            .nav-item { justify-content:center; padding:0.72rem; }
+            .btn-logout { justify-content:center; }
+            .main-content { margin-left:60px; }
+        }
+        @media (max-width:800px) { .layout { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo"><h1>STIHL <span>Workshop</span></h1></div>
-    <div class="user-area">
-        <div class="user-greeting">
-            <div class="name">{{ nombre }}</div>
-            <div class="role">{{ rol }}</div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <img src="{{ url_for('static', filename='White logo - no background.png') }}" 
+             alt="Equipos berlin" 
+             style="width:130px; height:auto; display:block; margin-right: 25px; padding: 0rem 0;">
     </div>
-</div>
-
-<div class="main-container">
-
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a> ›
-        <a href="{{ url_for('ordenes') }}">Órdenes</a> ›
-        <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}">{{ orden.folio }}</a> ›
-        Refacciones usadas
-    </div>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-            <div class="mensaje {{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
-
-    <!-- Banner de la orden -->
-    <div class="orden-banner">
+    <div class="sidebar-user">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
         <div>
-            <div class="folio">{{ orden.folio }}</div>
-            <div class="info">
-                👥 {{ orden.nombre_cliente }} &nbsp;·&nbsp;
-                🔧 {{ orden.tipo_equipo }} {{ orden.marca }} {{ orden.modelo or '' }}
-            </div>
+            <div class="user-name">{{ nombre }}</div>
+            <div class="user-role">{{ rol }}</div>
         </div>
-        <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}" class="btn-volver">
-            ← Volver a la orden
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <i class="fas fa-house ni"></i><span>Inicio</span>
+        </a>
+        <div class="nav-label">Módulos</div>
+        <a href="{{ url_for('ordenes') }}" class="nav-item active">
+            <i class="fas fa-clipboard-list ni"></i><span>Órdenes de servicio</span>
+        </a>
+        <a href="{{ url_for('clientes') }}" class="nav-item">
+            <i class="fas fa-address-book ni"></i><span>Clientes</span>
+        </a>
+        <a href="{{ url_for('equipos') }}" class="nav-item">
+            <i class="fas fa-toolbox ni"></i><span>Equipos</span>
+        </a>
+        <a href="{{ url_for('refacciones') }}" class="nav-item">
+            <i class="fas fa-gears ni"></i><span>Refacciones</span>
+        </a>
+        <a href="{{ url_for('cotizaciones') }}" class="nav-item">
+            <i class="fas fa-file-invoice-dollar ni"></i><span>Cotizaciones</span>
+        </a>
+        <a href="{{ url_for('reportes') }}" class="nav-item">
+            <i class="fas fa-chart-column ni"></i><span>Reportes</span>
+        </a>
+        <div class="nav-label">Administración</div>
+        <a href="{{ url_for('usuarios') }}" class="nav-item">
+            <i class="fas fa-users-gear ni"></i><span>Usuarios del sistema</span>
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i><span>Cerrar sesión</span>
         </a>
     </div>
+</aside>
 
-    <div class="layout">
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-content">
 
-        <!-- ── Formulario agregar refaccion ── -->
-        <div class="form-card">
-            <div class="form-header">
-                <h3>➕ Agregar refacción</h3>
-                <p>Solo se muestran refacciones con stock disponible.</p>
-            </div>
-            <div class="form-body">
-                <form action="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" method="POST">
-
-                    <div class="input-group">
-                        <label for="refaccion_id">Refacción *</label>
-                        <select id="refaccion_id" name="refaccion_id" required
-                                onchange="actualizarPrecio(this)">
-                            <option value="">— Selecciona —</option>
-                            {% for r in refacciones_disponibles %}
-                            <option value="{{ r.id }}"
-                                    data-precio="{{ r.precio_venta }}"
-                                    data-stock="{{ r.stock_actual }}"
-                                    data-unidad="{{ r.unidad }}">
-                                {{ r.nombre }}
-                                ({{ r.codigo }}) · Stock: {{ r.stock_actual }} {{ r.unidad }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="precio-preview" id="precioPreview"></div>
-
-                    <div class="input-group">
-                        <label for="cantidad">Cantidad *</label>
-                        <input type="number" id="cantidad" name="cantidad"
-                               min="1" value="1" required
-                               oninput="calcularSubtotal()">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="precio_unitario">Precio unitario ($) *</label>
-                        <input type="number" id="precio_unitario" name="precio_unitario"
-                               min="0" step="0.01" required
-                               oninput="calcularSubtotal()">
-                    </div>
-
-                    <div class="precio-preview" id="subtotalPreview" style="display:block; background:#e8f5e9; border-color:#a5d6a7; color:#2e7d32;">
-                        Subtotal: <strong id="subtotalValor">$0.00</strong>
-                    </div>
-
-                    <div class="input-group" style="margin-top:1rem;">
-                        <label for="notas">Notas (opcional)</label>
-                        <input type="text" id="notas" name="notas"
-                               placeholder="Ej. Instalada en carburador principal">
-                    </div>
-
-                    <button type="submit" class="btn-agregar">Agregar a la orden →</button>
-                </form>
-            </div>
+    <div class="topbar">
+        <div class="breadcrumb">
+            <i class="fas fa-house"></i>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{{ url_for('ordenes') }}">Órdenes</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}">{{ orden.folio }}</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="cur">Refacciones</span>
         </div>
-
-        <!-- ── Lista de refacciones usadas ── -->
-        <div class="lista-card">
-            <div class="lista-header">
-                <h3>🔩 Refacciones utilizadas</h3>
-                <span class="total-badge">{{ items_actuales | length }} pieza(s)</span>
-            </div>
-
-            {% if items_actuales %}
-            <div style="overflow-x:auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Refacción</th>
-                            <th>Cant.</th>
-                            <th>Precio unit.</th>
-                            <th>Subtotal</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items_actuales %}
-                        <tr>
-                            <td>
-                                <span class="ref-nombre">{{ item.nombre_refaccion }}</span>
-                                <span class="ref-codigo">{{ item.codigo }}</span>
-                                {% if item.notas %}
-                                    <span style="font-size:0.78rem; color:#9aa9b7; display:block;">
-                                        📝 {{ item.notas }}
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td>{{ item.cantidad }} {{ item.unidad }}</td>
-                            <td>${{ '%.2f' % item.precio_unitario }}</td>
-                            <td style="font-weight:700; color:#2d2d2d;">
-                                ${{ '%.2f' % item.subtotal }}
-                            </td>
-                            <td>
-                                <form method="POST"
-                                      action="{{ url_for('eliminar_refaccion_orden', item_id=item.id) }}"
-                                      onsubmit="return confirm('¿Quitar esta refacción? El stock será restaurado.')">
-                                    <button type="submit" class="btn-eliminar-item">Quitar</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="total-row">
-                <span class="total-label">Total en refacciones:</span>
-                <span class="total-valor">${{ '%.2f' % total_refacciones }}</span>
-            </div>
-            {% else %}
-            <div class="empty-ref">
-                <div class="icon">🔩</div>
-                <p>Aún no se han agregado refacciones a esta orden.</p>
-            </div>
-            {% endif %}
+        <div class="topbar-right">
+            <i class="fas fa-calendar-days"></i>
+            <span id="date-label"></span>
         </div>
-
     </div>
-</div>
 
-<div class="dashboard-footer">
-    <div class="footer-links"><a href="#">SOPORTE TÉCNICO</a><a href="#">CONTACTO</a></div>
-    <div class="footer-copy">© Acceso Seguro <span>STIHL Digital</span></div>
-</div>
+    <div class="content-area">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="mensaje {{ category }}">
+                    {% if category == 'error' %}   <i class="fas fa-circle-xmark"></i>
+                    {% elif category == 'success' %}<i class="fas fa-circle-check"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-triangle-exclamation"></i>
+                    {% else %}                      <i class="fas fa-circle-info"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <!-- ── Banner de la orden ── -->
+        <div class="orden-banner">
+            <div>
+                <div class="banner-folio">{{ orden.folio }}</div>
+                <div class="banner-info">
+                    <i class="fas fa-user"></i> {{ orden.nombre_cliente }}
+                    <span style="color:rgba(255,255,255,0.2)">·</span>
+                    <i class="fas fa-toolbox"></i> {{ orden.tipo_equipo }} {{ orden.marca }} {{ orden.modelo or '' }}
+                </div>
+            </div>
+            <a href="{{ url_for('detalle_orden', orden_id=orden.id) }}" class="btn-volver-orden">
+                <i class="fas fa-arrow-left"></i> Volver a la orden
+            </a>
+        </div>
+
+        <!-- ── Layout: form + lista ── -->
+        <div class="layout">
+
+            <!-- ── Formulario agregar refacción ── -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-header-icon"><i class="fas fa-plus"></i></div>
+                    <div>
+                        <h3>Agregar refacción</h3>
+                        <p>Solo con stock disponible.</p>
+                    </div>
+                </div>
+                <div class="form-body">
+                    <form action="{{ url_for('agregar_refaccion_orden', orden_id=orden.id) }}" method="POST">
+
+                        <div class="input-group">
+                            <label>
+                                <i class="fas fa-gears"></i> Refacción
+                                <span class="req">*</span>
+                            </label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-gears field-icon"></i>
+                                <select name="refaccion_id" id="refaccion_id" required
+                                        onchange="actualizarPrecio(this)">
+                                    <option value="">— Selecciona —</option>
+                                    {% for r in refacciones_disponibles %}
+                                    <option value="{{ r.id }}"
+                                            data-precio="{{ r.precio_venta }}"
+                                            data-stock="{{ r.stock_actual }}"
+                                            data-unidad="{{ r.unidad }}">
+                                        {{ r.nombre }} ({{ r.codigo }}) · Stock: {{ r.stock_actual }} {{ r.unidad }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow"></i>
+                            </div>
+                            <!-- Preview precio / stock -->
+                            <div class="precio-preview" id="precioPreview">
+                                <i class="fas fa-circle-info"></i>
+                                <span id="precioPreviewText"></span>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                <i class="fas fa-hashtag"></i> Cantidad
+                                <span class="req">*</span>
+                            </label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-hashtag field-icon"></i>
+                                <input type="number" id="cantidad" name="cantidad"
+                                       min="1" value="1" required
+                                       oninput="calcularSubtotal()">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                <i class="fas fa-dollar-sign"></i> Precio unitario ($)
+                                <span class="req">*</span>
+                            </label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-dollar-sign field-icon"></i>
+                                <input type="number" id="precio_unitario" name="precio_unitario"
+                                       min="0" step="0.01" required
+                                       oninput="calcularSubtotal()">
+                            </div>
+                        </div>
+
+                        <!-- Subtotal calculado -->
+                        <div class="subtotal-preview">
+                            <i class="fas fa-calculator"></i>
+                            Subtotal: <strong id="subtotalValor">$0.00</strong>
+                        </div>
+
+                        <div class="input-group">
+                            <label><i class="fas fa-note-sticky"></i> Notas (opcional)</label>
+                            <div class="icon-wrap">
+                                <i class="fas fa-note-sticky field-icon"></i>
+                                <input type="text" id="notas" name="notas"
+                                       placeholder="Ej. Instalada en carburador principal">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-agregar">
+                            <i class="fas fa-plus"></i> Agregar a la orden
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── Lista de refacciones usadas ── -->
+            <div class="lista-card">
+                <div class="lista-header">
+                    <div class="lista-header-left">
+                        <div class="lista-icon"><i class="fas fa-gears"></i></div>
+                        <h3>Refacciones utilizadas</h3>
+                    </div>
+                    <span class="count-badge">{{ items_actuales | length }} pieza(s)</span>
+                </div>
+
+                {% if items_actuales %}
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Refacción</th>
+                                <th>Cant.</th>
+                                <th>Precio unit.</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items_actuales %}
+                            <tr>
+                                <td>
+                                    <span class="ref-nombre">{{ item.nombre_refaccion }}</span>
+                                    <span class="ref-codigo">{{ item.codigo }}</span>
+                                    {% if item.notas %}
+                                    <span class="ref-notas">
+                                        <i class="fas fa-note-sticky" style="font-size:0.68rem;"></i>
+                                        {{ item.notas }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="cant-cell">
+                                        {{ item.cantidad }} {{ item.unidad }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="price-cell">${{ '%.2f' % item.precio_unitario }}</span>
+                                </td>
+                                <td>
+                                    <span class="total-cell">${{ '%.2f' % item.subtotal }}</span>
+                                </td>
+                                <td>
+                                    <form method="POST"
+                                          action="{{ url_for('eliminar_refaccion_orden', item_id=item.id) }}"
+                                          onsubmit="return confirm('¿Quitar esta refacción? El stock será restaurado.')">
+                                        <button type="submit" class="btn-quitar" title="Quitar refacción">
+                                            <i class="fas fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-row">
+                    <span class="total-label">Total en refacciones</span>
+                    <span class="total-valor">${{ '%.2f' % total_refacciones }}</span>
+                </div>
+                {% else %}
+                <div class="empty-ref">
+                    <i class="fas fa-gears"></i>
+                    <p>Aún no se han agregado refacciones a esta orden.</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div><!-- /layout -->
+
+    </div><!-- /content-area -->
+
+    <footer class="main-footer">
+        <div>
+            <a href="#"><i class="fas fa-headset"></i> Soporte</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <div>
+            <i class="fas fa-lock" style="margin-right:4px;opacity:.6;"></i>
+            © Acceso seguro &nbsp;·&nbsp; <span class="brand">STIHL Digital</span>
+        </div>
+    </footer>
+
+</div><!-- /main-content -->
 
 <script>
-function actualizarPrecio(select) {
-    const opt     = select.options[select.selectedIndex];
-    const precio  = opt.dataset.precio || 0;
-    const stock   = opt.dataset.stock  || 0;
-    const unidad  = opt.dataset.unidad || '';
-    const preview = document.getElementById('precioPreview');
-    const inputPrecio = document.getElementById('precio_unitario');
-    const inputCant   = document.getElementById('cantidad');
+    const d = new Date();
+    document.getElementById('date-label').textContent =
+        d.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-    if (select.value) {
-        inputPrecio.value = parseFloat(precio).toFixed(2);
-        inputCant.max     = stock;
-        preview.style.display = 'block';
-        preview.textContent   = `Precio sugerido: $${parseFloat(precio).toFixed(2)} · Stock disponible: ${stock} ${unidad}`;
-        calcularSubtotal();
-    } else {
-        preview.style.display = 'none';
-        inputPrecio.value = '';
+    /* Toda la lógica JS original preservada */
+    function actualizarPrecio(select) {
+        const opt        = select.options[select.selectedIndex];
+        const precio     = opt.dataset.precio  || 0;
+        const stock      = opt.dataset.stock   || 0;
+        const unidad     = opt.dataset.unidad  || '';
+        const preview    = document.getElementById('precioPreview');
+        const inputPrecio = document.getElementById('precio_unitario');
+        const inputCant   = document.getElementById('cantidad');
+
+        if (select.value) {
+            inputPrecio.value     = parseFloat(precio).toFixed(2);
+            inputCant.max         = stock;
+            preview.style.display = 'flex';
+            document.getElementById('precioPreviewText').textContent =
+                `Precio sugerido: $${parseFloat(precio).toFixed(2)} · Stock disponible: ${stock} ${unidad}`;
+            calcularSubtotal();
+        } else {
+            preview.style.display = 'none';
+            inputPrecio.value = '';
+        }
     }
-}
 
-function calcularSubtotal() {
-    const cant   = parseFloat(document.getElementById('cantidad').value) || 0;
-    const precio = parseFloat(document.getElementById('precio_unitario').value) || 0;
-    document.getElementById('subtotalValor').textContent = '$' + (cant * precio).toFixed(2);
-}
+    function calcularSubtotal() {
+        const cant   = parseFloat(document.getElementById('cantidad').value)         || 0;
+        const precio = parseFloat(document.getElementById('precio_unitario').value)  || 0;
+        document.getElementById('subtotalValor').textContent = '$' + (cant * precio).toFixed(2);
+    }
 </script>
 </body>
 </html>
